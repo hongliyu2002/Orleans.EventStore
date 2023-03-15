@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PackageId>Orleans.EventSourcing.EventStore</PackageId>
+        <Title>EventStore for Microsoft Orleans Event-Sourcing</Title>
+        <Description>EventStore Grpc client implementation of LogConsistencyProvider for Microsoft Orleans Event-Sourcing</Description>
+        <Version>7.1.0</Version>
+        <AssemblyVersion>7.1.0.0</AssemblyVersion>
+        <FileVersion>7.1.0.0</FileVersion>
+        <Authors>Leo Hong</Authors>
+        <Copyright>Copyright 2023 (c) Leo Hong. All rights reserved.</Copyright>
+        <RepositoryUrl>https://github.com/hongliyu2002/Orleans.EventSourcing.EventStore</RepositoryUrl>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>Result;Results;ResultPattern;Orleans;ExceptionHandling;ErrorHandling;Actor</PackageTags>
+        <PackageProjectUrl>https://github.com/hongliyu2002/Orleans.EventSourcing.EventStore</PackageProjectUrl>
+        <PackageIcon>logo_128.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <!--SourceLink-->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <OrleansBuildTimeCodeGen>true</OrleansBuildTimeCodeGen>
+        <RootNamespace>Orleans.EventSourcing</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="EventStore.Client.Grpc.Streams" Version="22.0.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.22.1" />
+        <PackageReference Include="Grpc.Core.Api" Version="2.51.0" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.51.0" />
+        <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.1.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\resources\icons\logo_128.png" Pack="true" PackagePath="">
+            <Link>logo_128.png</Link>
+        </None>
+        <None Include="..\..\README.md" Pack="true" PackagePath="">
+            <Link>README.md</Link>
+        </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Folder Include="Hosting" />
+    </ItemGroup>
+
+</Project>

@@ -27,15 +27,17 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <OrleansBuildTimeCodeGen>true</OrleansBuildTimeCodeGen>
-        <RootNamespace>Orleans.EventSourcing</RootNamespace>
+        <RootNamespace>Orleans.EventSourcing.EventStore</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="DeepCloner" Version="0.10.4" />
         <PackageReference Include="EventStore.Client.Grpc.Streams" Version="22.0.0" />
         <PackageReference Include="Google.Protobuf" Version="3.22.1" />
         <PackageReference Include="Grpc.Core.Api" Version="2.51.0" />
         <PackageReference Include="Grpc.Net.Client" Version="2.51.0" />
         <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.1.0" />
+        <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.1.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
         <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     </ItemGroup>
@@ -48,7 +50,7 @@
             <Link>README.md</Link>
         </None>
     </ItemGroup>
-    
+
     <ItemGroup>
         <Folder Include="Hosting" />
     </ItemGroup>

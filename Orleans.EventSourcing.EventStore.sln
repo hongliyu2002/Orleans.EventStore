@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "icons", "icons", "{A81E18C8
 		resources\icons\logo_128.png = resources\icons\logo_128.png
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.UnitTests", "tests\EventStore.UnitTests\EventStore.UnitTests.csproj", "{6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,9 +27,14 @@ Global
 		{001D97C7-6E25-47C4-9AB1-9469E45C0D26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{001D97C7-6E25-47C4-9AB1-9469E45C0D26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{001D97C7-6E25-47C4-9AB1-9469E45C0D26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{001D97C7-6E25-47C4-9AB1-9469E45C0D26} = {31C4AB96-B3CE-4EA6-802B-CF8268415146}
 		{A81E18C8-5B22-40B4-98B2-E2EC01DA5B03} = {6459E4B4-E0F4-4EF3-9E36-3519AADD9984}
+		{6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F} = {8E05DFCF-813B-458F-A429-D8BBA1B1ADF4}
 	EndGlobalSection
 EndGlobal

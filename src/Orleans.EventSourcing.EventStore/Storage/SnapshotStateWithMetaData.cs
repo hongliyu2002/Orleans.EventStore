@@ -18,7 +18,6 @@ public sealed class SnapshotStateWithMetaDataAndETag<TView> : IGrainState<Snapsh
     public SnapshotStateWithMetaDataAndETag()
     {
         State = new SnapshotStateWithMetaData<TView>();
-        ETag = string.Empty;
     }
 
     /// <summary>
@@ -28,12 +27,11 @@ public sealed class SnapshotStateWithMetaDataAndETag<TView> : IGrainState<Snapsh
     public SnapshotStateWithMetaDataAndETag(TView initialView)
     {
         State = new SnapshotStateWithMetaData<TView>(initialView);
-        ETag = string.Empty;
     }
 
     /// <inheritdoc />
     [Id(0)]
-    public string ETag { get; set; }
+    public string ETag { get; set; } = null!;
 
     /// <inheritdoc />
     [Id(1)]

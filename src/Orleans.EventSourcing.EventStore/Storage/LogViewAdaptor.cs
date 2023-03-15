@@ -11,8 +11,8 @@ namespace Orleans.EventSourcing.EventStore;
 ///     A log view adaptor that wraps around a traditional storage adaptor, and uses batching and e-tags
 ///     to append entries.
 ///     <para>
-///         The log itself is transient, i.e. not actually saved to storage - only the latest view and some
-///         metadata (the log position, and write flags) are stored.
+///         The log itself is actually saved to storage - the latest view and some
+///         metadata (the log position, and write flags) and log entries are all stored.
 ///     </para>
 /// </summary>
 /// <typeparam name="TLogView">Type of log view</typeparam>
@@ -26,12 +26,12 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
     private readonly ILogConsistentStorage _logStorage;
 
     private SnapshotStateWithMetaDataAndETag<TLogView> _globalSnapshot;
-    private TLogView _confirmedView;
+    private TLogView _confirmedView = null!;
     private int _confirmedVersion;
     private int _globalVersion;
 
     /// <summary>
-    ///     Initialize a StorageProviderLogViewAdaptor class
+    ///     Initializes a new instance of LogViewAdaptor class
     /// </summary>
     public LogViewAdaptor(ILogViewAdaptorHost<TLogView, TLogEntry> host, TLogView initialState, IGrainStorage grainStorage, string grainTypeName, ILogConsistencyProtocolServices services, ILogConsistentStorage logStorage)
         : base(host, initialState, services)
@@ -71,6 +71,12 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
         return _logStorage.ReadAsync<TLogEntry>(_grainTypeName, Services.GrainId, fromVersion, length);
     }
 
+    /// <inheritdoc />
+    protected override SubmissionEntry<TLogEntry> MakeSubmissionEntry(TLogEntry entry)
+    {
+        return new SubmissionEntry<TLogEntry> { Entry = entry };
+    }
+
     private void UpdateConfirmedView(IReadOnlyList<TLogEntry> logEntries)
     {
         foreach (var logEntry in logEntries)
@@ -86,6 +92,8 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
         }
         _confirmedVersion += logEntries.Count;
     }
+
+    #region Read & Write
 
     /// <inheritdoc />
     protected override async Task ReadAsync()
@@ -109,7 +117,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
                     _globalVersion = await _logStorage.GetLastVersionAsync(_grainTypeName, Services.GrainId);
                     if (_confirmedVersion < _globalVersion)
                     {
-                        var logEntries = await _logStorage.ReadAsync<TLogEntry>(_grainTypeName, Services.GrainId, _confirmedVersion, _globalVersion - _confirmedVersion);
+                        var logEntries = await RetrieveLogSegment(_confirmedVersion, _globalVersion - _confirmedVersion);
                         Services.Log(LogLevel.Debug, "read success {0}", logEntries);
                         UpdateConfirmedView(logEntries);
                     }
@@ -136,8 +144,8 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
     {
         enter_operation("WriteAsync");
         var updates = GetCurrentBatchOfUpdates();
-        var batchSuccessfullyWritten = false;
         var logsSuccessfullyAppended = false;
+        var batchSuccessfullyWritten = false;
         var writebit = _globalSnapshot.State.FlipBit(Services.MyClusterId);
         try
         {
@@ -186,10 +194,10 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
                     }
                     try
                     {
-                        // _globalVersion = await _logStorage.GetLastVersionAsync(_grainTypeName, Services.GrainId);
+                        _globalVersion = await _logStorage.GetLastVersionAsync(_grainTypeName, Services.GrainId);
                         if (_confirmedVersion < _globalVersion)
                         {
-                            var logEntries = await _logStorage.ReadAsync<TLogEntry>(_grainTypeName, Services.GrainId, _confirmedVersion, _globalVersion - _confirmedVersion);
+                            var logEntries = await RetrieveLogSegment(_confirmedVersion, _globalVersion - _confirmedVersion);
                             Services.Log(LogLevel.Debug, "read success {0}", logEntries);
                             UpdateConfirmedView(logEntries);
                         }
@@ -218,11 +226,72 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
         return batchSuccessfullyWritten ? updates.Length : 0;
     }
 
+    #endregion
+
+    #region Notifications
+
+    private const int maxEntriesInNotifications = 200;
+
     /// <inheritdoc />
-    protected override SubmissionEntry<TLogEntry> MakeSubmissionEntry(TLogEntry entry)
+    protected override INotificationMessage Merge(INotificationMessage earlierMessage, INotificationMessage laterMessage)
     {
-        return new SubmissionEntry<TLogEntry> { Entry = entry };
+        if (earlierMessage is UpdateNotificationMessage earlier
+         && laterMessage is UpdateNotificationMessage later
+         && earlier.Origin == later.Origin
+         && earlier.Version + later.Updates.Count == later.Version
+         && earlier.Updates.Count + later.Updates.Count < maxEntriesInNotifications)
+        {
+            return new UpdateNotificationMessage
+                   {
+                       Version = later.Version,
+                       Origin = later.Origin,
+                       Updates = earlier.Updates.Concat(later.Updates).ToList(),
+                       ETag = later.ETag
+                   };
+        }
+        return base.Merge(earlierMessage, laterMessage); // keep only the version number
     }
+
+    private readonly SortedList<long, UpdateNotificationMessage> _notifications = new();
+
+    /// <inheritdoc />
+    protected override void OnNotificationReceived(INotificationMessage payload)
+    {
+        if (payload is UpdateNotificationMessage um)
+        {
+            _notifications.Add(um.Version - um.Updates.Count, um);
+        }
+        else
+        {
+            base.OnNotificationReceived(payload);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void ProcessNotifications()
+    {
+        // discard notifications that are behind our already confirmed state
+        while (_notifications.Count > 0 && _notifications.ElementAt(0).Key < _globalVersion)
+        {
+            Services.Log(LogLevel.Debug, "discarding notification {0}", _notifications.ElementAt(0).Value);
+            _notifications.RemoveAt(0);
+        }
+        // process notifications that reflect next global version
+        while (_notifications.Count > 0 && _notifications.ElementAt(0).Key == _globalVersion)
+        {
+            var updateNotification = _notifications.ElementAt(0).Value;
+            _notifications.RemoveAt(0);
+            _globalSnapshot.State.FlipBit(updateNotification.Origin);
+            _globalSnapshot.ETag = updateNotification.ETag;
+            _globalVersion = updateNotification.Version;
+            UpdateConfirmedView(updateNotification.Updates);
+            Services.Log(LogLevel.Debug, "notification success ({0} updates) {1}", updateNotification.Updates.Count, _globalSnapshot);
+        }
+        Services.Log(LogLevel.Trace, "unprocessed notifications in queue: {0}", _notifications.Count);
+        base.ProcessNotifications();
+    }
+
+    #endregion
 
     #region Operation Failed Classes
 
@@ -279,6 +348,36 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
         public override string ToString()
         {
             return $"write logs to storage failed: caught {Exception.GetType().Name}: {Exception.Message}";
+        }
+    }
+
+    /// <summary>
+    ///     A notification message sent to remote instances after updating this grain in storage.
+    /// </summary>
+    [Serializable]
+    [GenerateSerializer]
+    protected internal sealed class UpdateNotificationMessage : INotificationMessage
+    {
+        /// <inheritdoc />
+        [Id(0)]
+        public int Version { get; set; }
+
+        /// <summary> The cluster that performed the update </summary>
+        [Id(1)]
+        public string Origin { get; set; } = null!;
+
+        /// <summary> The list of updates that were applied </summary>
+        [Id(2)]
+        public List<TLogEntry> Updates { get; set; } = null!;
+
+        /// <summary> The e-tag of the storage after applying the updates</summary>
+        [Id(3)]
+        public string ETag { get; set; } = null!;
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"v{Version} ({Updates.Count} updates by {Origin}) etag={ETag}";
         }
     }
 

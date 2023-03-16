@@ -66,9 +66,9 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
     }
 
     /// <inheritdoc />
-    public override Task<IReadOnlyList<TLogEntry>> RetrieveLogSegment(int fromVersion, int length)
+    public override Task<IReadOnlyList<TLogEntry>> RetrieveLogSegment(int fromVersion, int toVersion)
     {
-        return _logStorage.ReadAsync<TLogEntry>(_grainTypeName, Services.GrainId, fromVersion, length);
+        return _logStorage.ReadAsync<TLogEntry>(_grainTypeName, Services.GrainId, fromVersion, toVersion - fromVersion);
     }
 
     /// <inheritdoc />
@@ -117,7 +117,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
                     _globalVersion = await _logStorage.GetLastVersionAsync(_grainTypeName, Services.GrainId);
                     if (_confirmedVersion < _globalVersion)
                     {
-                        var logEntries = await RetrieveLogSegment(_confirmedVersion, _globalVersion - _confirmedVersion);
+                        var logEntries = await RetrieveLogSegment(_confirmedVersion, _globalVersion);
                         Services.Log(LogLevel.Debug, "read success {0}", logEntries);
                         UpdateConfirmedView(logEntries);
                     }
@@ -197,7 +197,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
                         _globalVersion = await _logStorage.GetLastVersionAsync(_grainTypeName, Services.GrainId);
                         if (_confirmedVersion < _globalVersion)
                         {
-                            var logEntries = await RetrieveLogSegment(_confirmedVersion, _globalVersion - _confirmedVersion);
+                            var logEntries = await RetrieveLogSegment(_confirmedVersion, _globalVersion);
                             Services.Log(LogLevel.Debug, "read success {0}", logEntries);
                             UpdateConfirmedView(logEntries);
                         }

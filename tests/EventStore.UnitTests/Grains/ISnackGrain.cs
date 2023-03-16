@@ -1,4 +1,6 @@
-﻿using EventStore.UnitTests.Commands;
+﻿using System.Collections.Immutable;
+using EventStore.UnitTests.Commands;
+using EventStore.UnitTests.Events;
 using EventStore.UnitTests.States;
 using Orleans.Concurrency;
 using Orleans.FluentResults;
@@ -9,6 +11,9 @@ public interface ISnackGrain : IGrainWithGuidKey
 {
     [AlwaysInterleave]
     Task<Result<Snack>> GetAsync();
+
+    [AlwaysInterleave]
+    Task<Result<ImmutableList<SnackEvent>>> GetEventsAsync();
 
     [AlwaysInterleave]
     Task<bool> CanInitializeAsync();

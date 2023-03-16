@@ -1,4 +1,5 @@
-﻿using EventStore.UnitTests.Commands;
+﻿using System.Collections.Immutable;
+using EventStore.UnitTests.Commands;
 using EventStore.UnitTests.Events;
 using EventStore.UnitTests.States;
 using Fluxera.Guards;
@@ -25,8 +26,13 @@ public class SnackGrain : JournaledGrain<Snack, SnackEvent>, ISnackGrain
     public Task<Result<Snack>> GetAsync()
     {
         var id = this.GetPrimaryKey();
-        return Task.FromResult(Result.Ok(State)
-                                     .Ensure(State.IsCreated, $"Snack {id} is not initialized."));
+        return Task.FromResult(Result.Ok(State).Ensure(State.IsCreated, $"Snack {id} is not initialized."));
+    }
+
+    /// <inheritdoc />
+    public Task<Result<ImmutableList<SnackEvent>>> GetEventsAsync()
+    {
+        return Result.Ok().MapTryAsync(() => RetrieveConfirmedEvents(0, Version)).MapTryAsync(list => list.ToImmutableList());
     }
 
     /// <inheritdoc />
@@ -81,7 +87,6 @@ public class SnackGrain : JournaledGrain<Snack, SnackEvent>, ISnackGrain
 
     protected Task<Result<bool>> PublishPersistedAsync(SnackEvent evt)
     {
-        return Result.Ok()
-                     .MapTryAsync(() => RaiseConditionalEvent(evt));
+        return Result.Ok().MapTryAsync(() => RaiseConditionalEvent(evt));
     }
 }

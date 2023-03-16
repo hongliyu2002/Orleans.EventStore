@@ -79,4 +79,20 @@ public class SnackGrainTests
         getResult.Value.Name.Should().Be("Orange");
         await TestContext.Progress.WriteLineAsync(getResult.Value.ToString());
     }
+
+    [Test]
+    [Order(5)]
+    public async Task Should_Get_All_Events_Of_SnackGrain()
+    {
+        var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
+        var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
+        snackGrain.Should().NotBeNull();
+        var getEventsResult = await snackGrain.GetEventsAsync();
+        getEventsResult.IsSuccess.Should().BeTrue();
+        getEventsResult.Value.Should().HaveCount(3);
+        foreach (var snackEvent in getEventsResult.Value)
+        {
+            await TestContext.Progress.WriteLineAsync(snackEvent.ToString());
+        }
+    }
 }

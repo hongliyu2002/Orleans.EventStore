@@ -13,6 +13,7 @@
         <Authors>Leo Hong</Authors>
         <Copyright>Copyright 2023 (c) Leo Hong. All rights reserved.</Copyright>
         <RepositoryUrl>https://github.com/hongliyu2002/Orleans.EventSourcing.EventStore</RepositoryUrl>
+        <PackageVersionSuffix>beta1</PackageVersionSuffix>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>Result;Results;ResultPattern;Orleans;ExceptionHandling;ErrorHandling;Actor</PackageTags>

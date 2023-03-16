@@ -12,9 +12,9 @@ public static class EventStoreLogConsistentStorageFactory
     /// <summary>
     ///     Creates a EventStore log consistent storage instance.
     /// </summary>
-    public static ILogConsistentStorage Create(IServiceProvider services, string name)
+    public static ILogConsistentStorage Create(IServiceProvider serviceProvider, string name)
     {
-        var optionsMonitor = services.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>();
-        return ActivatorUtilities.CreateInstance<EventStoreLogConsistentStorage>(services, name, optionsMonitor.Get(name));
+        var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>();
+        return ActivatorUtilities.CreateInstance<EventStoreLogConsistentStorage>(serviceProvider, name, optionsMonitor.Get(name));
     }
 }

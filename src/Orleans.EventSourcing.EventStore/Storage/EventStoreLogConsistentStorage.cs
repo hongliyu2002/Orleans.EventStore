@@ -12,7 +12,7 @@ namespace Orleans.EventSourcing.EventStore;
 /// <summary>
 ///     EventStore-based gog consistent storage provider
 /// </summary>
-internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleParticipant<ISiloLifecycle>
+internal sealed class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleParticipant<ISiloLifecycle>
 {
     private readonly string _name;
     private readonly EventStoreStorageOptions _options;
@@ -20,7 +20,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
     private readonly ILogger<EventStoreLogConsistentStorage> _logger;
     private readonly string _serviceId;
 
-    private EventStoreClient _esClient = null!;
+    private EventStoreClient _client = null!;
 
     /// <summary>
     ///     Creates a new instance of the <see cref="EventStoreLogConsistentStorage" /> type.
@@ -39,7 +39,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
     /// <param name="grainTypeName"></param>
     /// <param name="grainId"></param>
     /// <returns></returns>
-    protected virtual string GetStreamName(string grainTypeName, GrainId grainId)
+    private string GetStreamName(string grainTypeName, GrainId grainId)
     {
         return $"{_serviceId}-{grainTypeName}-{grainId.Key}";
     }
@@ -62,7 +62,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
             {
                 _logger.LogDebug("EventStoreLogConsistentStorage {Name} is initializing: ServiceId={ServiceId}", _name, _serviceId);
             }
-            _esClient = new EventStoreClient(_options.ClientSettings);
+            _client = new EventStoreClient(_options.ClientSettings);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 timer.Stop();
@@ -80,7 +80,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
 
     private Task Close(CancellationToken cancellationToken)
     {
-        return _esClient.DisposeAsync().AsTask();
+        return _client.DisposeAsync().AsTask();
     }
 
     #endregion
@@ -88,7 +88,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
     #region Storage
 
     /// <inheritdoc />
-    public virtual async Task<int> AppendAsync<TLogEntry>(string grainTypeName, GrainId grainId, IEnumerable<TLogEntry> entries, int expectedVersion)
+    public async Task<int> AppendAsync<TLogEntry>(string grainTypeName, GrainId grainId, IEnumerable<TLogEntry> entries, int expectedVersion)
     {
         var logEntries = entries as TLogEntry[] ?? entries.ToArray();
         if (!logEntries.Any())
@@ -99,7 +99,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
         try
         {
             var eventData = logEntries.Select(SerializeEvent);
-            var writeResult = await _esClient.AppendToStreamAsync(streamName, new StreamRevision((ulong)expectedVersion), eventData).ConfigureAwait(false);
+            var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision((ulong)expectedVersion), eventData).ConfigureAwait(false);
             return (int)writeResult.NextExpectedStreamRevision.ToUInt64();
         }
         catch (Exception ex)
@@ -110,7 +110,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
     }
 
     /// <inheritdoc />
-    public virtual async Task<IReadOnlyList<TLogEntry>> ReadAsync<TLogEntry>(string grainTypeName, GrainId grainId, int fromVersion, int length)
+    public async Task<IReadOnlyList<TLogEntry>> ReadAsync<TLogEntry>(string grainTypeName, GrainId grainId, int fromVersion, int length)
     {
         if (length <= 0)
         {
@@ -119,7 +119,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
         var streamName = GetStreamName(grainTypeName, grainId);
         try
         {
-            var readResult = _esClient.ReadStreamAsync(Direction.Forwards, streamName, StreamPosition.FromInt64(fromVersion), length);
+            var readResult = _client.ReadStreamAsync(Direction.Forwards, streamName, StreamPosition.FromInt64(fromVersion), length);
             var readState = await readResult.ReadState.ConfigureAwait(false);
             if (readState == ReadState.StreamNotFound)
             {
@@ -135,12 +135,12 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
     }
 
     /// <inheritdoc />
-    public virtual async Task<int> GetLastVersionAsync(string grainTypeName, GrainId grainId)
+    public async Task<int> GetLastVersionAsync(string grainTypeName, GrainId grainId)
     {
         var streamName = GetStreamName(grainTypeName, grainId);
         try
         {
-            var readResult = _esClient.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1);
+            var readResult = _client.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1);
             var readState = await readResult.ReadState.ConfigureAwait(false);
             if (readState == ReadState.StreamNotFound)
             {
@@ -165,7 +165,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
     /// <param name="entry"></param>
     /// <typeparam name="TLogEntry"></typeparam>
     /// <returns></returns>
-    protected virtual EventData SerializeEvent<TLogEntry>(TLogEntry entry)
+    private EventData SerializeEvent<TLogEntry>(TLogEntry entry)
     {
         if (entry is null)
         {
@@ -181,7 +181,7 @@ internal class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycl
     /// <param name="evt"></param>
     /// <typeparam name="TLogEntry"></typeparam>
     /// <returns></returns>
-    protected virtual (TLogEntry LogEntry, int Version) DeserializeEvent<TLogEntry>(ResolvedEvent evt)
+    private (TLogEntry LogEntry, int Version) DeserializeEvent<TLogEntry>(ResolvedEvent evt)
     {
         // var eventJson = Encoding.UTF8.GetString(evt.Event.Data.ToArray());
         // var logEntry = JsonConvert.DeserializeObject<TLogEntry>(eventJson, _jsonDefaultSettings) ?? Activator.CreateInstance<TLogEntry>();

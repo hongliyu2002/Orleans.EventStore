@@ -51,7 +51,7 @@ public static class EventStoreStorageServiceCollectionExtensions
         {
             services.TryAddSingleton(sp => sp.GetServiceByName<ILogConsistentStorage>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME));
         }
-        services.AddSingletonNamedService(name, EventStoreLogConsistentStorageFactory.Create);
+        services.AddSingletonNamedService<ILogConsistentStorage>(name, (sp, n) => EventStoreLogConsistentStorageFactory.Create(sp, n));
         services.AddSingletonNamedService<ILifecycleParticipant<ISiloLifecycle>>(name, (sp, n) => (ILifecycleParticipant<ISiloLifecycle>)sp.GetRequiredServiceByName<ILogConsistentStorage>(n));
 
         // Configure log view adaptor.

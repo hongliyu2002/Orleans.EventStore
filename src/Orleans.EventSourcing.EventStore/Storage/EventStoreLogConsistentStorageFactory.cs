@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Orleans.EventSourcing.EventStore.Configuration;
+using Orleans.EventSourcing.Configuration;
 
-namespace Orleans.EventSourcing.EventStore;
+namespace Orleans.EventSourcing.EventStoreStorage;
 
 /// <summary>
 ///     Factory used to create instances of EventStore log consistent storage.
@@ -12,9 +12,9 @@ public static class EventStoreLogConsistentStorageFactory
     /// <summary>
     ///     Creates a EventStore log consistent storage instance.
     /// </summary>
-    public static ILogConsistentStorage Create(IServiceProvider serviceProvider, string name)
+    public static ILogConsistentStorage Create(IServiceProvider services, string name)
     {
-        var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>();
-        return ActivatorUtilities.CreateInstance<EventStoreLogConsistentStorage>(serviceProvider, name, optionsMonitor.Get(name));
+        var optionsMonitor = services.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>();
+        return ActivatorUtilities.CreateInstance<EventStoreLogConsistentStorage>(services, name, optionsMonitor.Get(name));
     }
 }

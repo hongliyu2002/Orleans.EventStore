@@ -1,6 +1,6 @@
 ﻿using Orleans.EventSourcing.Common;
 
-namespace Orleans.EventSourcing.EventStore;
+namespace Orleans.EventSourcing.EventStoreStorage;
 
 /// <summary>
 ///     A class that extends snapshot state with versioning metadata, so that a grain with log-view consistency

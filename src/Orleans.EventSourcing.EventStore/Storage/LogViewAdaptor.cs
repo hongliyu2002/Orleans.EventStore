@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Orleans.EventSourcing.Common;
 using Orleans.Storage;
 
-namespace Orleans.EventSourcing.EventStore;
+namespace Orleans.EventSourcing.EventStoreStorage;
 
 /// <summary>
 ///     A log view adaptor that wraps around a traditional storage adaptor, and uses batching and e-tags

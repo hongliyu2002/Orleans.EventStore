@@ -1,7 +1,7 @@
 ﻿using EventStore.Client;
 using Orleans.Storage;
 
-namespace Orleans.EventSourcing.EventStore.Configuration;
+namespace Orleans.EventSourcing.Configuration;
 
 /// <summary>
 ///     EventStore log consistent storage options.

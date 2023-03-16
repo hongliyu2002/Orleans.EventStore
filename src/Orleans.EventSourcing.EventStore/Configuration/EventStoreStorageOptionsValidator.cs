@@ -1,6 +1,7 @@
-﻿using Orleans.Runtime;
+﻿using Orleans.EventSourcing.EventStoreStorage;
+using Orleans.Runtime;
 
-namespace Orleans.EventSourcing.EventStore.Configuration;
+namespace Orleans.EventSourcing.Configuration;
 
 /// <summary>
 ///     Configuration validator for EventStoreStorageOptions

@@ -1,6 +1,6 @@
 ﻿using Orleans.Storage;
 
-namespace Orleans.EventSourcing.EventStore;
+namespace Orleans.EventSourcing.EventStoreStorage;
 
 /// <summary>
 ///     A log-consistency provider that stores the latest view in primary storage, using any standard storage provider.

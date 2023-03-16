@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-using Orleans.EventSourcing.EventStore.Configuration;
+using Orleans.EventSourcing.Configuration;
 using Orleans.Providers;
 
-namespace Orleans.EventSourcing.EventStore.Hosting;
+namespace Orleans.EventSourcing.Hosting;
 
 /// <summary>
 /// </summary>

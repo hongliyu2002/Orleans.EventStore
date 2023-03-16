@@ -1,6 +1,6 @@
 ﻿using Orleans.Runtime;
 
-namespace Orleans.EventSourcing.EventStore;
+namespace Orleans.EventSourcing.EventStoreStorage;
 
 /// <summary>
 /// </summary>

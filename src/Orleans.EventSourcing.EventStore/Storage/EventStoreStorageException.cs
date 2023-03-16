@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Orleans.EventSourcing.EventStore;
+namespace Orleans.EventSourcing.EventStoreStorage;
 
 /// <summary>
 ///     Exception for throwing from EventStore log consistent storage.

@@ -3,11 +3,11 @@ using EventStore.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
-using Orleans.EventSourcing.EventStore.Configuration;
+using Orleans.EventSourcing.Configuration;
 using Orleans.Runtime;
 using Orleans.Storage;
 
-namespace Orleans.EventSourcing.EventStore;
+namespace Orleans.EventSourcing.EventStoreStorage;
 
 /// <summary>
 ///     EventStore-based gog consistent storage provider

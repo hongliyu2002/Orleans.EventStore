@@ -2,12 +2,14 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
-using Orleans.EventSourcing.EventStore.Configuration;
+using Orleans.EventSourcing.Configuration;
+using Orleans.EventSourcing.EventStoreStorage;
+using Orleans.EventSourcing.LogConsistency;
 using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Storage;
 
-namespace Orleans.EventSourcing.EventStore.Hosting;
+namespace Orleans.EventSourcing.Hosting;
 
 /// <summary>
 /// </summary>
@@ -42,7 +44,7 @@ public static class EventStoreStorageServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddEventStoreBasedLogConsistencyProvider(this IServiceCollection services, string name, Action<OptionsBuilder<EventStoreStorageOptions>>? configureOptions = null)
     {
-        // Configure storage.
+        // Configure log storage.
         configureOptions?.Invoke(services.AddOptions<EventStoreStorageOptions>(name));
         services.AddTransient<IConfigurationValidator>(sp => new EventStoreStorageOptionsValidator(sp.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>().Get(name), name));
         services.AddTransient<IPostConfigureOptions<EventStoreStorageOptions>, DefaultStorageProviderSerializerOptionsConfigurator<EventStoreStorageOptions>>();
@@ -53,6 +55,13 @@ public static class EventStoreStorageServiceCollectionExtensions
         }
         services.AddSingletonNamedService<ILogConsistentStorage>(name, (sp, n) => EventStoreLogConsistentStorageFactory.Create(sp, n));
         services.AddSingletonNamedService<ILifecycleParticipant<ISiloLifecycle>>(name, (sp, n) => (ILifecycleParticipant<ISiloLifecycle>)sp.GetRequiredServiceByName<ILogConsistentStorage>(n));
+
+        // Configure log consistency.
+        services.TryAddSingleton<Factory<IGrainContext, ILogConsistencyProtocolServices>>(serviceProvider =>
+                                                                                          {
+                                                                                              var protocolServicesFactory = ActivatorUtilities.CreateFactory(typeof(DefaultProtocolServices), new[] { typeof(IGrainContext) });
+                                                                                              return grainContext => (ILogConsistencyProtocolServices)protocolServicesFactory(serviceProvider, new object[] { grainContext });
+                                                                                          });
 
         // Configure log view adaptor.
         if (string.Equals(name, ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, StringComparison.Ordinal))

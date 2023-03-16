@@ -46,14 +46,16 @@ public static class EventStoreStorageServiceCollectionExtensions
     {
         // Configure log storage.
         configureOptions?.Invoke(services.AddOptions<EventStoreStorageOptions>(name));
-        services.AddTransient<IConfigurationValidator>(sp => new EventStoreStorageOptionsValidator(sp.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>().Get(name), name));
+        services.AddTransient<IConfigurationValidator>(sp => new EventStoreStorageOptionsValidator(sp.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>()
+                                                                                                     .Get(name),
+                                                                                                   name));
         services.AddTransient<IPostConfigureOptions<EventStoreStorageOptions>, DefaultStorageProviderSerializerOptionsConfigurator<EventStoreStorageOptions>>();
         services.ConfigureNamedOptionForLogging<EventStoreStorageOptions>(name);
         if (string.Equals(name, ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, StringComparison.Ordinal))
         {
             services.TryAddSingleton(sp => sp.GetServiceByName<ILogConsistentStorage>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME));
         }
-        services.AddSingletonNamedService<ILogConsistentStorage>(name, (sp, n) => EventStoreLogConsistentStorageFactory.Create(sp, n));
+        services.AddSingletonNamedService<ILogConsistentStorage>(name, EventStoreLogConsistentStorageFactory.Create);
         services.AddSingletonNamedService<ILifecycleParticipant<ISiloLifecycle>>(name, (sp, n) => (ILifecycleParticipant<ISiloLifecycle>)sp.GetRequiredServiceByName<ILogConsistentStorage>(n));
 
         // Configure log consistency.
@@ -68,6 +70,6 @@ public static class EventStoreStorageServiceCollectionExtensions
         {
             services.TryAddSingleton(sp => sp.GetServiceByName<ILogViewAdaptorFactory>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME));
         }
-        return services.AddSingletonNamedService<ILogViewAdaptorFactory, LogConsistencyProvider>(name);
+        return services.AddSingletonNamedService<ILogViewAdaptorFactory>(name, LogConsistencyProviderFactory.Create);
     }
 }

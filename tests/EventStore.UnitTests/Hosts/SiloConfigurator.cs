@@ -16,6 +16,6 @@ public class SiloConfigurator : ISiloConfigurator
                                                                  var connectionString = "esdb://123.60.184.85:2113?tls=false";
                                                                  options.ClientSettings = EventStoreClientSettings.Create(connectionString);
                                                              })
-                   .AddMemoryGrainStorage(Constants.SalesStoreName);
+                   .AddMemoryGrainStorage(Constants.LogSnapshotStoreName);
     }
 }

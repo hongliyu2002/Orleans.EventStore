@@ -10,7 +10,7 @@ using Orleans.Providers;
 namespace EventStore.UnitTests.Grains;
 
 [LogConsistencyProvider(ProviderName = Constants.LogConsistencyStoreName)]
-[StorageProvider(ProviderName = Constants.SalesStoreName)]
+[StorageProvider(ProviderName = Constants.LogSnapshotStoreName)]
 public class SnackGrain : JournaledGrain<Snack, SnackEvent>, ISnackGrain
 {
     private readonly ILogger<SnackGrain> _logger;
@@ -25,7 +25,8 @@ public class SnackGrain : JournaledGrain<Snack, SnackEvent>, ISnackGrain
     public Task<Result<Snack>> GetAsync()
     {
         var id = this.GetPrimaryKey();
-        return Task.FromResult(Result.Ok(State).Ensure(State.IsCreated, $"Snack {id} is not initialized."));
+        return Task.FromResult(Result.Ok(State)
+                                     .Ensure(State.IsCreated, $"Snack {id} is not initialized."));
     }
 
     /// <inheritdoc />
@@ -80,6 +81,7 @@ public class SnackGrain : JournaledGrain<Snack, SnackEvent>, ISnackGrain
 
     protected Task<Result<bool>> PublishPersistedAsync(SnackEvent evt)
     {
-        return Result.Ok().MapTryAsync(() => RaiseConditionalEvent(evt));
+        return Result.Ok()
+                     .MapTryAsync(() => RaiseConditionalEvent(evt));
     }
 }

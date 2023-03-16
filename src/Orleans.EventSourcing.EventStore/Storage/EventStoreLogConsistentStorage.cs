@@ -12,7 +12,7 @@ namespace Orleans.EventSourcing.EventStoreStorage;
 /// <summary>
 ///     EventStore-based gog consistent storage provider
 /// </summary>
-internal sealed class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleParticipant<ISiloLifecycle>
+public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleParticipant<ISiloLifecycle>
 {
     private readonly string _name;
     private readonly EventStoreStorageOptions _options;

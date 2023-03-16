@@ -15,6 +15,7 @@ public static class EventStoreLogConsistentStorageFactory
     public static ILogConsistentStorage Create(IServiceProvider services, string name)
     {
         var optionsMonitor = services.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>();
-        return ActivatorUtilities.CreateInstance<EventStoreLogConsistentStorage>(services, name, optionsMonitor.Get(name));
+        var logConsistentStorage = ActivatorUtilities.CreateInstance<EventStoreLogConsistentStorage>(services, name, optionsMonitor.Get(name));
+        return logConsistentStorage;
     }
 }

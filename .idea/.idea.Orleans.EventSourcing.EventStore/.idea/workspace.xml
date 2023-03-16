@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9dce4cf2-173b-44d5-b86c-81137facf7be" name="Changes" comment="Update">
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing.EventStore/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/indexLayout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Orleans.EventSourcing.sln.DotSettings.user" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Storage/EventStoreLogConsistentStorage.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Storage/NullLogConsistentStorage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Orleans.EventSourcing.EventStore.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Orleans.EventSourcing.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Orleans.EventSourcing.EventStore.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Orleans.EventSourcing.EventStore.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Storage/LogViewAdaptor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Storage/LogViewAdaptor.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2cffb134e7c94911aace41325eca35bc3b200/1a/b762a570/EventStoreClient.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2cffb134e7c94911aace41325eca35bc3b200/c8/5de7ebc8/IWriteResult.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/40a530b4e1bb4204933ab94a0dce6ce925800/04/c8df22e8/ResolvedEvent.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/40a530b4e1bb4204933ab94a0dce6ce925800/32/0acf2846/FromStream.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/40a530b4e1bb4204933ab94a0dce6ce925800/35/a541fab0/EventRecord.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/40a530b4e1bb4204933ab94a0dce6ce925800/40/700aa9ba/EventStoreClientBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/40a530b4e1bb4204933ab94a0dce6ce925800/41/3dd43636/EventStoreClientOperationOptions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/40a530b4e1bb4204933ab94a0dce6ce925800/82/38fc99c6/EventData.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/40a530b4e1bb4204933ab94a0dce6ce925800/98/adebb5f4/Position.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/40a530b4e1bb4204933ab94a0dce6ce925800/c0/39099002/WrongExpectedVersionException.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/40a530b4e1bb4204933ab94a0dce6ce925800/c5/de7579cc/StreamState.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/51a6bc92e3c447f594f3e0efd5173d07c2598/7c/fe411442/IGrainStorage.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/51a6bc92e3c447f594f3e0efd5173d07c2598/c0/3098d6ca/IGrainState`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6e5cf5376b6a41ce9a6f22410734740822fa0/5c/79749aa7/SubmissionEntry`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6e5cf5376b6a41ce9a6f22410734740822fa0/b3/1ab1bba0/RecordedConnectionIssue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6e5cf5376b6a41ce9a6f22410734740822fa0/fd/9685c48b/PrimaryBasedLogViewAdaptor`3.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d18d01238a6f4343a97b42ae27bc0da716c880/16/042194b4/JsonSerializer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fea81c23aa0e4eedaf4745bdf375be873d3a0/60/e400b2eb/GrainId.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fea81c23aa0e4eedaf4745bdf375be873d3a0/71/5a984e50/IdSpan.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProjectId" id="2N2n8daj3mFA8qf7YegMklQb40I" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "settings.editor.selected.configurable": "preferences.sourceCode.C#",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\hongl\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\hongl\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\hongl\\AppData\\Local\\Symbols\\src"
+    ]
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9dce4cf2-173b-44d5-b86c-81137facf7be" name="Changes" comment="" />
+      <created>1678870886459</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1678870886459</updated>
+      <workItem from="1678870887914" duration="50501000" />
+    </task>
+    <task id="LOCAL-00001" summary="Init">
+      <created>1678872616067</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1678872616067</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Update">
+      <created>1678916853696</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1678916853696</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Update">
+      <created>1678923388917</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1678923388917</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Init" />
+    <MESSAGE value="Update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update" />
+  </component>
+</project>

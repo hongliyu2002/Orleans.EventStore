@@ -25,8 +25,8 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
     private readonly string _grainTypeName;
     private readonly ILogConsistentStorage _logStorage;
 
-    private SnapshotStateWithMetaDataAndETag<TLogView> _globalSnapshot;
-    private TLogView _confirmedView = null!;
+    private SnapshotStateWithMetaDataAndETag<TLogView> _globalSnapshot = new();
+    private TLogView _confirmedView = new();
     private int _confirmedVersion;
     private int _globalVersion;
 

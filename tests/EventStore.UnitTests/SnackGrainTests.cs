@@ -30,46 +30,46 @@ public class SnackGrainTests
 
     [Test]
     [Order(1)]
-    public async Task Should_Create_A_New_SnackGrain()
+    public async Task Should_Create_A_New_Snack()
     {
         var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
         var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
         snackGrain.Should().NotBeNull();
         var canInitialize = await snackGrain.CanInitializeAsync();
         canInitialize.Should().BeTrue();
-        var initializeResult = await snackGrain.InitializeAsync(new SnackInitializeCommand("Apple", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Create_A_New_SnackGrain"));
+        var initializeResult = await snackGrain.InitializeAsync(new SnackInitializeCommand("Apple", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Create_A_New_Snack"));
         initializeResult.IsSuccess.Should().BeTrue();
     }
 
     [Test]
     [Order(2)]
-    public async Task Should_Change_Name_Of_SnackGrain()
+    public async Task Should_Change_Name_Of_Snack()
     {
         var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
         var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
         snackGrain.Should().NotBeNull();
         var canChangeName = await snackGrain.CanChangeNameAsync();
         canChangeName.Should().BeTrue();
-        var changeNameResult = await snackGrain.ChangeNameAsync(new SnackChangeNameCommand("Orange", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Create_A_New_SnackGrain"));
+        var changeNameResult = await snackGrain.ChangeNameAsync(new SnackChangeNameCommand("Orange", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Change_Name_Of_Snack"));
         changeNameResult.IsSuccess.Should().BeTrue();
     }
 
     [Test]
     [Order(3)]
-    public async Task Should_Remove_SnackGrain()
+    public async Task Should_Remove_SnackG()
     {
         var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
         var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
         snackGrain.Should().NotBeNull();
         var canChangeName = await snackGrain.CanRemoveAsync();
         canChangeName.Should().BeTrue();
-        var removeResult = await snackGrain.RemoveAsync(new SnackRemoveCommand(Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Create_A_New_SnackGrain"));
+        var removeResult = await snackGrain.RemoveAsync(new SnackRemoveCommand(Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Remove_Snack"));
         removeResult.IsSuccess.Should().BeTrue();
     }
 
     [Test]
     [Order(4)]
-    public async Task Should_Get_SnackGrain()
+    public async Task Should_Get_Snack()
     {
         var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
         var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
@@ -82,14 +82,14 @@ public class SnackGrainTests
 
     [Test]
     [Order(5)]
-    public async Task Should_Get_All_Events_Of_SnackGrain()
+    public async Task Should_Get_Events_Of_Snack()
     {
         var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
         var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
         snackGrain.Should().NotBeNull();
-        var getEventsResult = await snackGrain.GetEventsAsync();
+        var getEventsResult = await snackGrain.GetEventsAsync(1, 2);
         getEventsResult.IsSuccess.Should().BeTrue();
-        getEventsResult.Value.Should().HaveCount(3);
+        getEventsResult.Value.Should().HaveCount(2);
         foreach (var snackEvent in getEventsResult.Value)
         {
             await TestContext.Progress.WriteLineAsync(snackEvent.ToString());

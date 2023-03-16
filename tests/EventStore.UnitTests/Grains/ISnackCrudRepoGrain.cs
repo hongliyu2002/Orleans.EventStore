@@ -11,7 +11,7 @@ public interface ISnackCrudRepoGrain : IGrainWithGuidKey
     Task<Result<ISnackGrain>> GetAsync(SnackRepoGetCommand command);
 
     [AlwaysInterleave]
-    Task<Result<ImmutableList<ISnackGrain>>> GetMultipleAsync(SnackRepoGetManyCommand command);
+    Task<Result<ImmutableList<ISnackGrain>>> GetManyAsync(SnackRepoGetManyCommand command);
 
     Task<Result<bool>> CreateAsync(SnackRepoCreateCommand cmd);
 

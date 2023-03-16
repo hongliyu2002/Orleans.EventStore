@@ -30,9 +30,9 @@ public class SnackGrain : JournaledGrain<Snack, SnackEvent>, ISnackGrain
     }
 
     /// <inheritdoc />
-    public Task<Result<ImmutableList<SnackEvent>>> GetEventsAsync()
+    public Task<Result<ImmutableList<SnackEvent>>> GetEventsAsync(int fromVersion, int toVersion)
     {
-        return Result.Ok().MapTryAsync(() => RetrieveConfirmedEvents(0, Version)).MapTryAsync(list => list.ToImmutableList());
+        return Result.Ok().MapTryAsync(() => RetrieveConfirmedEvents(fromVersion, toVersion)).MapTryAsync(list => list.ToImmutableList());
     }
 
     /// <inheritdoc />

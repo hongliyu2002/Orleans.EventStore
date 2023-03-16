@@ -13,7 +13,7 @@ public interface ISnackGrain : IGrainWithGuidKey
     Task<Result<Snack>> GetAsync();
 
     [AlwaysInterleave]
-    Task<Result<ImmutableList<SnackEvent>>> GetEventsAsync();
+    Task<Result<ImmutableList<SnackEvent>>> GetEventsAsync(int fromVersion, int toVersion);
 
     [AlwaysInterleave]
     Task<bool> CanInitializeAsync();

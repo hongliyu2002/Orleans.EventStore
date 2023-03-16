@@ -7,7 +7,7 @@
         <PackageId>Orleans.EventSourcing.EventStore</PackageId>
         <Title>EventStore for Microsoft Orleans Event-Sourcing</Title>
         <Description>EventStore Grpc client implementation of LogConsistencyProvider for Microsoft Orleans Event-Sourcing</Description>
-        <Version>7.1.0</Version>
+        <Version>7.1.0.1</Version>
         <AssemblyVersion>7.1.0.0</AssemblyVersion>
         <FileVersion>7.1.0.0</FileVersion>
         <Authors>Leo Hong</Authors>
@@ -16,7 +16,7 @@
         <PackageVersionSuffix>beta1</PackageVersionSuffix>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageTags>Result;Results;ResultPattern;Orleans;ExceptionHandling;ErrorHandling;Actor</PackageTags>
+        <PackageTags>eventstore;event-store;event-sourcing;eventsourcing;orleans;orleans-eventsourcing;event-driven</PackageTags>
         <PackageProjectUrl>https://github.com/hongliyu2002/Orleans.EventSourcing.EventStore</PackageProjectUrl>
         <PackageIcon>logo_128.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>

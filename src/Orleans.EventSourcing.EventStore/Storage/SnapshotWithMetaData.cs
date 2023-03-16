@@ -9,24 +9,24 @@ namespace Orleans.EventSourcing.EventStore;
 /// <typeparam name="TView">The type used for log view</typeparam>
 [Serializable]
 [GenerateSerializer]
-public sealed class SnapshotStateWithMetaDataAndETag<TView> : IGrainState<SnapshotStateWithMetaData<TView>>
+public sealed class SnapshotWithMetaDataAndETag<TView> : IGrainState<SnapshotWithMetaData<TView>>
     where TView : class, new()
 {
     /// <summary>
-    ///     Initializes a new instance of SnapshotStateWithMetaDataAndETag class
+    ///     Initializes a new instance of SnapshotWithMetaDataAndETag class
     /// </summary>
-    public SnapshotStateWithMetaDataAndETag()
+    public SnapshotWithMetaDataAndETag()
     {
-        State = new SnapshotStateWithMetaData<TView>();
+        State = new SnapshotWithMetaData<TView>();
     }
 
     /// <summary>
-    ///     Initialize a new instance of SnapshotStateWithMetaDataAndETag class with an initialView
+    ///     Initialize a new instance of SnapshotWithMetaDataAndETag class with an initialView
     /// </summary>
     /// <param name="initialView"></param>
-    public SnapshotStateWithMetaDataAndETag(TView initialView)
+    public SnapshotWithMetaDataAndETag(TView initialView)
     {
-        State = new SnapshotStateWithMetaData<TView>(initialView);
+        State = new SnapshotWithMetaData<TView>(initialView);
     }
 
     /// <inheritdoc />
@@ -39,10 +39,10 @@ public sealed class SnapshotStateWithMetaDataAndETag<TView> : IGrainState<Snapsh
 
     /// <inheritdoc />
     [Id(2)]
-    public SnapshotStateWithMetaData<TView> State { get; set; }
+    public SnapshotWithMetaData<TView> State { get; set; }
 
     /// <summary>
-    ///     Convert current SnapshotStateWithMetaDataAndETag object information to a string
+    ///     Convert current SnapshotWithMetaDataAndETag object information to a string
     /// </summary>
     public override string ToString()
     {
@@ -57,13 +57,13 @@ public sealed class SnapshotStateWithMetaDataAndETag<TView> : IGrainState<Snapsh
 /// <typeparam name="TView"></typeparam>
 [Serializable]
 [GenerateSerializer]
-public sealed class SnapshotStateWithMetaData<TView>
+public sealed class SnapshotWithMetaData<TView>
     where TView : class, new()
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="SnapshotStateWithMetaData{TView}" /> class.
+    ///     Initializes a new instance of the <see cref="SnapshotWithMetaData{TView}" /> class.
     /// </summary>
-    public SnapshotStateWithMetaData()
+    public SnapshotWithMetaData()
     {
         Snapshot = new TView();
         SnapshotVersion = 0;
@@ -71,9 +71,9 @@ public sealed class SnapshotStateWithMetaData<TView>
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="SnapshotStateWithMetaData{TView}" /> class.
+    ///     Initializes a new instance of the <see cref="SnapshotWithMetaData{TView}" /> class.
     /// </summary>
-    public SnapshotStateWithMetaData(TView initialState)
+    public SnapshotWithMetaData(TView initialState)
     {
         Snapshot = initialState;
         SnapshotVersion = 0;

@@ -4,19 +4,11 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9dce4cf2-173b-44d5-b86c-81137facf7be" name="Changes" comment="Update">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing.EventStore/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/.name" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Orleans.EventSourcing.sln.DotSettings.user" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Storage/EventStoreLogConsistentStorage.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Storage/NullLogConsistentStorage.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Orleans.EventSourcing.EventStore.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Orleans.EventSourcing.sln" afterDir="false" />
+    <list default="true" id="9dce4cf2-173b-44d5-b86c-81137facf7be" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Hosting/EventStoreStorageOptions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Hosting/EventStoreStorageSiloBuilderExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing.EventStore/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Orleans.EventSourcing.EventStore/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Orleans.EventSourcing.EventStore.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Orleans.EventSourcing.EventStore.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Storage/LogViewAdaptor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Orleans.EventSourcing.EventStore/Storage/LogViewAdaptor.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +35,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d18d01238a6f4343a97b42ae27bc0da716c880/16/042194b4/JsonSerializer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fea81c23aa0e4eedaf4745bdf375be873d3a0/60/e400b2eb/GrainId.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fea81c23aa0e4eedaf4745bdf375be873d3a0/71/5a984e50/IdSpan.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e98eea5e8dc1aa9ec6829a2a1c3828b6b8d46fe63ce24417e54f1685663c2/ProviderConstants.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -81,7 +74,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1678870886459</updated>
-      <workItem from="1678870887914" duration="50501000" />
+      <workItem from="1678870887914" duration="52370000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <created>1678872616067</created>
@@ -104,7 +97,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678923388917</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Update">
+      <created>1678930218663</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1678930218663</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

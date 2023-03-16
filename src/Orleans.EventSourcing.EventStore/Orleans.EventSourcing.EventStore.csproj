@@ -52,8 +52,4 @@
         </None>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Hosting" />
-    </ItemGroup>
-
 </Project>

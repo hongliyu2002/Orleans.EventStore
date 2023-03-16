@@ -25,7 +25,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
     private readonly string _grainTypeName;
     private readonly ILogConsistentStorage _logStorage;
 
-    private SnapshotStateWithMetaDataAndETag<TLogView> _globalSnapshot = new();
+    private SnapshotWithMetaDataAndETag<TLogView> _globalSnapshot = new();
     private TLogView _confirmedView = new();
     private int _confirmedVersion;
     private int _globalVersion;
@@ -47,7 +47,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
     /// <inheritdoc />
     protected override void InitializeConfirmedView(TLogView initialState)
     {
-        _globalSnapshot = new SnapshotStateWithMetaDataAndETag<TLogView>(initialState);
+        _globalSnapshot = new SnapshotWithMetaDataAndETag<TLogView>(initialState);
         _confirmedView = initialState;
         _confirmedVersion = 0;
         _globalVersion = 0;
@@ -103,7 +103,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
         {
             try
             {
-                var snapshot = new SnapshotStateWithMetaDataAndETag<TLogView>();
+                var snapshot = new SnapshotWithMetaDataAndETag<TLogView>();
                 await _grainStorage.ReadStateAsync(_grainTypeName, Services.GrainId, snapshot);
                 _globalSnapshot = snapshot;
                 Services.Log(LogLevel.Debug, "read success {0}", _globalSnapshot);
@@ -183,7 +183,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
                 await LastPrimaryIssue.DelayBeforeRetry();
                 try
                 {
-                    var snapshot = new SnapshotStateWithMetaDataAndETag<TLogView>();
+                    var snapshot = new SnapshotWithMetaDataAndETag<TLogView>();
                     await _grainStorage.ReadStateAsync(_grainTypeName, Services.GrainId, snapshot);
                     _globalSnapshot = snapshot;
                     Services.Log(LogLevel.Debug, "read success {0}", _globalSnapshot);

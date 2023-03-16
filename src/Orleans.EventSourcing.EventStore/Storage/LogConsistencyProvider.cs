@@ -12,16 +12,16 @@ namespace Orleans.EventSourcing.EventStore;
 /// </summary>
 public class LogConsistencyProvider : ILogViewAdaptorFactory
 {
-    private readonly ILogConsistentStorage _logStorage;
+    private readonly ILogConsistentStorage _logConsistentStorage;
 
     /// <summary>
     ///     Initializes a new instance of LogConsistencyProvider class
     /// </summary>
-    /// <param name="logStorage"></param>
-    public LogConsistencyProvider(ILogConsistentStorage logStorage)
+    /// <param name="logConsistentStorage"></param>
+    public LogConsistencyProvider(ILogConsistentStorage logConsistentStorage)
     {
-        ArgumentNullException.ThrowIfNull(logStorage);
-        _logStorage = logStorage;
+        ArgumentNullException.ThrowIfNull(logConsistentStorage);
+        _logConsistentStorage = logConsistentStorage;
     }
 
     /// <inheritdoc />
@@ -29,7 +29,7 @@ public class LogConsistencyProvider : ILogViewAdaptorFactory
         where TLogView : class, new()
         where TLogEntry : class
     {
-        return new LogViewAdaptor<TLogView, TLogEntry>(hostGrain, initialState, grainStorage, grainTypeName, services, _logStorage);
+        return new LogViewAdaptor<TLogView, TLogEntry>(hostGrain, initialState, grainStorage, grainTypeName, services, _logConsistentStorage);
     }
 
     /// <inheritdoc />

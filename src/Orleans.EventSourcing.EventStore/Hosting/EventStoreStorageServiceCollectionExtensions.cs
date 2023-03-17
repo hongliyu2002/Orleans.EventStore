@@ -46,9 +46,7 @@ public static class EventStoreStorageServiceCollectionExtensions
     {
         // Configure log storage.
         configureOptions?.Invoke(services.AddOptions<EventStoreStorageOptions>(name));
-        services.AddTransient<IConfigurationValidator>(sp => new EventStoreStorageOptionsValidator(sp.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>()
-                                                                                                     .Get(name),
-                                                                                                   name));
+        services.AddTransient<IConfigurationValidator>(sp => new EventStoreStorageOptionsValidator(sp.GetRequiredService<IOptionsMonitor<EventStoreStorageOptions>>().Get(name), name));
         services.AddTransient<IPostConfigureOptions<EventStoreStorageOptions>, DefaultStorageProviderSerializerOptionsConfigurator<EventStoreStorageOptions>>();
         services.ConfigureNamedOptionForLogging<EventStoreStorageOptions>(name);
         if (string.Equals(name, ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, StringComparison.Ordinal))

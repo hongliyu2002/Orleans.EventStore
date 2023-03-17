@@ -1,14 +1,14 @@
 ﻿using System.Collections.Immutable;
-using EventStore.UnitTests.Commands;
-using EventStore.UnitTests.Events;
-using EventStore.UnitTests.States;
+using Orleans.EventSourcing.EventStore.UnitTests.Commands;
+using Orleans.EventSourcing.EventStore.UnitTests.Events;
+using Orleans.EventSourcing.EventStore.UnitTests.States;
 using Fluxera.Guards;
 using Microsoft.Extensions.Logging;
 using Orleans.EventSourcing;
 using Orleans.FluentResults;
 using Orleans.Providers;
 
-namespace EventStore.UnitTests.Grains;
+namespace Orleans.EventSourcing.EventStore.UnitTests.Grains;
 
 [LogConsistencyProvider(ProviderName = Constants.LogConsistencyStoreName)]
 [StorageProvider(ProviderName = Constants.LogSnapshotStoreName)]

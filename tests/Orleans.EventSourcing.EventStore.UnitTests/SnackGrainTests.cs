@@ -1,12 +1,12 @@
-﻿using EventStore.UnitTests.Commands;
-using EventStore.UnitTests.Grains;
-using EventStore.UnitTests.Hosts;
+﻿using Orleans.EventSourcing.EventStore.UnitTests.Commands;
+using Orleans.EventSourcing.EventStore.UnitTests.Grains;
+using Orleans.EventSourcing.EventStore.UnitTests.Hosts;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Orleans.TestingHost;
 
-namespace EventStore.UnitTests;
+namespace Orleans.EventSourcing.EventStore.UnitTests;
 
 [TestFixture]
 public class SnackGrainTests

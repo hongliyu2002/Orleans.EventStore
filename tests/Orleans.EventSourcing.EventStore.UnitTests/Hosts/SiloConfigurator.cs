@@ -1,7 +1,7 @@
 ﻿using EventStore.Client;
 using Orleans.TestingHost;
 
-namespace EventStore.UnitTests.Hosts;
+namespace Orleans.EventSourcing.EventStore.UnitTests.Hosts;
 
 public class SiloConfigurator : ISiloConfigurator
 {

@@ -29,4 +29,7 @@
         <PackageReference Include="Orleans.FluentResults" Version="7.1.0.8" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Orleans.Persistence.EventStore\Orleans.Persistence.EventStore.csproj" />
+    </ItemGroup>
 </Project>

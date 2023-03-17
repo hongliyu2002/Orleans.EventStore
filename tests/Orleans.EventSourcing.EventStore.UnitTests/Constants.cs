@@ -1,4 +1,4 @@
-﻿namespace EventStore.UnitTests;
+﻿namespace Orleans.EventSourcing.EventStore.UnitTests;
 
 public static class Constants
 {

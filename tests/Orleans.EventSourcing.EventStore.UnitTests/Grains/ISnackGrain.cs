@@ -1,11 +1,11 @@
 ﻿using System.Collections.Immutable;
-using EventStore.UnitTests.Commands;
-using EventStore.UnitTests.Events;
-using EventStore.UnitTests.States;
+using Orleans.EventSourcing.EventStore.UnitTests.Commands;
+using Orleans.EventSourcing.EventStore.UnitTests.Events;
+using Orleans.EventSourcing.EventStore.UnitTests.States;
 using Orleans.Concurrency;
 using Orleans.FluentResults;
 
-namespace EventStore.UnitTests.Grains;
+namespace Orleans.EventSourcing.EventStore.UnitTests.Grains;
 
 public interface ISnackGrain : IGrainWithGuidKey
 {

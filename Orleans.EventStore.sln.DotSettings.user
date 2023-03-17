@@ -12,11 +12,7 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.EventStoreClientTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::3FE85E59-ADAD-4E87-9108-C66752DA39E2::net7.0::Orleans.EventSourcing.EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=32e8d4ac_002D6478_002D42fa_002Da7a8_002D982e854070ec/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Should_Create_A_New_SnackGrain" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.SnackRepoGrainTests&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+	</wpf:ResourceDictionary>

@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.UnitTests", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Persistence.EventStore", "src\Orleans.Persistence.EventStore\Orleans.Persistence.EventStore.csproj", "{AB5BEB2B-55AE-4872-8E3D-3EBC76FF7C54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.EventSourcing.EventStore.UnitTests", "tests\Orleans.EventSourcing.EventStore.UnitTests\Orleans.EventSourcing.EventStore.UnitTests.csproj", "{3FE85E59-ADAD-4E87-9108-C66752DA39E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Persistence.EventStore.UnitTests", "tests\Orleans.Persistence.EventStore.UnitTests\Orleans.Persistence.EventStore.UnitTests.csproj", "{A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,11 +41,21 @@ Global
 		{AB5BEB2B-55AE-4872-8E3D-3EBC76FF7C54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB5BEB2B-55AE-4872-8E3D-3EBC76FF7C54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB5BEB2B-55AE-4872-8E3D-3EBC76FF7C54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FE85E59-ADAD-4E87-9108-C66752DA39E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FE85E59-ADAD-4E87-9108-C66752DA39E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FE85E59-ADAD-4E87-9108-C66752DA39E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FE85E59-ADAD-4E87-9108-C66752DA39E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{001D97C7-6E25-47C4-9AB1-9469E45C0D26} = {31C4AB96-B3CE-4EA6-802B-CF8268415146}
 		{A81E18C8-5B22-40B4-98B2-E2EC01DA5B03} = {6459E4B4-E0F4-4EF3-9E36-3519AADD9984}
 		{6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F} = {8E05DFCF-813B-458F-A429-D8BBA1B1ADF4}
 		{AB5BEB2B-55AE-4872-8E3D-3EBC76FF7C54} = {31C4AB96-B3CE-4EA6-802B-CF8268415146}
+		{3FE85E59-ADAD-4E87-9108-C66752DA39E2} = {8E05DFCF-813B-458F-A429-D8BBA1B1ADF4}
+		{A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2} = {8E05DFCF-813B-458F-A429-D8BBA1B1ADF4}
 	EndGlobalSection
 EndGlobal

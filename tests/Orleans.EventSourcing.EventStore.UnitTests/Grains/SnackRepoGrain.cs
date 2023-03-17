@@ -1,11 +1,11 @@
 ﻿using System.Collections.Immutable;
-using EventStore.UnitTests.Commands;
+using Orleans.EventSourcing.EventStore.UnitTests.Commands;
 using Fluxera.Guards;
 using Microsoft.Extensions.Logging;
 using Orleans.Concurrency;
 using Orleans.FluentResults;
 
-namespace EventStore.UnitTests.Grains;
+namespace Orleans.EventSourcing.EventStore.UnitTests.Grains;
 
 [StatelessWorker]
 public class SnackRepoGrain : Grain, ISnackCrudRepoGrain

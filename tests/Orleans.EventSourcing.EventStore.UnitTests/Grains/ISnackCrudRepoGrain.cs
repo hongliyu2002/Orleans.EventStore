@@ -1,9 +1,9 @@
 ﻿using System.Collections.Immutable;
-using EventStore.UnitTests.Commands;
+using Orleans.EventSourcing.EventStore.UnitTests.Commands;
 using Orleans.Concurrency;
 using Orleans.FluentResults;
 
-namespace EventStore.UnitTests.Grains;
+namespace Orleans.EventSourcing.EventStore.UnitTests.Grains;
 
 public interface ISnackCrudRepoGrain : IGrainWithGuidKey
 {

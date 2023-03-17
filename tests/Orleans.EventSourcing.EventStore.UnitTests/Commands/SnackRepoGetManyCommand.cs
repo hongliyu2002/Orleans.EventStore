@@ -1,4 +1,4 @@
-﻿namespace EventStore.UnitTests.Commands;
+﻿namespace Orleans.EventSourcing.EventStore.UnitTests.Commands;
 
 [Immutable]
 [GenerateSerializer]

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Orleans.TestingHost;
 
-namespace EventStore.UnitTests.Hosts;
+namespace Orleans.EventSourcing.EventStore.UnitTests.Hosts;
 
 public class ClientBuilderConfigurator : IClientBuilderConfigurator
 {

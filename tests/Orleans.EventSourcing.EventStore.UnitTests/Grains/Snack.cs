@@ -1,7 +1,7 @@
-﻿using EventStore.UnitTests.Events;
+﻿using Orleans.EventSourcing.EventStore.UnitTests.Events;
 using Fluxera.Guards;
 
-namespace EventStore.UnitTests.States;
+namespace Orleans.EventSourcing.EventStore.UnitTests.States;
 
 [GenerateSerializer]
 public sealed class Snack

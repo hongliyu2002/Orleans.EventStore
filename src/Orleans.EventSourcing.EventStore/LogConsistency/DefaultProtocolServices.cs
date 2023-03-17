@@ -2,7 +2,7 @@
 using Orleans.Runtime;
 using Orleans.Serialization;
 
-namespace Orleans.EventSourcing.LogConsistency;
+namespace Orleans.EventSourcing;
 
 /// <summary>
 ///     Functionality for use by _logger view adaptors that run distributed protocols.

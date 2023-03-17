@@ -2,14 +2,13 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
-using Orleans.EventSourcing.Configuration;
+using Orleans.EventSourcing;
 using Orleans.EventSourcing.EventStoreStorage;
-using Orleans.EventSourcing.LogConsistency;
 using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Storage;
 
-namespace Orleans.EventSourcing.Hosting;
+namespace Orleans.Hosting;
 
 /// <summary>
 /// </summary>

@@ -9,6 +9,11 @@ namespace Orleans.Configuration;
 public class EventStoreStorageOptions : IStorageProviderSerializerOptions
 {
     /// <summary>
+    ///     Whether or not to delete underlying state stream during a clear operation.
+    /// </summary>
+    public bool DeleteStateOnClear { get; set; }
+
+    /// <summary>
     ///     Stage of silo lifecycle where storage should be initialized.  Storage must be initialized prior to use.
     /// </summary>
     public int InitStage { get; set; } = ServiceLifecycleStage.ApplicationServices;

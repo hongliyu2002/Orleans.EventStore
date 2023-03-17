@@ -18,7 +18,7 @@ public class EventStoreClientTests
     {
         var clientSettings = EventStoreClientSettings.Create("esdb://123.60.184.85:2113?tls=false");
         _client = new EventStoreClient(clientSettings);
-        _id = new Guid("fc3358d7-77e6-4ce1-846c-86d28ce34f78");
+        _id = new Guid("888858d7-77e6-4ce1-846c-86d28ce34f78");
     }
 
     [OneTimeTearDown]
@@ -83,5 +83,34 @@ public class EventStoreClientTests
         }
         await _client!.SubscribeToStreamAsync($"Snack-{_id}", FromStream.Start, OnEventAppeared, true, OnSubscriptionDropped!);
         await Task.Delay(1000);
+    }
+
+    [Test]
+    public async Task Should_Delete_Stream()
+    {
+        var id = Guid.NewGuid();
+        var evt = new SnackInitializedEvent(id, "Cafe", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Delete_Stream", -1);
+        var evtData = new EventData(Uuid.NewUuid(), nameof(SnackInitializedEvent), JsonSerializer.SerializeToUtf8Bytes(evt));
+        var evtResult = await _client!.AppendToStreamAsync($"Snack-{id}", StreamRevision.None, new[] { evtData });
+        var version = evtResult.NextExpectedStreamRevision.ToUInt64();
+        version.Should().Be(0);
+
+        await TestContext.Progress.WriteLineAsync(version.ToString());
+        var evt1 = new SnackRemovedEvent(id, Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Delete_Stream", (int)version);
+        var evt1Data = new EventData(Uuid.NewUuid(), nameof(SnackNameChangedEvent), JsonSerializer.SerializeToUtf8Bytes(evt1));
+        var evt1Result = await _client!.AppendToStreamAsync($"Snack-{id}", new StreamRevision(version), new[] { evt1Data });
+        var version1 = evt1Result.NextExpectedStreamRevision.ToUInt64();
+        version1.Should().Be(1);
+        
+        await TestContext.Progress.WriteLineAsync(version1.ToString());
+        var deleteResult = await _client.DeleteAsync($"Snack-{id}", new StreamRevision(version1));
+        await TestContext.Progress.WriteLineAsync(deleteResult.LogPosition.ToString());
+        
+        var evt2 = new SnackNameChangedEvent(id, "Coke", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Delete_Stream", (int)version1);
+        var evt2Data = new EventData(Uuid.NewUuid(), nameof(SnackNameChangedEvent), JsonSerializer.SerializeToUtf8Bytes(evt2));
+        var evt2Result = await _client!.AppendToStreamAsync($"Snack-{id}", new StreamRevision(version1), new[] { evt2Data });
+        var version2 = evt2Result.NextExpectedStreamRevision.ToUInt64();
+        version2.Should().Be(2);
+        await TestContext.Progress.WriteLineAsync(version2.ToString());
     }
 }

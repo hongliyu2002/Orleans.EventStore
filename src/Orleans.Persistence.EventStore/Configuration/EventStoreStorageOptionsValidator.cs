@@ -1,5 +1,5 @@
-﻿using Orleans.EventSourcing.EventStoreStorage;
-using Orleans.Runtime;
+﻿using Orleans.Runtime;
+using Orleans.Storage;
 
 namespace Orleans.Configuration;
 
@@ -18,7 +18,7 @@ public class EventStoreStorageOptionsValidator : IConfigurationValidator
     /// <exception cref="OrleansConfigurationException"></exception>
     public EventStoreStorageOptionsValidator(EventStoreStorageOptions options, string name)
     {
-        _options = options ?? throw new OrleansConfigurationException($"Invalid EventStoreStorageOptions for EventStoreLogConsistentStorage {name}. Options is required.");
+        _options = options ?? throw new OrleansConfigurationException($"Invalid EventStoreStorageOptions for EventStoreStorage {name}. Options is required.");
         _name = name;
     }
 
@@ -27,7 +27,7 @@ public class EventStoreStorageOptionsValidator : IConfigurationValidator
     {
         if (_options.ClientSettings == null)
         {
-            throw new OrleansConfigurationException($"Invalid configuration for {nameof(EventStoreLogConsistentStorage)} with name {_name}. {nameof(EventStoreStorageOptions)}.{nameof(_options.ClientSettings)} is required.");
+            throw new OrleansConfigurationException($"Invalid configuration for {nameof(EventStoreGrainStorage)} with name {_name}. {nameof(EventStoreStorageOptions)}.{nameof(_options.ClientSettings)} is required.");
         }
     }
 }

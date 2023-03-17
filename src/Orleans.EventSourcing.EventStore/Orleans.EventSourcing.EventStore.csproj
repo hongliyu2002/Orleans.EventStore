@@ -7,7 +7,7 @@
         <PackageId>Orleans.EventSourcing.EventStore</PackageId>
         <Title>EventStore for Microsoft Orleans Event-Sourcing</Title>
         <Description>EventStore Grpc client implementation of log consistency provider for Microsoft Orleans EventSourcing.</Description>
-        <Version>7.1.0.2</Version>
+        <Version>7.1.0.3</Version>
         <AssemblyVersion>7.1.0.0</AssemblyVersion>
         <FileVersion>7.1.0.0</FileVersion>
         <Authors>Leo Hong</Authors>
@@ -34,8 +34,8 @@
     <ItemGroup>
         <PackageReference Include="EventStore.Client.Grpc.Streams" Version="22.0.0" />
         <PackageReference Include="Google.Protobuf" Version="3.22.1" />
-        <PackageReference Include="Grpc.Core.Api" Version="2.51.0" />
-        <PackageReference Include="Grpc.Net.Client" Version="2.51.0" />
+        <PackageReference Include="Grpc.Core.Api" Version="2.52.0" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.52.0" />
         <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.1.0" />
         <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.1.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />

@@ -3,14 +3,13 @@ using EventStore.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
-using Orleans.EventSourcing.Configuration;
 using Orleans.Runtime;
 using Orleans.Storage;
 
 namespace Orleans.EventSourcing.EventStoreStorage;
 
 /// <summary>
-///     EventStore-based gog consistent storage provider
+///     EventStore-based log consistent storage provider
 /// </summary>
 public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleParticipant<ISiloLifecycle>
 {
@@ -36,12 +35,11 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
 
     /// <summary>
     /// </summary>
-    /// <param name="grainTypeName"></param>
     /// <param name="grainId"></param>
     /// <returns></returns>
-    private string GetStreamName(string grainTypeName, GrainId grainId)
+    private string GetStreamName(GrainId grainId)
     {
-        return $"{_serviceId}-{grainTypeName}-{grainId.Key}";
+        return $"{_serviceId}/log/{grainId}";
     }
 
     #region Lifecycle Participant
@@ -95,14 +93,18 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         {
             return expectedVersion;
         }
-        var streamName = GetStreamName(grainTypeName, grainId);
+        var streamName = GetStreamName(grainId);
         try
         {
-            var eventData = logEntries.Select(SerializeEvent);
-            var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision((ulong)expectedVersion), eventData).ConfigureAwait(false);
+            var serializedEntries = logEntries.Select(SerializeEvent);
+            var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision((ulong)expectedVersion), serializedEntries).ConfigureAwait(false);
             return (int)writeResult.NextExpectedStreamRevision.ToUInt64();
         }
-        catch (Exception ex)
+        catch (WrongExpectedVersionException)
+        {
+            throw new InconsistentStateException($"Version conflict ({nameof(AppendAsync)}): ServiceId={_serviceId} ProviderName={_name} GrainType={grainTypeName} GrainId={grainId} Version={expectedVersion}.");
+        }
+        catch (Exception ex) when (ex is not InconsistentStateException)
         {
             _logger.LogError("Failed to write log entries for {GrainType} grain with ID {GrainId} and stream key {Key}.", grainTypeName, grainId, streamName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to write log entries for {grainTypeName} with ID {grainId} and stream key {streamName}. {ex.GetType()}: {ex.Message}"));
@@ -116,7 +118,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         {
             return new List<TLogEntry>();
         }
-        var streamName = GetStreamName(grainTypeName, grainId);
+        var streamName = GetStreamName(grainId);
         try
         {
             var readResult = _client.ReadStreamAsync(Direction.Forwards, streamName, StreamPosition.FromInt64(fromVersion), length);
@@ -137,7 +139,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
     /// <inheritdoc />
     public async Task<int> GetLastVersionAsync(string grainTypeName, GrainId grainId)
     {
-        var streamName = GetStreamName(grainTypeName, grainId);
+        var streamName = GetStreamName(grainId);
         try
         {
             var readResult = _client.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1);
@@ -165,15 +167,15 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
     /// <param name="entry"></param>
     /// <typeparam name="TLogEntry"></typeparam>
     /// <returns></returns>
-    private EventData SerializeEvent<TLogEntry>(TLogEntry entry)
+    protected virtual EventData SerializeEvent<TLogEntry>(TLogEntry entry)
     {
+        var contentType = _storageSerializer is JsonGrainStorageSerializer ? "application/json" : "application/octet-stream";
         if (entry is null)
         {
-            return new EventData(Uuid.NewUuid(), typeof(TLogEntry).Name, new ReadOnlyMemory<byte>());
+            return new EventData(Uuid.NewUuid(), typeof(TLogEntry).Name, new ReadOnlyMemory<byte>(), null, contentType);
         }
-        // var eventJson = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(entry, _jsonDefaultSettings));
-        var eventJson = _storageSerializer.Serialize(entry);
-        return new EventData(Uuid.NewUuid(), entry.GetType().Name, eventJson.ToMemory());
+        var entryData = _storageSerializer.Serialize(entry);
+        return new EventData(Uuid.NewUuid(), entry.GetType().Name, entryData.ToMemory(), null, contentType);
     }
 
     /// <summary>
@@ -181,12 +183,10 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
     /// <param name="evt"></param>
     /// <typeparam name="TLogEntry"></typeparam>
     /// <returns></returns>
-    private (TLogEntry LogEntry, int Version) DeserializeEvent<TLogEntry>(ResolvedEvent evt)
+    protected virtual (TLogEntry LogEntry, int Version) DeserializeEvent<TLogEntry>(ResolvedEvent evt)
     {
-        // var eventJson = Encoding.UTF8.GetString(evt.Event.Data.ToArray());
-        // var logEntry = JsonConvert.DeserializeObject<TLogEntry>(eventJson, _jsonDefaultSettings) ?? Activator.CreateInstance<TLogEntry>();
-        var logEntry = _storageSerializer.Deserialize<TLogEntry>(evt.Event.Data) ?? Activator.CreateInstance<TLogEntry>();
-        return (logEntry, (int)evt.Event.EventNumber.ToUInt64());
+        var entry = _storageSerializer.Deserialize<TLogEntry>(evt.Event.Data) ?? Activator.CreateInstance<TLogEntry>();
+        return (entry, (int)evt.Event.EventNumber.ToUInt64());
     }
 
     #endregion

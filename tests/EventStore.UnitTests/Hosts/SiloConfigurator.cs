@@ -1,5 +1,4 @@
 ﻿using EventStore.Client;
-using Orleans.EventSourcing.Hosting;
 using Orleans.TestingHost;
 
 namespace EventStore.UnitTests.Hosts;

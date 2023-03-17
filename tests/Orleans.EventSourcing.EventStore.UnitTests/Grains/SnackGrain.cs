@@ -1,10 +1,8 @@
 ﻿using System.Collections.Immutable;
-using Orleans.EventSourcing.EventStore.UnitTests.Commands;
-using Orleans.EventSourcing.EventStore.UnitTests.Events;
-using Orleans.EventSourcing.EventStore.UnitTests.States;
 using Fluxera.Guards;
 using Microsoft.Extensions.Logging;
-using Orleans.EventSourcing;
+using Orleans.EventSourcing.EventStore.UnitTests.Commands;
+using Orleans.EventSourcing.EventStore.UnitTests.Events;
 using Orleans.FluentResults;
 using Orleans.Providers;
 

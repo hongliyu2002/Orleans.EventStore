@@ -1,7 +1,6 @@
-﻿using Orleans.EventSourcing.EventStore.UnitTests.Events;
-using Fluxera.Guards;
+﻿using Fluxera.Guards;
 
-namespace Orleans.EventSourcing.EventStore.UnitTests.Grains;
+namespace Orleans.Persistence.EventStore.UnitTests.Grains;
 
 [GenerateSerializer]
 public sealed class Snack
@@ -54,31 +53,4 @@ public sealed class Snack
     {
         return $"Snack with Id:{Id} Name:'{Name}'";
     }
-
-    #region Apply
-
-    public void Apply(SnackInitializedEvent evt)
-    {
-        Id = evt.Id;
-        Name = evt.Name;
-        CreatedAt = evt.OperatedAt;
-        CreatedBy = evt.OperatedBy;
-    }
-
-    public void Apply(SnackRemovedEvent evt)
-    {
-        DeletedAt = evt.OperatedAt;
-        DeletedBy = evt.OperatedBy;
-        IsDeleted = true;
-    }
-
-    public void Apply(SnackNameChangedEvent evt)
-    {
-        Name = evt.Name;
-        LastModifiedAt = evt.OperatedAt;
-        LastModifiedBy = evt.OperatedBy;
-    }
-
-    #endregion
-
 }

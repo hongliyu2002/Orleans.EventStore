@@ -5,7 +5,6 @@ namespace Orleans.EventSourcing.EventStore.UnitTests.Hosts;
 
 public class SiloConfigurator : ISiloConfigurator
 {
-
     /// <inheritdoc />
     public void Configure(ISiloBuilder siloBuilder)
     {

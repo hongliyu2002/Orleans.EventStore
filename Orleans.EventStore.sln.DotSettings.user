@@ -13,6 +13,9 @@
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.EventStoreClientTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::3FE85E59-ADAD-4E87-9108-C66752DA39E2::net7.0::Orleans.EventSourcing.EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackRepoGrainTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::3FE85E59-ADAD-4E87-9108-C66752DA39E2::net7.0::Orleans.EventSourcing.EventStore.UnitTests.SnackRepoGrainTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>

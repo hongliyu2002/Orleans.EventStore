@@ -14,7 +14,6 @@ public static class LogConsistencyProviderFactory
     public static LogConsistencyProvider Create(IServiceProvider serviceProvider, string name)
     {
         var logConsistentStorage = serviceProvider.GetRequiredServiceByName<ILogConsistentStorage>(name);
-        var logConsistencyProvider = ActivatorUtilities.CreateInstance<LogConsistencyProvider>(serviceProvider, logConsistentStorage);
-        return logConsistencyProvider;
+        return ActivatorUtilities.CreateInstance<LogConsistencyProvider>(serviceProvider, logConsistentStorage);
     }
 }

@@ -5,13 +5,13 @@
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.eventsourcing\7.1.0\lib\net7.0\Orleans.EventSourcing.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.testinghost\7.1.0\lib\net7.0\Orleans.TestingHost.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ec151381_002D3eed_002D4836_002Db2d1_002Da9531b1be078/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="EventStoreClientTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ec151381_002D3eed_002D4836_002Db2d1_002Da9531b1be078/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EventStoreClientTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.EventStoreClientTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=32e8d4ac_002D6478_002D42fa_002Da7a8_002D982e854070ec/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Should_Create_A_New_SnackGrain" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=32e8d4ac_002D6478_002D42fa_002Da7a8_002D982e854070ec/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Should_Create_A_New_SnackGrain" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.SnackRepoGrainTests&lt;/TestId&gt;&#xD;

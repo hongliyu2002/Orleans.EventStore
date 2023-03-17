@@ -1,8 +1,8 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
-using Force.DeepCloner;
 using Microsoft.Extensions.Logging;
 using Orleans.EventSourcing.Common;
+using Orleans.Serialization;
 using Orleans.Storage;
 
 namespace Orleans.EventSourcing.EventStoreStorage;
@@ -11,8 +11,8 @@ namespace Orleans.EventSourcing.EventStoreStorage;
 ///     A log view adaptor that wraps around a traditional storage adaptor, and uses batching and e-tags
 ///     to append entries.
 ///     <para>
-///         The log itself is actually saved to storage - the latest view and some
-///         metadata (the log position, and write flags) and log entries are all stored.
+///         The log itself is actually saved to storage - the latest view (snapshot) and metadata (the log position, and write flags)
+///         and all log entries are stored in the primary.
 ///     </para>
 /// </summary>
 /// <typeparam name="TLogView">Type of log view</typeparam>
@@ -24,6 +24,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
     private readonly IGrainStorage _grainStorage;
     private readonly string _grainTypeName;
     private readonly ILogConsistentStorage _logStorage;
+    private readonly DeepCopier _deepCopier;
 
     private SnapshotWithMetaDataAndETag<TLogView> _globalSnapshot = new();
     private TLogView _confirmedView = new();
@@ -33,7 +34,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
     /// <summary>
     ///     Initializes a new instance of LogViewAdaptor class
     /// </summary>
-    public LogViewAdaptor(ILogViewAdaptorHost<TLogView, TLogEntry> host, TLogView initialState, IGrainStorage grainStorage, string grainTypeName, ILogConsistencyProtocolServices services, ILogConsistentStorage logStorage)
+    public LogViewAdaptor(ILogViewAdaptorHost<TLogView, TLogEntry> host, TLogView initialState, IGrainStorage grainStorage, string grainTypeName, ILogConsistencyProtocolServices services, ILogConsistentStorage logStorage, DeepCopier deepCopier)
         : base(host, initialState, services)
     {
         ArgumentNullException.ThrowIfNull(grainStorage);
@@ -42,6 +43,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
         _grainStorage = grainStorage;
         _grainTypeName = grainTypeName;
         _logStorage = logStorage;
+        _deepCopier = deepCopier;
     }
 
     /// <inheritdoc />
@@ -110,7 +112,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
                 if (_confirmedVersion < _globalSnapshot.State.SnapshotVersion)
                 {
                     _confirmedVersion = _globalSnapshot.State.SnapshotVersion;
-                    _confirmedView = _globalSnapshot.State.Snapshot.DeepClone();
+                    _confirmedView = _deepCopier.Copy(_globalSnapshot.State.Snapshot);
                 }
                 try
                 {
@@ -163,7 +165,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
         {
             try
             {
-                _globalSnapshot.State.Snapshot = _confirmedView.DeepClone();
+                _globalSnapshot.State.Snapshot = _deepCopier.Copy(_confirmedView);
                 _globalSnapshot.State.SnapshotVersion = _confirmedVersion;
                 await _grainStorage.WriteStateAsync(_grainTypeName, Services.GrainId, _globalSnapshot);
                 batchSuccessfullyWritten = true;
@@ -190,7 +192,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> : PrimaryBasedLogViewAdaptor<
                     if (_confirmedVersion < _globalSnapshot.State.SnapshotVersion)
                     {
                         _confirmedVersion = _globalSnapshot.State.SnapshotVersion;
-                        _confirmedView = _globalSnapshot.State.Snapshot.DeepClone();
+                        _confirmedView = _deepCopier.Copy(_globalSnapshot.State.Snapshot);
                     }
                     try
                     {

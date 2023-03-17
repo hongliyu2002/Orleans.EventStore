@@ -67,6 +67,7 @@ public static class EventStoreStorageServiceCollectionExtensions
         {
             services.TryAddSingleton(sp => sp.GetServiceByName<ILogViewAdaptorFactory>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME));
         }
-        return services.AddSingletonNamedService<ILogViewAdaptorFactory>(name, LogConsistencyProviderFactory.Create);
+        services.AddSingletonNamedService<ILogViewAdaptorFactory>(name, LogConsistencyProviderFactory.Create);
+        return services;
     }
 }

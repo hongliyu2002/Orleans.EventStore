@@ -49,9 +49,5 @@
             <Link>README.md</Link>
         </None>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Hosting" />
-    </ItemGroup>
     
 </Project>

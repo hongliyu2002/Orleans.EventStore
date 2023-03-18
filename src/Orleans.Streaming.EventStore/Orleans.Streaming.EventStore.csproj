@@ -4,10 +4,10 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <PackageId>Orleans.EventSourcing.EventStore</PackageId>
-        <Title>EventStore for Microsoft Orleans Event-Sourcing</Title>
-        <Description>EventStore Grpc client implementation of log consistency provider for Microsoft Orleans EventSourcing.</Description>
-        <Version>7.1.1</Version>
+        <PackageId>Orleans.Streaming.EventStore</PackageId>
+        <Title>EventStore for Microsoft Orleans Streaming</Title>
+        <Description>EventStore Grpc client implementation of streaming for Microsoft Orleans Streaming.</Description>
+        <Version>7.1.0</Version>
         <AssemblyVersion>7.1.0.0</AssemblyVersion>
         <FileVersion>7.1.0.0</FileVersion>
         <Authors>Leo Hong</Authors>
@@ -15,11 +15,10 @@
         <RepositoryUrl>https://github.com/hongliyu2002/Orleans.EventStore</RepositoryUrl>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageTags>eventstore;event-store;persistence;grain-storage;orleans;orleans-persistence;orleans-storage;orleans-grain-storage</PackageTags>
+        <PackageTags>eventstore;event-store;streaming;orleans;orleans-streaming;event-driven;</PackageTags>
         <PackageProjectUrl>https://github.com/hongliyu2002/Orleans.EventStore</PackageProjectUrl>
         <PackageIcon>logo_128.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>Use orleans deep copier</PackageReleaseNotes>
         <!--SourceLink-->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -28,7 +27,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <OrleansBuildTimeCodeGen>true</OrleansBuildTimeCodeGen>
-        <RootNamespace>Orleans.EventSourcing</RootNamespace>
+        <RootNamespace>Orleans.Streaming</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -36,7 +35,7 @@
         <PackageReference Include="Google.Protobuf" Version="3.22.1" />
         <PackageReference Include="Grpc.Core.Api" Version="2.52.0" />
         <PackageReference Include="Grpc.Net.Client" Version="2.52.0" />
-        <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.1.0" />
+        <PackageReference Include="Microsoft.Orleans.Runtime" Version="7.1.0" />
         <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.1.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
         <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
@@ -49,6 +48,10 @@
         <None Include=".\README.md" Pack="true" PackagePath="">
             <Link>README.md</Link>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Hosting" />
     </ItemGroup>
 
 </Project>

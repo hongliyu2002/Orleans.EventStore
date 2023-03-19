@@ -19,7 +19,7 @@
         <PackageProjectUrl>https://github.com/hongliyu2002/Orleans.EventStore</PackageProjectUrl>
         <PackageIcon>logo_128.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>Use orleans deep copier</PackageReleaseNotes>
+        <PackageReleaseNotes>Add UserCredentials options to connect to EventStore</PackageReleaseNotes>
         <!--SourceLink-->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

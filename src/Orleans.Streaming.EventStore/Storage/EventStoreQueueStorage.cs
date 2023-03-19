@@ -110,15 +110,79 @@ public class EventStoreQueueStorage
 
     #endregion
 
-    #region Internal Queue Operations
+    #region Internal Queue Handlers
 
-    private Task OnEventAppeared(PersistentSubscription arg1, ResolvedEvent arg2, int? arg3, CancellationToken arg4)
+    private async Task OnEventAppeared(PersistentSubscription subscription, ResolvedEvent resolvedEvent, int? retryCount, CancellationToken cancellationToken)
     {
-        return null;
+        if (_logger.IsEnabled(LogLevel.Trace))
+        {
+            _logger.LogTrace("EventAppeared from subscription: {Subscription} for the queue: {QueueName}", subscription.SubscriptionId, _queueName);
+        }
+        try
+        {
+            if (retryCount is null or <= 3)
+            {
+                _eventQueue.Enqueue(resolvedEvent);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to handle event from subscription for the queue {QueueName} for 3 times.", _queueName);
+                await subscription.Nack(PersistentSubscriptionNakEventAction.Park, "Retried 3 times.", resolvedEvent);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to handle event from subscription for the queue {QueueName}.", _queueName);
+            await subscription.Nack(PersistentSubscriptionNakEventAction.Retry, ex.Message, resolvedEvent);
+        }
     }
 
-    private void OnSubscriptionDropped(PersistentSubscription arg1, SubscriptionDroppedReason arg2, Exception? arg3)
+    private async void OnSubscriptionDropped(PersistentSubscription subscription, SubscriptionDroppedReason reason, Exception? exception)
     {
+        try
+        {
+            switch (reason)
+            {
+                case SubscriptionDroppedReason.ServerError:
+                    _logger.LogWarning("SubscriptionDropped from subscription: {Subscription} for the queue: {QueueName} with server error: {Error}", subscription.SubscriptionId, _queueName, exception?.Message);
+                    await ResubscribeAsync(5);
+                    break;
+                case SubscriptionDroppedReason.SubscriberError:
+                    _logger.LogWarning("SubscriptionDropped from subscription: {Subscription} for the queue: {QueueName} with client error: {Error}", subscription.SubscriptionId, _queueName, exception?.Message);
+                    await ResubscribeAsync(1);
+                    break;
+                case SubscriptionDroppedReason.Disposed:
+                    _logger.LogInformation("SubscriptionDropped from subscription: {Subscription} for the queue: {QueueName} successfully", subscription.SubscriptionId, _queueName);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to handle subscription dropped for the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"{ex.GetType()}: {ex.Message}"));
+        }
+    }
+
+    private async Task ResubscribeAsync(int retryCount)
+    {
+        for (var i = 0; i < retryCount; i++)
+        {
+            try
+            {
+                _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _storageOptions.Credentials, _storageOptions.SubscriptionQueueBufferSize);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Successfully reconnected to the queue {QueueName}.", _queueName);
+                }
+                return;
+            }
+            catch (Exception)
+            {
+                _logger.LogError("Failed to reconnect to the queue {QueueName}. Retrying... Attempt: {Attempt}", _queueName, i + 1);
+                await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, i))); // Exponential backoff
+            }
+        }
+        _logger.LogError("Failed to reconnect to the queue {QueueName} after {Retries} attempts. Aborting...", _queueName, retryCount);
     }
 
     #endregion
@@ -141,8 +205,8 @@ public class EventStoreQueueStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to peek event from internal queue for the stream {QueueName}.", _queueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to peek event from internal queue for the stream {_queueName}. {ex.GetType()}: {ex.Message}"));
+            _logger.LogError("Failed to peek event from internal queue for the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to peek event from internal queue for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 
@@ -170,8 +234,8 @@ public class EventStoreQueueStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to peek events from internal queue for the stream {QueueName}.", _queueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to peek events from internal queue for the stream {_queueName}. {ex.GetType()}: {ex.Message}"));
+            _logger.LogError("Failed to peek events from internal queue for the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to peek events from internal queue for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 
@@ -191,8 +255,8 @@ public class EventStoreQueueStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to dequeue event from internal queue for the stream {QueueName}.", _queueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to dequeue event from internal queue for the stream {_queueName}. {ex.GetType()}: {ex.Message}"));
+            _logger.LogError("Failed to dequeue event from internal queue for the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to dequeue event from internal queue for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 
@@ -220,8 +284,8 @@ public class EventStoreQueueStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to dequeue events from internal queue for the stream {QueueName}.", _queueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to dequeue events from internal queue for the stream {_queueName}. {ex.GetType()}: {ex.Message}"));
+            _logger.LogError("Failed to dequeue events from internal queue for the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to dequeue events from internal queue for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 
@@ -232,7 +296,7 @@ public class EventStoreQueueStorage
     {
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace("Acknowledge event to stream: {QueueName}", _queueName);
+            _logger.LogTrace("Acknowledge event to queue: {QueueName}", _queueName);
         }
         try
         {
@@ -240,8 +304,8 @@ public class EventStoreQueueStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to acknowledge event for the stream {QueueName}.", _queueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to acknowledge event for the stream {_queueName}. {ex.GetType()}: {ex.Message}"));
+            _logger.LogError("Failed to acknowledge event for the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to acknowledge event for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 
@@ -252,7 +316,7 @@ public class EventStoreQueueStorage
     {
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace("Unacknowledge event to stream: {QueueName}", _queueName);
+            _logger.LogTrace("Unacknowledge event to queue: {QueueName}", _queueName);
         }
         try
         {
@@ -260,8 +324,8 @@ public class EventStoreQueueStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to unacknowledge event for the stream {QueueName}.", _queueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to unacknowledge event for the stream {_queueName}. {ex.GetType()}: {ex.Message}"));
+            _logger.LogError("Failed to unacknowledge event for the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to unacknowledge event for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 
@@ -273,7 +337,7 @@ public class EventStoreQueueStorage
     {
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace("Appending message to stream: {QueueName}", _queueName);
+            _logger.LogTrace("Appending message to queue: {QueueName}", _queueName);
         }
         try
         {
@@ -282,8 +346,8 @@ public class EventStoreQueueStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to write message for the stream {QueueName}.", _queueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to write message for the stream {_queueName}. {ex.GetType()}: {ex.Message}"));
+            _logger.LogError("Failed to write message for the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to write message for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 
@@ -302,8 +366,8 @@ public class EventStoreQueueStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to delete the stream {QueueName}.", _queueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to delete the stream {_queueName}. {ex.GetType()}: {ex.Message}"));
+            _logger.LogError("Failed to delete the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to delete the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 

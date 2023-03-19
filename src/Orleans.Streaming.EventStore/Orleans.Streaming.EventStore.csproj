@@ -37,6 +37,7 @@
         <PackageReference Include="Grpc.Net.Client" Version="2.52.0" />
         <PackageReference Include="Microsoft.Orleans.Runtime" Version="7.1.0" />
         <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.1.0" />
+        <PackageReference Include="Microsoft.Orleans.Streaming" Version="7.1.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
         <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     </ItemGroup>
@@ -51,7 +52,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Hosting" />
+        <Folder Include="Hosting" />
     </ItemGroup>
 
 </Project>

@@ -13,7 +13,7 @@ namespace Orleans.Storage;
 public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
 {
     private readonly string _name;
-    private readonly EventStoreStorageOptions _options;
+    private readonly EventStoreStorageOptions _storageOptions;
     private readonly IGrainStorageSerializer _storageSerializer;
     private readonly ILogger<EventStoreGrainStorage> _logger;
     private readonly string _serviceId;
@@ -25,8 +25,12 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     /// </summary>
     public EventStoreGrainStorage(string name, EventStoreStorageOptions storageOptions, IOptions<ClusterOptions> clusterOptions, ILogger<EventStoreGrainStorage> logger)
     {
+        ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
+        ArgumentNullException.ThrowIfNull(storageOptions, nameof(storageOptions));
+        ArgumentNullException.ThrowIfNull(clusterOptions, nameof(clusterOptions));
+        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _name = name;
-        _options = storageOptions;
+        _storageOptions = storageOptions;
         _storageSerializer = storageOptions.GrainStorageSerializer;
         _serviceId = clusterOptions.Value.ServiceId;
         _logger = logger;
@@ -47,7 +51,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     public void Participate(ISiloLifecycle lifecycle)
     {
         var name = OptionFormattingUtilities.Name<EventStoreGrainStorage>(_name);
-        lifecycle.Subscribe(name, _options.InitStage, Init, Close);
+        lifecycle.Subscribe(name, _storageOptions.InitStage, Init, Close);
     }
 
     private Task Init(CancellationToken cancellationToken)
@@ -59,7 +63,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
             {
                 _logger.LogDebug("EventStoreGrainStorage {Name} is initializing: ServiceId={ServiceId}", _name, _serviceId);
             }
-            _client = new EventStoreClient(_options.ClientSettings);
+            _client = new EventStoreClient(_storageOptions.ClientSettings);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 timer.Stop();
@@ -127,6 +131,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         }
         catch (WrongExpectedVersionException)
         {
+            _logger.LogWarning("Version conflict for {GrainType} grain with ID {GrainId} and stream key {Key} on WriteStateAsync.", grainTypeName, grainId, streamName);
             throw new InconsistentStateException($"Version conflict ({nameof(WriteStateAsync)}): ServiceId={_serviceId} ProviderName={_name} GrainType={grainTypeName} GrainId={grainId} ETag={grainState.ETag}.");
         }
         catch (Exception ex) when (ex is not InconsistentStateException)
@@ -143,7 +148,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         try
         {
             var eTagExists = ulong.TryParse(grainState.ETag, out var eTag);
-            if (_options.DeleteStateOnClear)
+            if (_storageOptions.DeleteStateOnClear)
             {
                 if (eTagExists)
                 {
@@ -164,10 +169,12 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         }
         catch (WrongExpectedVersionException)
         {
+            _logger.LogWarning("Version conflict for {GrainType} grain with ID {GrainId} and stream key {Key} on ClearStateAsync.", grainTypeName, grainId, streamName);
             throw new InconsistentStateException($"Version conflict ({nameof(ClearStateAsync)}): ServiceId={_serviceId} ProviderName={_name} GrainType={grainTypeName} GrainId={grainId} ETag={grainState.ETag}.");
         }
         catch (Exception ex) when (ex is not InconsistentStateException)
         {
+            _logger.LogError("Failed to clear grain state for {GrainType} grain with ID {GrainId} and stream key {Key}.", grainTypeName, grainId, streamName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to clear grain state for grain {grainTypeName} with ID {grainId}. {ex.GetType()}: {ex.Message}"));
         }
     }
@@ -181,7 +188,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     /// <param name="state"></param>
     /// <typeparam name="TState"></typeparam>
     /// <returns></returns>
-    protected virtual EventData SerializeState<TState>(TState state)
+    private EventData SerializeState<TState>(TState state)
     {
         var contentType = _storageSerializer is JsonGrainStorageSerializer ? "application/json" : "application/octet-stream";
         if (state is null)
@@ -197,7 +204,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     /// <param name="evt"></param>
     /// <typeparam name="TState"></typeparam>
     /// <returns></returns>
-    protected virtual (TState State, string ETag) DeserializeState<TState>(ResolvedEvent evt)
+    private (TState State, string ETag) DeserializeState<TState>(ResolvedEvent evt)
     {
         var state = _storageSerializer.Deserialize<TState>(evt.Event.Data) ?? Activator.CreateInstance<TState>();
         return (state, evt.Event.EventNumber.ToUInt64().ToString());

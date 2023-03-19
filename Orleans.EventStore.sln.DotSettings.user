@@ -7,6 +7,8 @@
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.runtime\7.1.0\lib\net7.0\Orleans.Runtime.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.serialization\7.1.0\lib\net7.0\Orleans.Serialization.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.core\7.1.0\lib\net7.0\Orleans.Core.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.streaming\7.1.0\lib\net7.0\Orleans.Streaming.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.core.abstractions\7.1.0\lib\net7.0\Orleans.Core.Abstractions.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ec151381_002D3eed_002D4836_002Db2d1_002Da9531b1be078/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EventStoreClientTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;

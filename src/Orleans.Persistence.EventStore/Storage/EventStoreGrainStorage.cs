@@ -79,9 +79,17 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         return Task.CompletedTask;
     }
 
-    private Task Close(CancellationToken cancellationToken)
+    private async Task Close(CancellationToken cancellationToken)
     {
-        return _client.DisposeAsync().AsTask();
+        try
+        {
+            await _client.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Close: Name={Name} ServiceId={ServiceId}", _name, _serviceId);
+            throw new EventStoreStorageException(FormattableString.Invariant($"{ex.GetType()}: {ex.Message}"));
+        }
     }
 
     #endregion
@@ -94,7 +102,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         var streamName = GetStreamName(grainId);
         try
         {
-            var readResult = _client.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1);
+            var readResult = _client.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1, false, null, _storageOptions.Credentials);
             var readState = await readResult.ReadState.ConfigureAwait(false);
             if (readState == ReadState.Ok)
             {
@@ -125,7 +133,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         {
             var eTagExists = ulong.TryParse(grainState.ETag, out var eTag);
             var serializedState = SerializeState(grainState.State);
-            var writeResult = await _client.AppendToStreamAsync(streamName, eTagExists ? new StreamRevision(eTag) : StreamRevision.None, new[] { serializedState }).ConfigureAwait(false);
+            var writeResult = await _client.AppendToStreamAsync(streamName, eTagExists ? new StreamRevision(eTag) : StreamRevision.None, new[] { serializedState }, null, null, _storageOptions.Credentials).ConfigureAwait(false);
             grainState.ETag = writeResult.NextExpectedStreamRevision.ToUInt64().ToString();
             grainState.RecordExists = true;
         }
@@ -152,7 +160,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
             {
                 if (eTagExists)
                 {
-                    await _client.DeleteAsync(streamName, new StreamRevision(eTag)).ConfigureAwait(false);
+                    await _client.DeleteAsync(streamName, new StreamRevision(eTag), null, _storageOptions.Credentials).ConfigureAwait(false);
                     grainState.ETag = eTag.ToString();
                 }
             }
@@ -161,7 +169,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
                 if (eTagExists)
                 {
                     var serializedState = SerializeState(default(T));
-                    var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision(eTag), new[] { serializedState }).ConfigureAwait(false);
+                    var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision(eTag), new[] { serializedState }, null, null, _storageOptions.Credentials).ConfigureAwait(false);
                     grainState.ETag = writeResult.NextExpectedStreamRevision.ToUInt64().ToString();
                 }
             }

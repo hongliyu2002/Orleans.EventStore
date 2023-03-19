@@ -9,7 +9,12 @@
 
     <ItemGroup>
         <PackageReference Include="Bogus" Version="34.0.2" />
+        <PackageReference Include="EventStore.Client.Grpc" Version="22.0.0" />
+        <PackageReference Include="EventStore.Client.Grpc.Operations" Version="22.0.0" />
+        <PackageReference Include="EventStore.Client.Grpc.PersistentSubscriptions" Version="22.0.0" />
+        <PackageReference Include="EventStore.Client.Grpc.ProjectionManagement" Version="22.0.0" />
         <PackageReference Include="EventStore.Client.Grpc.Streams" Version="22.0.0" />
+        <PackageReference Include="EventStore.Client.Grpc.UserManagement" Version="22.0.0" />
         <PackageReference Include="FluentAssertions" Version="6.10.0" />
         <PackageReference Include="Fluxera.Guards" Version="7.1.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />

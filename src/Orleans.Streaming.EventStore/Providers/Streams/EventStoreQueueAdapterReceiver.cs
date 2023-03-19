@@ -1,5 +1,7 @@
 ﻿using EventStore.Client;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Orleans.Configuration;
 using Orleans.Streaming.Configuration;
 using Orleans.Streaming.EventStoreStorage;
 using Orleans.Streams;
@@ -11,32 +13,40 @@ namespace Orleans.Providers.Streams.EventStore;
 /// </summary>
 internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
 {
-    public static IQueueAdapterReceiver Create(string streamName, EventStoreStorageOptions storageOptions, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILoggerFactory loggerFactory)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(streamName, nameof(streamName));
-        ArgumentNullException.ThrowIfNull(storageOptions, nameof(storageOptions));
-        ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
-        ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
-        var streamStorage = new EventStoreStreamStorage(streamName, storageOptions, loggerFactory.CreateLogger<EventStoreStreamStorage>());
-        return new EventStoreQueueAdapterReceiver(streamName, streamStorage, dataAdapter, loggerFactory.CreateLogger<EventStoreQueueAdapterReceiver>());
-    }
+    private record PendingDelivery(StreamSequenceToken SequenceToken, ResolvedEvent Event);
 
-    private readonly string _streamName;
-    private EventStoreStreamStorage? _streamStorage;
+    private readonly string _queueName;
+    private EventStoreQueueStorage? _queueStorage;
     private readonly IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> _dataAdapter;
     private readonly ILogger<EventStoreQueueAdapterReceiver> _logger;
-    private readonly List<PendingDelivery> _pendings;
-    private Task? _outstandingTask;
-    private long lastReadMessage;
+    private readonly List<PendingDelivery> _pendingDeliveries = new(32);
 
-    private EventStoreQueueAdapterReceiver(string streamName, EventStoreStreamStorage streamStorage, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILogger<EventStoreQueueAdapterReceiver> logger)
+    private Task? _task;
+
+    public static IQueueAdapterReceiver Create(string queueName, EventStoreStorageOptions storageOptions, IOptions<ClusterOptions> clusterOptions, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILoggerFactory loggerFactory)
     {
-        _streamName = streamName;
-        _streamStorage = streamStorage;
+        ArgumentException.ThrowIfNullOrEmpty(queueName, nameof(queueName));
+        ArgumentNullException.ThrowIfNull(storageOptions, nameof(storageOptions));
+        ArgumentNullException.ThrowIfNull(clusterOptions, nameof(clusterOptions));
+        ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
+        ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
+        var streamStorage = new EventStoreQueueStorage(queueName, clusterOptions.Value.ServiceId, storageOptions, loggerFactory.CreateLogger<EventStoreQueueStorage>());
+        return new EventStoreQueueAdapterReceiver(queueName, streamStorage, dataAdapter, loggerFactory.CreateLogger<EventStoreQueueAdapterReceiver>());
+    }
+
+    private EventStoreQueueAdapterReceiver(string queueName, EventStoreQueueStorage queueStorage, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILogger<EventStoreQueueAdapterReceiver> logger)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(queueName, nameof(queueName));
+        ArgumentNullException.ThrowIfNull(queueStorage, nameof(queueStorage));
+        ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
+        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
+        _queueName = queueName;
+        _queueStorage = queueStorage;
         _dataAdapter = dataAdapter;
         _logger = logger;
-        _pendings = new List<PendingDelivery>(32);
     }
+
+    #region Lifecycle
 
     /// <summary>
     ///     Initializes this receiver.
@@ -44,7 +54,11 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
     /// <returns>A <see cref="Task" />representing the operation.</returns>
     public Task Initialize(TimeSpan timeout)
     {
-        return _streamStorage == null ? Task.CompletedTask : _streamStorage.Init();
+        if (_queueStorage != null)
+        {
+            return _queueStorage.Init();
+        }
+        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -55,20 +69,25 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
     {
         try
         {
-            if (_outstandingTask != null)
+            // await the last storage operation, so after we shutdown and stop this receiver we don't get async operation completions from pending storage operations.
+            if (_task != null)
             {
-                await _outstandingTask;
+                await _task;
             }
-            if (_streamStorage != null)
+            if (_queueStorage != null)
             {
-                await _streamStorage.Close();
+                await _queueStorage.Close();
             }
         }
         finally
         {
-            _streamStorage = null;
+            _queueStorage = null;
         }
     }
+
+    #endregion
+
+    #region IQueueAdapterReceiver Implementation
 
     /// <summary>
     ///     Retrieves batches from a message queue.
@@ -77,33 +96,31 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
     ///     The maximum number of message batches to retrieve.
     /// </param>
     /// <returns>The message batches.</returns>
-    public async Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
+    public Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
     {
         const int MaxNumberOfMessagesToPeek = 32;
         try
         {
             // store direct ref, in case we are somehow asked to shutdown while we are receiving.
-            var streamStorage = _streamStorage;
-            if (streamStorage == null)
+            var queueStorage = _queueStorage;
+            if (queueStorage == null)
             {
-                return new List<IBatchContainer>();
+                return Task.FromResult<IList<IBatchContainer>>(new List<IBatchContainer>());
             }
             var count = maxCount < 0 ? MaxNumberOfMessagesToPeek : Math.Min(maxCount, MaxNumberOfMessagesToPeek);
-            var readLastTask = streamStorage.ReadLastAsync(count);
-            _outstandingTask = readLastTask;
-            var messages = await readLastTask;
-            var containers = new List<IBatchContainer>();
-            foreach (var message in messages)
+            var resolvedEvents = queueStorage.DequeueMany(count);
+            var batchContainers = new List<IBatchContainer>(resolvedEvents.Count);
+            foreach (var resolvedEvent in resolvedEvents)
             {
-                var container = _dataAdapter.FromQueueMessage(message.Data, lastReadMessage++);
-                containers.Add(container);
-                _pendings.Add(new PendingDelivery(container.SequenceToken, message));
+                var batchContainer = _dataAdapter.FromQueueMessage(resolvedEvent.Event.Data, (long)resolvedEvent.Event.Position.CommitPosition * 1000);
+                batchContainers.Add(batchContainer);
+                _pendingDeliveries.Add(new PendingDelivery(batchContainer.SequenceToken, resolvedEvent));
             }
-            return containers;
+            return Task.FromResult<IList<IBatchContainer>>(batchContainers);
         }
         finally
         {
-            _outstandingTask = null;
+            _task = null;
         }
     }
 
@@ -111,36 +128,55 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
     ///     Notifies the adapter receiver that the messages were delivered to all consumers,
     ///     so the receiver can take an appropriate action (e.g., delete the messages from a message queue).
     /// </summary>
-    /// <param name="messages">
+    /// <param name="deliveredContainers">
     ///     The message batches.
     /// </param>
     /// <returns>A <see cref="Task" /> representing the operation.</returns>
-    public async Task MessagesDeliveredAsync(IList<IBatchContainer> messages)
+    public async Task MessagesDeliveredAsync(IList<IBatchContainer> deliveredContainers)
     {
         try
         {
-            var streamStorage = _streamStorage;
-            if (streamStorage == null || messages.Count == 0)
+            // store direct ref, in case we are somehow asked to shutdown while we are receiving.
+            var queueStorage = _queueStorage;
+            if (queueStorage == null || deliveredContainers == null || deliveredContainers.Count == 0)
             {
                 return;
+            }
+            // get sequence tokens of delivered messages
+            var deliveredTokens = deliveredContainers.Select(container => container.SequenceToken).ToList();
+            // find latest delivered message
+            var latestToken = deliveredTokens.Max();
+            // finalize all pending messages at or before the latest
+            var finalizedDeliveries = _pendingDeliveries.Where(pendingDelivery => !pendingDelivery.SequenceToken.Newer(latestToken)).ToList();
+            if (finalizedDeliveries.Count == 0)
+            {
+                return;
+            }
+            // remove all finalized deliveries from pending, regardless of if it was delivered or not.
+            _pendingDeliveries.RemoveRange(0, finalizedDeliveries.Count);
+            // get the queue messages for all finalized deliveries that were delivered.
+            var deliveredEvents = finalizedDeliveries.Where(finalized => deliveredTokens.Contains(finalized.SequenceToken)).Select(finalized => finalized.Event).ToList();
+            if (deliveredEvents.Count == 0)
+            {
+                return;
+            }
+            // Acknowlege all delivered queue messages from the queue.  Anything finalized but not delivered will show back up later
+            _task = queueStorage.AcknowledgeAsync(deliveredEvents.ToArray());
+            try
+            {
+                await _task;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Exception upon Acknowledge on queue {QueueName}. Ignoring.", _queueName);
             }
         }
         finally
         {
-            _outstandingTask = null;
+            _task = null;
         }
     }
 
-    private class PendingDelivery
-    {
-        public PendingDelivery(StreamSequenceToken token, EventRecord message)
-        {
-            Token = token;
-            Message = message;
-        }
+    #endregion
 
-        public EventRecord Message { get; }
-
-        public StreamSequenceToken Token { get; }
-    }
 }

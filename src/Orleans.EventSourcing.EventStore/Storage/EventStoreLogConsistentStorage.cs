@@ -80,9 +80,17 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         return Task.CompletedTask;
     }
 
-    private Task Close(CancellationToken cancellationToken)
+    private async Task Close(CancellationToken cancellationToken)
     {
-        return _client.DisposeAsync().AsTask();
+        try
+        {
+            await _client.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Close: Name={Name} ServiceId={ServiceId}", _name, _serviceId);
+            throw new EventStoreStorageException(FormattableString.Invariant($"{ex.GetType()}: {ex.Message}"));
+        }
     }
 
     #endregion
@@ -99,7 +107,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         var streamName = GetStreamName(grainId);
         try
         {
-            var readResult = _client.ReadStreamAsync(Direction.Forwards, streamName, StreamPosition.FromInt64(fromVersion), maxCount);
+            var readResult = _client.ReadStreamAsync(Direction.Forwards, streamName, StreamPosition.FromInt64(fromVersion), maxCount, false, null, _storageOptions.Credentials);
             var readState = await readResult.ReadState.ConfigureAwait(false);
             if (readState == ReadState.StreamNotFound)
             {
@@ -120,7 +128,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         var streamName = GetStreamName(grainId);
         try
         {
-            var readResult = _client.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1);
+            var readResult = _client.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1, false, null, _storageOptions.Credentials);
             var readState = await readResult.ReadState.ConfigureAwait(false);
             if (readState == ReadState.StreamNotFound)
             {
@@ -148,7 +156,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         try
         {
             var serializedEntries = entriesList.Select(SerializeEvent);
-            var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision((ulong)expectedVersion), serializedEntries).ConfigureAwait(false);
+            var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision((ulong)expectedVersion), serializedEntries, null, null, _storageOptions.Credentials).ConfigureAwait(false);
             return (int)writeResult.NextExpectedStreamRevision.ToUInt64();
         }
         catch (WrongExpectedVersionException)

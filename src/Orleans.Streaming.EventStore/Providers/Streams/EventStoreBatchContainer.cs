@@ -14,6 +14,7 @@ namespace Orleans.Providers.Streams.EventStore;
 public class EventStoreBatchContainer : IBatchContainer
 {
     /// <summary>
+    ///     Initializes a new instance of the <see cref="EventStoreBatchContainer" /> class.
     /// </summary>
     /// <param name="streamId"></param>
     /// <param name="events"></param>
@@ -24,23 +25,21 @@ public class EventStoreBatchContainer : IBatchContainer
         StreamId = streamId;
         Events = events;
         RequestContext = requestContext;
-        SequenceToken = new EventSequenceToken();
+        EventSequenceToken = new EventSequenceToken();
     }
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="EventStoreBatchContainer" /> class.
     /// </summary>
     /// <param name="streamId"></param>
     /// <param name="events"></param>
     /// <param name="requestContext"></param>
     /// <param name="sequenceToken"></param>
     [JsonConstructor]
-    public EventStoreBatchContainer(StreamId streamId, List<object> events, Dictionary<string, object> requestContext, StreamSequenceToken sequenceToken)
+    public EventStoreBatchContainer(StreamId streamId, List<object> events, Dictionary<string, object> requestContext, EventSequenceToken sequenceToken)
+        : this(streamId, events, requestContext)
     {
-        ArgumentNullException.ThrowIfNull(events, nameof(events));
-        StreamId = streamId;
-        Events = events;
-        RequestContext = requestContext;
-        SequenceToken = sequenceToken == null ? new EventSequenceToken() : sequenceToken as EventSequenceToken ?? new EventSequenceToken(sequenceToken.SequenceNumber, sequenceToken.EventIndex);
+        EventSequenceToken = sequenceToken;
     }
 
     /// <summary>
@@ -48,7 +47,12 @@ public class EventStoreBatchContainer : IBatchContainer
     /// </summary>
     [JsonProperty]
     [Id(0)]
-    public StreamSequenceToken SequenceToken { get; set; }
+    internal EventSequenceToken EventSequenceToken { get; set; }
+
+    /// <summary>
+    ///     Ges the stream sequence token for the start of this batch.
+    /// </summary>
+    public StreamSequenceToken SequenceToken => EventSequenceToken;
 
     /// <summary>
     /// </summary>
@@ -75,7 +79,7 @@ public class EventStoreBatchContainer : IBatchContainer
     /// <returns></returns>
     public IEnumerable<Tuple<T, StreamSequenceToken>> GetEvents<T>()
     {
-        return Events.OfType<T>().Select((x, i) => Tuple.Create<T, StreamSequenceToken>(x, new EventSequenceToken(SequenceToken.SequenceNumber, i)));
+        return Events.OfType<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, EventSequenceToken.CreateSequenceTokenForEvent(index)));
     }
 
     /// <summary>
@@ -85,12 +89,12 @@ public class EventStoreBatchContainer : IBatchContainer
     /// <returns><see langword="true" /> if the <see cref="Runtime.RequestContext" /> was indeed modified, <see langword="false" /> otherwise.</returns>
     public bool ImportRequestContext()
     {
-        if (RequestContext == null)
+        if (RequestContext != null)
         {
-            return false;
+            RequestContextExtensions.Import(RequestContext);
+            return true;
         }
-        RequestContextExtensions.Import(RequestContext);
-        return true;
+        return false;
     }
 
     /// <summary>

@@ -1,24 +1,31 @@
 ﻿using EventStore.Client;
-using Orleans.Storage;
 
 namespace Orleans.Streaming.Configuration;
 
 /// <summary>
 ///     EventStore streaming storage options.
 /// </summary>
-public class EventStoreStorageOptions : IStorageProviderSerializerOptions
+public class EventStoreStorageOptions
 {
-    /// <summary>
-    ///     Stage of silo lifecycle where storage should be initialized.  Storage must be initialized prior to use.
-    /// </summary>
-    public int InitStage { get; set; } = ServiceLifecycleStage.ApplicationServices;
-
-    /// <inheritdoc />
-    public IGrainStorageSerializer GrainStorageSerializer { get; set; } = null!;
-
     /// <summary>
     ///     The EventStore client settings.
     /// </summary>
     [Redact]
     public EventStoreClientSettings ClientSettings { get; set; } = null!;
+
+    /// <summary>
+    ///     The user credentials that have permissions to create persistent subscription and append events.
+    /// </summary>
+    [Redact]
+    public UserCredentials? Credentials { get; set; }
+
+    /// <summary>
+    ///     The EventStore persistent subscription settings.
+    /// </summary>
+    public PersistentSubscriptionSettings SubscriptionSettings { get; set; } = new();
+
+    /// <summary>
+    ///     The buffer size used in persistent subscription client queue.
+    /// </summary>
+    public int SubscriptionQueueBufferSize { get; set; } = 32;
 }

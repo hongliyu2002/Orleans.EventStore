@@ -26,4 +26,10 @@ public class EventStoreStorageOptions : IStorageProviderSerializerOptions
     /// </summary>
     [Redact]
     public EventStoreClientSettings ClientSettings { get; set; } = null!;
+
+    /// <summary>
+    ///     The user credentials that have permissions to append events.
+    /// </summary>
+    [Redact]
+    public UserCredentials? Credentials { get; set; }
 }

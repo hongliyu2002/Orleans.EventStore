@@ -8,12 +8,14 @@ namespace Orleans.Providers.Streams.EventStore;
 /// <summary>
 ///     Each queue message is allowed to be a heterogeneous, ordered set of events.
 ///     <see cref="IBatchContainer" /> contains these events and allows users to query the batch for a specific type of event.
+///     Second version of EventStoreBatchContainer.  This version supports external serializers (like json)
 /// </summary>
 [Serializable]
 [GenerateSerializer]
 public class EventStoreBatchContainerV2 : IBatchContainer
 {
     /// <summary>
+    ///     Initializes a new instance of the <see cref="EventStoreBatchContainerV2" /> class.
     /// </summary>
     /// <param name="streamId"></param>
     /// <param name="events"></param>
@@ -24,23 +26,21 @@ public class EventStoreBatchContainerV2 : IBatchContainer
         StreamId = streamId;
         Events = events;
         RequestContext = requestContext;
-        SequenceToken = new EventSequenceTokenV2();
+        EventSequenceToken = new EventSequenceTokenV2();
     }
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="EventStoreBatchContainerV2" /> class.
     /// </summary>
     /// <param name="streamId"></param>
     /// <param name="events"></param>
     /// <param name="requestContext"></param>
     /// <param name="sequenceToken"></param>
     [JsonConstructor]
-    public EventStoreBatchContainerV2(StreamId streamId, List<object> events, Dictionary<string, object> requestContext, StreamSequenceToken sequenceToken)
+    public EventStoreBatchContainerV2(StreamId streamId, List<object> events, Dictionary<string, object> requestContext, EventSequenceTokenV2 sequenceToken)
+        : this(streamId, events, requestContext)
     {
-        ArgumentNullException.ThrowIfNull(events, nameof(events));
-        StreamId = streamId;
-        Events = events;
-        RequestContext = requestContext;
-        SequenceToken = sequenceToken == null ? new EventSequenceTokenV2() : sequenceToken as EventSequenceTokenV2 ?? new EventSequenceTokenV2(sequenceToken.SequenceNumber, sequenceToken.EventIndex);
+        EventSequenceToken = sequenceToken;
     }
 
     /// <summary>
@@ -48,7 +48,12 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     /// </summary>
     [JsonProperty]
     [Id(0)]
-    public StreamSequenceToken SequenceToken { get; set; }
+    internal EventSequenceTokenV2 EventSequenceToken { get; set; }
+
+    /// <summary>
+    ///     Ges the stream sequence token for the start of this batch.
+    /// </summary>
+    public StreamSequenceToken SequenceToken => EventSequenceToken;
 
     /// <summary>
     /// </summary>
@@ -75,7 +80,7 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     /// <returns></returns>
     public IEnumerable<Tuple<T, StreamSequenceToken>> GetEvents<T>()
     {
-        return Events.OfType<T>().Select((x, i) => Tuple.Create<T, StreamSequenceToken>(x, new EventSequenceTokenV2(SequenceToken.SequenceNumber, i)));
+        return Events.OfType<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, EventSequenceToken.CreateSequenceTokenForEvent(index)));
     }
 
     /// <summary>
@@ -85,12 +90,12 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     /// <returns><see langword="true" /> if the <see cref="Runtime.RequestContext" /> was indeed modified, <see langword="false" /> otherwise.</returns>
     public bool ImportRequestContext()
     {
-        if (RequestContext == null)
+        if (RequestContext != null)
         {
-            return false;
+            RequestContextExtensions.Import(RequestContext);
+            return true;
         }
-        RequestContextExtensions.Import(RequestContext);
-        return true;
+        return false;
     }
 
     /// <summary>

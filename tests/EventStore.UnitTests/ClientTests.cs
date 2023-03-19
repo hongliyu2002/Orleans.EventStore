@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace EventStore.UnitTests;
 
 [TestFixture]
-public class EventStoreClientTests
+public class ClientTests
 {
     public EventStoreClient? _client;
     public Guid _id;
@@ -55,6 +55,21 @@ public class EventStoreClientTests
                          };
         await evt2Action.Should().ThrowAsync<WrongExpectedVersionException>();
     }
+    
+    [Test]
+    public async Task Should_Append_Multiple_Data_To_Stream()
+    {
+        var evt0 = new SnackInitializedEvent(_id, "Coke", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Append_Multiple_Data_To_Stream", 0);
+        var evt1 = new SnackNameChangedEvent(_id, "Orange", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Append_Multiple_Data_To_Stream", 1);
+        var evt2 = new SnackNameChangedEvent(_id, "Pizza", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Append_Multiple_Data_To_Stream", 2);
+        var evt3 = new SnackRemovedEvent(_id, Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Append_Multiple_Data_To_Stream", 3);
+        var evt0Data = new EventData(Uuid.NewUuid(), nameof(SnackInitializedEvent), JsonSerializer.SerializeToUtf8Bytes(evt0));
+        var evt1Data = new EventData(Uuid.NewUuid(), nameof(SnackNameChangedEvent), JsonSerializer.SerializeToUtf8Bytes(evt1));
+        var evt2Data = new EventData(Uuid.NewUuid(), nameof(SnackNameChangedEvent), JsonSerializer.SerializeToUtf8Bytes(evt2));
+        var evt3Data = new EventData(Uuid.NewUuid(), nameof(SnackRemovedEvent), JsonSerializer.SerializeToUtf8Bytes(evt3));
+        var writeResult = await _client!.AppendToStreamAsync($"Snack-{_id}", StreamState.Any, new[] { evt0Data, evt1Data, evt2Data, evt3Data });
+        await TestContext.Progress.WriteLineAsync(writeResult.NextExpectedStreamRevision.ToString());
+    }
 
     [Test]
     public async Task Should_Read_Data_From_Stream()
@@ -70,22 +85,6 @@ public class EventStoreClientTests
     }
 
     [Test]
-    public async Task Should_Subscribe_To_Stream()
-    {
-        static async Task OnEventAppeared(StreamSubscription sub, ResolvedEvent evt, CancellationToken ct)
-        {
-            var evtJson = Encoding.UTF8.GetString(evt.Event.Data.ToArray());
-            await TestContext.Progress.WriteLineAsync($"{evt.Event.EventNumber} {evtJson}");
-        }
-        static async void OnSubscriptionDropped(StreamSubscription subscription, SubscriptionDroppedReason reason, Exception exception)
-        {
-            await TestContext.Progress.WriteLineAsync($"Subscription was dropped due to {reason}. {exception}");
-        }
-        await _client!.SubscribeToStreamAsync($"Snack-{_id}", FromStream.Start, OnEventAppeared, true, OnSubscriptionDropped!);
-        await Task.Delay(1000);
-    }
-
-    [Test]
     public async Task Should_Delete_Stream()
     {
         var id = Guid.NewGuid();
@@ -94,8 +93,9 @@ public class EventStoreClientTests
         var evtResult = await _client!.AppendToStreamAsync($"Snack-{id}", StreamRevision.None, new[] { evtData });
         var version = evtResult.NextExpectedStreamRevision.ToUInt64();
         version.Should().Be(0);
-
+        
         await TestContext.Progress.WriteLineAsync(version.ToString());
+        
         var evt1 = new SnackRemovedEvent(id, Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Delete_Stream", (int)version);
         var evt1Data = new EventData(Uuid.NewUuid(), nameof(SnackNameChangedEvent), JsonSerializer.SerializeToUtf8Bytes(evt1));
         var evt1Result = await _client!.AppendToStreamAsync($"Snack-{id}", new StreamRevision(version), new[] { evt1Data });
@@ -112,5 +112,27 @@ public class EventStoreClientTests
         var version2 = evt2Result.NextExpectedStreamRevision.ToUInt64();
         version2.Should().Be(2);
         await TestContext.Progress.WriteLineAsync(version2.ToString());
+    }
+    
+    [Test]
+    public async Task Should_Subscribe_To_Stream()
+    {
+        static async Task OnEventAppeared(StreamSubscription sub, ResolvedEvent evt, CancellationToken ct)
+        {
+            var evtJson = Encoding.UTF8.GetString(evt.Event.Data.ToArray());
+            await TestContext.Progress.WriteLineAsync($"{evt.Event.EventNumber} {evtJson}");
+        }
+        static async void OnSubscriptionDropped(StreamSubscription subscription, SubscriptionDroppedReason reason, Exception exception)
+        {
+            await TestContext.Progress.WriteLineAsync($"Subscription was dropped due to {reason}. {exception}");
+        }
+        var sub = await _client!.SubscribeToStreamAsync($"Snack-{_id}", FromStream.Start, OnEventAppeared, true, OnSubscriptionDropped!);
+        await Task.Delay(1000);
+    }
+
+    [Test]
+    public async Task  Should()
+    {
+        await TestContext.Progress.WriteLineAsync($"{typeof(EventStoreClient).Name}");
     }
 }

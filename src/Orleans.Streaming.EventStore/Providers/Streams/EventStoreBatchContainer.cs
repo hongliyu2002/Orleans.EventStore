@@ -1,107 +1,118 @@
-﻿using Newtonsoft.Json;
-using Orleans.Providers.Streams.Common;
+﻿using EventStore.Client;
+using Newtonsoft.Json;
 using Orleans.Runtime;
+using Orleans.Serialization;
 using Orleans.Streams;
 
-namespace Orleans.Providers.Streams.EventStore;
+namespace Orleans.Streaming.Providers.Streams;
 
 /// <summary>
-///     Each queue message is allowed to be a heterogeneous, ordered set of events.
-///     <see cref="IBatchContainer" /> contains these events and allows users to query the batch for a specific type of event.
+///     Batch container that is delivers payload and stream position information for a set of events in an EventStore EventData.
 /// </summary>
 [Serializable]
 [GenerateSerializer]
 public class EventStoreBatchContainer : IBatchContainer
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EventStoreBatchContainer" /> class.
     /// </summary>
-    /// <param name="streamId"></param>
-    /// <param name="events"></param>
-    /// <param name="requestContext"></param>
-    public EventStoreBatchContainer(StreamId streamId, List<object> events, Dictionary<string, object> requestContext)
+    /// <param name="serializer"></param>
+    [GeneratedActivatorConstructor]
+    internal EventStoreBatchContainer(Serializer serializer)
     {
-        ArgumentNullException.ThrowIfNull(events, nameof(events));
-        StreamId = streamId;
-        Events = events;
-        RequestContext = requestContext;
-        EventSequenceToken = new EventSequenceToken();
+        _serializer = serializer;
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EventStoreBatchContainer" /> class.
+    ///     Batch container that delivers events from cached EventStore data associated with an orleans stream
     /// </summary>
-    /// <param name="streamId"></param>
-    /// <param name="events"></param>
-    /// <param name="requestContext"></param>
-    /// <param name="sequenceToken"></param>
-    [JsonConstructor]
-    public EventStoreBatchContainer(StreamId streamId, List<object> events, Dictionary<string, object> requestContext, EventSequenceToken sequenceToken)
-        : this(streamId, events, requestContext)
+    public EventStoreBatchContainer(EventStoreMessage eventStoreMessage, Serializer serializer)
     {
-        EventSequenceToken = sequenceToken;
+        _eventStoreMessage = eventStoreMessage;
+        _serializer = serializer;
+        _sequenceToken = new EventStoreSequenceTokenV2(eventStoreMessage.Offset, eventStoreMessage.SequenceNumber, 0);
     }
 
-    /// <summary>
-    ///     Ges the stream sequence token for the start of this batch.
-    /// </summary>
     [JsonProperty]
     [Id(0)]
-    internal EventSequenceToken EventSequenceToken { get; set; }
+    private readonly EventStoreMessage _eventStoreMessage = null!;
 
-    /// <summary>
-    ///     Ges the stream sequence token for the start of this batch.
-    /// </summary>
-    public StreamSequenceToken SequenceToken => EventSequenceToken;
-
-    /// <summary>
-    /// </summary>
     [JsonProperty]
     [Id(1)]
-    private List<object> Events { get; }
+    private readonly EventStoreSequenceToken _sequenceToken = null!;
 
     /// <summary>
+    ///     Stream identifier for the stream this batch is part of.
     /// </summary>
-    [JsonProperty]
-    [Id(2)]
-    private Dictionary<string, object> RequestContext { get; }
+    public StreamId StreamId => _eventStoreMessage.StreamId;
 
     /// <summary>
-    ///     Ges the stream identifier for the stream this batch is part of.
+    ///     Stream Sequence Token for the start of this batch.
     /// </summary>
-    [Id(3)]
-    public StreamId StreamId { get; }
+    public StreamSequenceToken SequenceToken => _sequenceToken;
+
+    [JsonIgnore]
+    [NonSerialized]
+    internal Serializer _serializer;
 
     /// <summary>
-    ///     Gets events of a specific type from the batch.
+    ///     Payload is local cache of deserialized payloadBytes.
+    ///     Should never be serialized as part of batch container.
+    ///     During batch container serialization raw payloadBytes will always be used.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    [NonSerialized]
+    private Body? _payload;
+
+    internal Body Payload => _payload ??= _serializer.Deserialize<Body>(_eventStoreMessage.Payload);
+
+    /// <inheritdoc />
     public IEnumerable<Tuple<T, StreamSequenceToken>> GetEvents<T>()
     {
-        return Events.OfType<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, EventSequenceToken.CreateSequenceTokenForEvent(index)));
+        return Payload.Events.Cast<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, new EventStoreSequenceTokenV2(_sequenceToken.Offset, _sequenceToken.SequenceNumber, index)));
     }
 
     /// <summary>
-    ///     Gives an opportunity to <see cref="IBatchContainer" /> to set any data in the <see cref="Runtime.RequestContext" /> before this <see cref="IBatchContainer" /> is sent to consumers.
+    ///     Gives an opportunity to IBatchContainer to set any data in the RequestContext before this IBatchContainer is sent to consumers.
     ///     It can be the data that was set at the time event was generated and enqueued into the persistent provider or any other data.
     /// </summary>
-    /// <returns><see langword="true" /> if the <see cref="Runtime.RequestContext" /> was indeed modified, <see langword="false" /> otherwise.</returns>
+    /// <returns>True if the RequestContext was indeed modified, false otherwise.</returns>
     public bool ImportRequestContext()
     {
-        if (RequestContext != null)
+        if (Payload.RequestContext != null)
         {
-            RequestContextExtensions.Import(RequestContext);
+            RequestContextExtensions.Import(Payload.RequestContext);
             return true;
         }
         return false;
     }
 
     /// <summary>
+    ///     Put events list and its context into a EventData object
     /// </summary>
-    /// <returns></returns>
-    public override string ToString()
+    public static EventData ToEventData<T>(Serializer serializer, StreamId streamId, IEnumerable<T> events, Dictionary<string, object> requestContext)
     {
-        return $"[EventStoreBatchContainer:Stream={StreamId},#Items={Events.Count}]";
+        var payload = new Body
+                      {
+                          Events = events.Cast<object>().ToList(),
+                          RequestContext = requestContext
+                      };
+        var data = new ReadOnlyMemory<byte>(serializer.SerializeToArray(payload));
+        var typeName = payload.Events.Count <= 1 ? typeof(T).Name : $"{typeof(T).Name} List";
+        return new EventData(Uuid.NewUuid(), typeName, data, streamId.FullKey, "application/octet-stream");
     }
+
+    #region Internal Class
+
+    [Serializable]
+    [GenerateSerializer]
+    internal class Body
+    {
+        [Id(0)]
+        public List<object> Events { get; set; } = new();
+
+        [Id(1)]
+        public Dictionary<string, object> RequestContext { get; set; } = new();
+    }
+
+    #endregion
+
 }

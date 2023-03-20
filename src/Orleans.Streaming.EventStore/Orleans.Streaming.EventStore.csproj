@@ -53,8 +53,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Configuration" />
-      <Folder Include="Hosting" />
       <Folder Include="Providers\PersistentStreams" />
     </ItemGroup>
 

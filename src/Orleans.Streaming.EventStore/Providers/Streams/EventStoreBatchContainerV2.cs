@@ -8,36 +8,37 @@ namespace Orleans.Providers.Streams.EventStore;
 /// <summary>
 ///     Each queue message is allowed to be a heterogeneous, ordered set of events.
 ///     <see cref="IBatchContainer" /> contains these events and allows users to query the batch for a specific type of event.
+///     Second version of EventStoreBatchContainer.  This version supports external serializers (like json)
 /// </summary>
 [Serializable]
 [GenerateSerializer]
-public class EventStoreBatchContainer : IBatchContainer
+public class EventStoreBatchContainerV2 : IBatchContainer
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EventStoreBatchContainer" /> class.
+    ///     Initializes a new instance of the <see cref="EventStoreBatchContainerV2" /> class.
     /// </summary>
     /// <param name="streamId"></param>
-    /// <param name="events"></param>
+    /// <param name="evt"></param>
     /// <param name="requestContext"></param>
-    public EventStoreBatchContainer(StreamId streamId, List<object> events, Dictionary<string, object> requestContext)
+    public EventStoreBatchContainerV2(StreamId streamId, object evt, Dictionary<string, object> requestContext)
     {
-        ArgumentNullException.ThrowIfNull(events, nameof(events));
+        ArgumentNullException.ThrowIfNull(evt, nameof(evt));
         StreamId = streamId;
-        Events = events;
+        Event = evt;
         RequestContext = requestContext;
-        EventSequenceToken = new EventSequenceToken();
+        EventSequenceToken = new EventSequenceTokenV2();
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EventStoreBatchContainer" /> class.
+    ///     Initializes a new instance of the <see cref="EventStoreBatchContainerV2" /> class.
     /// </summary>
     /// <param name="streamId"></param>
-    /// <param name="events"></param>
+    /// <param name="evt"></param>
     /// <param name="requestContext"></param>
     /// <param name="sequenceToken"></param>
     [JsonConstructor]
-    public EventStoreBatchContainer(StreamId streamId, List<object> events, Dictionary<string, object> requestContext, EventSequenceToken sequenceToken)
-        : this(streamId, events, requestContext)
+    public EventStoreBatchContainerV2(StreamId streamId, object evt, Dictionary<string, object> requestContext, EventSequenceTokenV2 sequenceToken)
+        : this(streamId, evt, requestContext)
     {
         EventSequenceToken = sequenceToken;
     }
@@ -47,7 +48,7 @@ public class EventStoreBatchContainer : IBatchContainer
     /// </summary>
     [JsonProperty]
     [Id(0)]
-    internal EventSequenceToken EventSequenceToken { get; set; }
+    internal EventSequenceTokenV2 EventSequenceToken { get; set; }
 
     /// <summary>
     ///     Ges the stream sequence token for the start of this batch.
@@ -58,7 +59,7 @@ public class EventStoreBatchContainer : IBatchContainer
     /// </summary>
     [JsonProperty]
     [Id(1)]
-    private List<object> Events { get; }
+    private object Event { get; }
 
     /// <summary>
     /// </summary>
@@ -79,7 +80,8 @@ public class EventStoreBatchContainer : IBatchContainer
     /// <returns></returns>
     public IEnumerable<Tuple<T, StreamSequenceToken>> GetEvents<T>()
     {
-        return Events.OfType<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, EventSequenceToken.CreateSequenceTokenForEvent(index)));
+        // return Events.OfType<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, EventSequenceToken.CreateSequenceTokenForEvent(index)));
+        return new[] { Tuple.Create<T, StreamSequenceToken>((T)Event, EventSequenceToken) };
     }
 
     /// <summary>
@@ -102,6 +104,6 @@ public class EventStoreBatchContainer : IBatchContainer
     /// <returns></returns>
     public override string ToString()
     {
-        return $"[EventStoreBatchContainer:Stream={StreamId},#Items={Events.Count}]";
+        return $"[EventStoreBatchContainerV2:Stream={StreamId}]";
     }
 }

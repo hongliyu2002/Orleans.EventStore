@@ -1,5 +1,5 @@
-﻿using Orleans.Runtime;
-using Orleans.Providers.Streams.EventStore;
+﻿using Orleans.Providers.Streams.EventStore;
+using Orleans.Runtime;
 
 namespace Orleans.Configuration;
 
@@ -10,6 +10,17 @@ public class EventStoreQueueOptionsValidator : IConfigurationValidator
 {
     private readonly EventStoreQueueOptions _options;
     private readonly string _name;
+
+    /// <summary>
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static IConfigurationValidator Create(IServiceProvider services, string name)
+    {
+        var queueOptions = services.GetOptionsByName<EventStoreQueueOptions>(name);
+        return new EventStoreQueueOptionsValidator(queueOptions, name);
+    }
 
     /// <summary>
     /// </summary>

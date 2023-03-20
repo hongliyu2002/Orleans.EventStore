@@ -34,6 +34,6 @@ public static class EventStoreQueueStreamConfiguratorExtensions
     public static void ConfigureQueueDataAdapter<TQueueDataAdapter>(this IEventStoreQueueStreamConfigurator configurator)
         where TQueueDataAdapter : IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer>
     {
-        configurator.ConfigureComponent<IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer>>((sp, n) => ActivatorUtilities.CreateInstance<TQueueDataAdapter>(sp));
+        configurator.ConfigureComponent<IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer>>((sp, _) => ActivatorUtilities.CreateInstance<TQueueDataAdapter>(sp));
     }
 }

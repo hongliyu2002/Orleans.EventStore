@@ -2,6 +2,7 @@
 using Orleans.Providers.Streams.Common;
 using Orleans.Runtime;
 using Orleans.Serialization;
+using Orleans.Storage;
 using Orleans.Streams;
 
 namespace Orleans.Providers.Streams.EventStore;
@@ -13,15 +14,15 @@ namespace Orleans.Providers.Streams.EventStore;
 [SerializationCallbacks(typeof(OnDeserializedCallbacks))]
 public class EventStoreQueueDataAdapterV2 : IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer>, IOnDeserialized
 {
-    private Serializer<EventStoreBatchContainerV2> _serializer;
+    private IGrainStorageSerializer _serializer;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="EventStoreQueueDataAdapterV2" /> class.
     /// </summary>
     /// <param name="serializer"></param>
-    public EventStoreQueueDataAdapterV2(Serializer serializer)
+    public EventStoreQueueDataAdapterV2(IGrainStorageSerializer serializer)
     {
-        _serializer = serializer.GetSerializer<EventStoreBatchContainerV2>();
+        _serializer = serializer;
     }
 
     /// <summary>
@@ -38,8 +39,8 @@ public class EventStoreQueueDataAdapterV2 : IQueueDataAdapter<ReadOnlyMemory<byt
         ArgumentNullException.ThrowIfNull(events, nameof(events));
         var eventSequenceToken = sequenceToken == null ? new EventSequenceTokenV2() : sequenceToken as EventSequenceTokenV2 ?? new EventSequenceTokenV2(sequenceToken.SequenceNumber, sequenceToken.EventIndex);
         var batchContainer = new EventStoreBatchContainerV2(streamId, events.Cast<object>().ToList(), requestContext, eventSequenceToken);
-        var queueMessageBuffer = _serializer.SerializeToArray(batchContainer);
-        return new ReadOnlyMemory<byte>(queueMessageBuffer);
+        var queueMessageBuffer = _serializer.Serialize(batchContainer);
+        return queueMessageBuffer.ToMemory();
     }
 
     /// <summary>
@@ -50,7 +51,7 @@ public class EventStoreQueueDataAdapterV2 : IQueueDataAdapter<ReadOnlyMemory<byt
     /// <returns>The message batch.</returns>
     public IBatchContainer FromQueueMessage(ReadOnlyMemory<byte> queueMessage, long sequenceId)
     {
-        var batchContainer = _serializer.Deserialize(queueMessage);
+        var batchContainer = _serializer.Deserialize<EventStoreBatchContainerV2>(queueMessage) ?? Activator.CreateInstance<EventStoreBatchContainerV2>();
         batchContainer.EventSequenceToken = new EventSequenceTokenV2(sequenceId);
         return batchContainer;
     }
@@ -58,6 +59,6 @@ public class EventStoreQueueDataAdapterV2 : IQueueDataAdapter<ReadOnlyMemory<byt
     /// <inheritdoc />
     void IOnDeserialized.OnDeserialized(DeserializationContext context)
     {
-        _serializer = context.ServiceProvider.GetRequiredService<Serializer<EventStoreBatchContainerV2>>();
+        _serializer = context.ServiceProvider.GetRequiredService<IGrainStorageSerializer>();
     }
 }

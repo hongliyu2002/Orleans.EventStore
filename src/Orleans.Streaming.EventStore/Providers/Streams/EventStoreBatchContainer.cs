@@ -8,11 +8,19 @@ namespace Orleans.Providers.Streams.EventStore;
 /// <summary>
 ///     Each queue message is allowed to be a heterogeneous, ordered set of events.
 ///     <see cref="IBatchContainer" /> contains these events and allows users to query the batch for a specific type of event.
+///     Second version of EventStoreBatchContainer.  This version supports external serializers (like json)
 /// </summary>
 [Serializable]
 [GenerateSerializer]
 public class EventStoreBatchContainer : IBatchContainer
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EventStoreBatchContainer" /> class.
+    /// </summary>
+    public EventStoreBatchContainer()
+    {
+    }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="EventStoreBatchContainer" /> class.
     /// </summary>
@@ -47,7 +55,7 @@ public class EventStoreBatchContainer : IBatchContainer
     /// </summary>
     [JsonProperty]
     [Id(0)]
-    internal EventSequenceToken EventSequenceToken { get; set; }
+    internal EventSequenceToken EventSequenceToken { get; set; } = new();
 
     /// <summary>
     ///     Ges the stream sequence token for the start of this batch.
@@ -58,13 +66,13 @@ public class EventStoreBatchContainer : IBatchContainer
     /// </summary>
     [JsonProperty]
     [Id(1)]
-    private List<object> Events { get; }
+    private List<object> Events { get; } = new();
 
     /// <summary>
     /// </summary>
     [JsonProperty]
     [Id(2)]
-    private Dictionary<string, object> RequestContext { get; }
+    private Dictionary<string, object> RequestContext { get; } = new();
 
     /// <summary>
     ///     Ges the stream identifier for the stream this batch is part of.

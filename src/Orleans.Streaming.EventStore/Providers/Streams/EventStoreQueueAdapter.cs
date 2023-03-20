@@ -37,7 +37,7 @@ internal sealed class EventStoreQueueAdapter : IQueueAdapter
     public string Name { get; }
 
     /// <inheritdoc />
-    public bool IsRewindable => true;
+    public bool IsRewindable => false;
 
     /// <inheritdoc />
     public StreamProviderDirection Direction => StreamProviderDirection.ReadWrite;
@@ -60,7 +60,7 @@ internal sealed class EventStoreQueueAdapter : IQueueAdapter
             queueStorage = _queues.GetOrAdd(queueId, newQueueStorage);
         }
         var messageData = _dataAdapter.ToQueueMessage(streamId, events, sequenceToken, requestContext);
-        await queueStorage.AppendAsync(new EventData(Uuid.NewUuid(), typeof(T).Name, messageData));
+        await queueStorage.AppendAsync(new EventData(Uuid.NewUuid(), typeof(T).Name, messageData, streamId.FullKey));
     }
 
 }

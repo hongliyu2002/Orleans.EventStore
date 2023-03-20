@@ -32,8 +32,8 @@ public class ChannelGrainTests
     {
         // Arrange
         var channel = Client.GetGrain<IChannelGrain>(Guid.NewGuid());
-        var nickname = "TestUser";
-        var sentMessage = new ChatMessage(nickname, "Hello, everyone!", DateTimeOffset.UtcNow);
+        var nickname = "Boss";
+        var sentMessage = new ChatMessage(nickname, "Fuck, everyone!", DateTimeOffset.UtcNow);
 
         // Act
         var streamId = await channel.Join(nickname);

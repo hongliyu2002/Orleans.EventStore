@@ -18,13 +18,13 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     ///     Initializes a new instance of the <see cref="EventStoreBatchContainerV2" /> class.
     /// </summary>
     /// <param name="streamId"></param>
-    /// <param name="events"></param>
+    /// <param name="evt"></param>
     /// <param name="requestContext"></param>
-    public EventStoreBatchContainerV2(StreamId streamId, List<object> events, Dictionary<string, object> requestContext)
+    public EventStoreBatchContainerV2(StreamId streamId, object evt, Dictionary<string, object> requestContext)
     {
-        ArgumentNullException.ThrowIfNull(events, nameof(events));
+        ArgumentNullException.ThrowIfNull(evt, nameof(evt));
         StreamId = streamId;
-        Events = events;
+        Event = evt;
         RequestContext = requestContext;
         EventSequenceToken = new EventSequenceTokenV2();
     }
@@ -33,12 +33,12 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     ///     Initializes a new instance of the <see cref="EventStoreBatchContainerV2" /> class.
     /// </summary>
     /// <param name="streamId"></param>
-    /// <param name="events"></param>
+    /// <param name="evt"></param>
     /// <param name="requestContext"></param>
     /// <param name="sequenceToken"></param>
     [JsonConstructor]
-    public EventStoreBatchContainerV2(StreamId streamId, List<object> events, Dictionary<string, object> requestContext, EventSequenceTokenV2 sequenceToken)
-        : this(streamId, events, requestContext)
+    public EventStoreBatchContainerV2(StreamId streamId, object evt, Dictionary<string, object> requestContext, EventSequenceTokenV2 sequenceToken)
+        : this(streamId, evt, requestContext)
     {
         EventSequenceToken = sequenceToken;
     }
@@ -59,7 +59,7 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     /// </summary>
     [JsonProperty]
     [Id(1)]
-    private List<object> Events { get; }
+    private object Event { get; }
 
     /// <summary>
     /// </summary>
@@ -80,7 +80,8 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     /// <returns></returns>
     public IEnumerable<Tuple<T, StreamSequenceToken>> GetEvents<T>()
     {
-        return Events.OfType<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, EventSequenceToken.CreateSequenceTokenForEvent(index)));
+        // return Events.OfType<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, EventSequenceToken.CreateSequenceTokenForEvent(index)));
+        return new[] { Tuple.Create<T, StreamSequenceToken>((T)Event, EventSequenceToken) };
     }
 
     /// <summary>
@@ -103,6 +104,6 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     /// <returns></returns>
     public override string ToString()
     {
-        return $"[EventStoreBatchContainerV2:Stream={StreamId},#Items={Events.Count}]";
+        return $"[EventStoreBatchContainerV2:Stream={StreamId}]";
     }
 }

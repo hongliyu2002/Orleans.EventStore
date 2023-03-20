@@ -4,15 +4,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
 using Orleans.Runtime;
-using Orleans.Streaming.Configuration;
-using Orleans.Streaming.EventStoreStorage;
 using Orleans.Streams;
 
 namespace Orleans.Providers.Streams.EventStore;
 
 internal sealed class EventStoreQueueAdapter : IQueueAdapter
 {
-    private readonly EventStoreStorageOptions _storageOptions;
+    private readonly EventStoreQueueOptions _queueOptions;
     private readonly IOptions<ClusterOptions> _clusterOptions;
     private readonly HashRingBasedPartitionedStreamQueueMapper _streamQueueMapper;
     private readonly IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> _dataAdapter;
@@ -21,14 +19,14 @@ internal sealed class EventStoreQueueAdapter : IQueueAdapter
     private readonly ConcurrentDictionary<QueueId, EventStoreQueueStorage> _queues = new();
 
     public EventStoreQueueAdapter(string name,
-                                  EventStoreStorageOptions storageOptions,
+                                  EventStoreQueueOptions queueOptions,
                                   IOptions<ClusterOptions> clusterOptions,
                                   HashRingBasedPartitionedStreamQueueMapper streamQueueMapper,
                                   IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter,
                                   ILoggerFactory loggerFactory)
     {
         Name = name;
-        _storageOptions = storageOptions;
+        _queueOptions = queueOptions;
         _clusterOptions = clusterOptions;
         _streamQueueMapper = streamQueueMapper;
         _dataAdapter = dataAdapter;
@@ -48,7 +46,7 @@ internal sealed class EventStoreQueueAdapter : IQueueAdapter
     public IQueueAdapterReceiver CreateReceiver(QueueId queueId)
     {
         var queueName = _streamQueueMapper.QueueToPartition(queueId);
-        return EventStoreQueueAdapterReceiver.Create(queueName, _storageOptions, _clusterOptions, _dataAdapter, _loggerFactory);
+        return EventStoreQueueAdapterReceiver.Create(queueName, _queueOptions, _clusterOptions, _dataAdapter, _loggerFactory);
     }
 
     /// <inheritdoc />
@@ -57,7 +55,7 @@ internal sealed class EventStoreQueueAdapter : IQueueAdapter
         var queueId = _streamQueueMapper.GetQueueForStream(streamId);
         if (!_queues.TryGetValue(queueId, out var queueStorage))
         {
-            var newQueueStorage = new EventStoreQueueStorage(_streamQueueMapper.QueueToPartition(queueId), _clusterOptions.Value.ServiceId, _storageOptions, _loggerFactory.CreateLogger<EventStoreQueueStorage>());
+            var newQueueStorage = new EventStoreQueueStorage(_streamQueueMapper.QueueToPartition(queueId), _clusterOptions.Value.ServiceId, _queueOptions, _loggerFactory.CreateLogger<EventStoreQueueStorage>());
             await newQueueStorage.Init();
             queueStorage = _queues.GetOrAdd(queueId, newQueueStorage);
         }

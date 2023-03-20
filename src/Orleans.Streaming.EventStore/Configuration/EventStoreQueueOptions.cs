@@ -1,11 +1,11 @@
 ﻿using EventStore.Client;
 
-namespace Orleans.Streaming.Configuration;
+namespace Orleans.Configuration;
 
 /// <summary>
 ///     EventStore streaming storage options.
 /// </summary>
-public class EventStoreStorageOptions
+public class EventStoreQueueOptions
 {
     /// <summary>
     ///     The EventStore client settings.

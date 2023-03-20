@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Orleans.Configuration;
 using Orleans.Providers.Streams.Common;
 using Orleans.Runtime;
-using Orleans.Streaming.Configuration;
 using Orleans.Streams;
 
 namespace Orleans.Providers.Streams.EventStore;
@@ -15,7 +14,7 @@ namespace Orleans.Providers.Streams.EventStore;
 public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
 {
     private readonly string _name;
-    private readonly EventStoreStorageOptions _storageOptions;
+    private readonly EventStoreQueueOptions _queueOptions;
     private readonly IOptions<ClusterOptions> _clusterOptions;
     private readonly IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> _dataAdapter;
     private readonly ILoggerFactory _loggerFactory;
@@ -30,7 +29,7 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
     /// <returns></returns>
     public static EventStoreQueueAdapterFactory Create(IServiceProvider serviceProvider, string name)
     {
-        var storageOptions = serviceProvider.GetOptionsByName<EventStoreStorageOptions>(name);
+        var storageOptions = serviceProvider.GetOptionsByName<EventStoreQueueOptions>(name);
         var clusterOptions = serviceProvider.GetRequiredService<IOptions<ClusterOptions>>();
         var cacheOptions = serviceProvider.GetOptionsByName<SimpleQueueCacheOptions>(name);
         var dataAdapter = serviceProvider.GetServiceByName<IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer>>(name) ?? serviceProvider.GetRequiredService<IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer>>();
@@ -43,28 +42,28 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
     ///     Initializes a new instance of the <see cref="EventStoreQueueAdapterFactory" /> class.
     /// </summary>
     /// <param name="name"></param>
-    /// <param name="storageOptions"></param>
+    /// <param name="queueOptions"></param>
     /// <param name="clusterOptions"></param>
     /// <param name="cacheOptions"></param>
     /// <param name="dataAdapter"></param>
     /// <param name="loggerFactory"></param>
     public EventStoreQueueAdapterFactory(string name,
-                                         EventStoreStorageOptions storageOptions,
+                                         EventStoreQueueOptions queueOptions,
                                          IOptions<ClusterOptions> clusterOptions,
                                          SimpleQueueCacheOptions cacheOptions,
                                          IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter,
                                          ILoggerFactory loggerFactory)
     {
-        ArgumentNullException.ThrowIfNull(storageOptions, nameof(storageOptions));
+        ArgumentNullException.ThrowIfNull(queueOptions, nameof(queueOptions));
         ArgumentNullException.ThrowIfNull(clusterOptions, nameof(clusterOptions));
         ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
         ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
         _name = name;
-        _storageOptions = storageOptions;
+        _queueOptions = queueOptions;
         _clusterOptions = clusterOptions;
         _dataAdapter = dataAdapter;
         _loggerFactory = loggerFactory;
-        _streamQueueMapper = new HashRingBasedPartitionedStreamQueueMapper(storageOptions.QueueNames, name);
+        _streamQueueMapper = new HashRingBasedPartitionedStreamQueueMapper(queueOptions.QueueNames, name);
         _adapterCache = new SimpleQueueAdapterCache(cacheOptions, name, loggerFactory);
     }
 
@@ -87,7 +86,7 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
     /// <returns>The queue adapter</returns>
     public Task<IQueueAdapter> CreateAdapter()
     {
-        var queueAdapter = new EventStoreQueueAdapter(_name, _storageOptions, _clusterOptions, _streamQueueMapper, _dataAdapter, _loggerFactory);
+        var queueAdapter = new EventStoreQueueAdapter(_name, _queueOptions, _clusterOptions, _streamQueueMapper, _dataAdapter, _loggerFactory);
         return Task.FromResult<IQueueAdapter>(queueAdapter);
     }
 

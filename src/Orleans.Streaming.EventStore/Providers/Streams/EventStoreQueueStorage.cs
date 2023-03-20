@@ -3,10 +3,10 @@ using System.Diagnostics;
 using EventStore.Client;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using Orleans.Configuration;
 using Orleans.Storage;
-using Orleans.Streaming.Configuration;
 
-namespace Orleans.Streaming.EventStoreStorage;
+namespace Orleans.Providers.Streams.EventStore;
 
 /// <summary>
 ///     EventStore-based queue storage provider based on persistent subscription feature.
@@ -15,7 +15,7 @@ public class EventStoreQueueStorage
 {
     private readonly string _queueName;
     private readonly string _groupName;
-    private readonly EventStoreStorageOptions _storageOptions;
+    private readonly EventStoreQueueOptions _queueOptions;
     private readonly ILogger<EventStoreQueueStorage> _logger;
 
     private EventStoreClient _client = null!;
@@ -29,19 +29,19 @@ public class EventStoreQueueStorage
     /// </summary>
     /// <param name="queueName">Name of the queue to be connected to.</param>
     /// <param name="groupName"></param>
-    /// <param name="storageOptions"></param>
+    /// <param name="queueOptions"></param>
     /// <param name="logger"></param>
-    public EventStoreQueueStorage(string queueName, string groupName, EventStoreStorageOptions storageOptions, ILogger<EventStoreQueueStorage> logger)
+    public EventStoreQueueStorage(string queueName, string groupName, EventStoreQueueOptions queueOptions, ILogger<EventStoreQueueStorage> logger)
     {
         ArgumentException.ThrowIfNullOrEmpty(queueName, nameof(queueName));
         ArgumentException.ThrowIfNullOrEmpty(groupName, nameof(groupName));
-        ArgumentNullException.ThrowIfNull(storageOptions, nameof(storageOptions));
+        ArgumentNullException.ThrowIfNull(queueOptions, nameof(queueOptions));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         queueName = SanitizeQueueName(queueName);
         ValidateQueueName(queueName);
         _queueName = queueName;
         _groupName = groupName;
-        _storageOptions = storageOptions;
+        _queueOptions = queueOptions;
         _logger = logger;
     }
 
@@ -61,12 +61,12 @@ public class EventStoreQueueStorage
             {
                 _logger.LogDebug("EventStoreQueueStorage for queue {QueueName} is initializing.", _queueName);
             }
-            _client = new EventStoreClient(_storageOptions.ClientSettings);
-            _subscriptionClient = new EventStorePersistentSubscriptionsClient(_storageOptions.ClientSettings);
+            _client = new EventStoreClient(_queueOptions.ClientSettings);
+            _subscriptionClient = new EventStorePersistentSubscriptionsClient(_queueOptions.ClientSettings);
             try
             {
                 // Create a persistent subscription if it does not exist. 
-                await _subscriptionClient.CreateAsync(_queueName, _groupName, _storageOptions.SubscriptionSettings, null, _storageOptions.Credentials);
+                await _subscriptionClient.CreateAsync(_queueName, _groupName, _queueOptions.SubscriptionSettings, null, _queueOptions.Credentials);
             }
             catch (RpcException ex) when (ex.StatusCode is StatusCode.AlreadyExists)
             {
@@ -75,7 +75,7 @@ public class EventStoreQueueStorage
                     _logger.LogDebug("Init: {Message}", ex.Message);
                 }
             }
-            _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _storageOptions.Credentials, _storageOptions.QueueBufferSize);
+            _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _queueOptions.Credentials, _queueOptions.QueueBufferSize);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 timer.Stop();
@@ -169,7 +169,7 @@ public class EventStoreQueueStorage
         {
             try
             {
-                _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _storageOptions.Credentials, _storageOptions.QueueBufferSize);
+                _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _queueOptions.Credentials, _queueOptions.QueueBufferSize);
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug("Successfully reconnected to the queue {QueueName}.", _queueName);
@@ -341,7 +341,7 @@ public class EventStoreQueueStorage
         }
         try
         {
-            var writeResult = await _client.AppendToStreamAsync(_queueName, StreamState.Any, new[] { message }, null, null, _storageOptions.Credentials).ConfigureAwait(false);
+            var writeResult = await _client.AppendToStreamAsync(_queueName, StreamState.Any, new[] { message }, null, null, _queueOptions.Credentials).ConfigureAwait(false);
             return (long)writeResult.LogPosition.CommitPosition;
         }
         catch (Exception ex)
@@ -361,7 +361,7 @@ public class EventStoreQueueStorage
         try
         {
             _subscription.Dispose();
-            await _subscriptionClient.DeleteAsync(_queueName, _groupName, null, _storageOptions.Credentials);
+            await _subscriptionClient.DeleteAsync(_queueName, _groupName, null, _queueOptions.Credentials);
             await _client.DeleteAsync(_queueName, StreamState.Any).ConfigureAwait(false);
         }
         catch (Exception ex)

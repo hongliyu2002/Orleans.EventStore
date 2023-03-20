@@ -53,7 +53,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Hosting" />
+      <Folder Include="Providers\PersistentStreams" />
     </ItemGroup>
 
 </Project>

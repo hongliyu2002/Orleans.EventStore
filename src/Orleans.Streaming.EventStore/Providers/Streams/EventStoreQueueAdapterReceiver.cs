@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
-using Orleans.Streaming.Configuration;
-using Orleans.Streaming.EventStoreStorage;
 using Orleans.Streams;
 
 namespace Orleans.Providers.Streams.EventStore;
@@ -23,14 +21,14 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
 
     private Task? _task;
 
-    public static IQueueAdapterReceiver Create(string queueName, EventStoreStorageOptions storageOptions, IOptions<ClusterOptions> clusterOptions, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILoggerFactory loggerFactory)
+    public static IQueueAdapterReceiver Create(string queueName, EventStoreQueueOptions queueOptions, IOptions<ClusterOptions> clusterOptions, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILoggerFactory loggerFactory)
     {
         ArgumentException.ThrowIfNullOrEmpty(queueName, nameof(queueName));
-        ArgumentNullException.ThrowIfNull(storageOptions, nameof(storageOptions));
+        ArgumentNullException.ThrowIfNull(queueOptions, nameof(queueOptions));
         ArgumentNullException.ThrowIfNull(clusterOptions, nameof(clusterOptions));
         ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
         ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
-        var streamStorage = new EventStoreQueueStorage(queueName, clusterOptions.Value.ServiceId, storageOptions, loggerFactory.CreateLogger<EventStoreQueueStorage>());
+        var streamStorage = new EventStoreQueueStorage(queueName, clusterOptions.Value.ServiceId, queueOptions, loggerFactory.CreateLogger<EventStoreQueueStorage>());
         return new EventStoreQueueAdapterReceiver(queueName, streamStorage, dataAdapter, loggerFactory.CreateLogger<EventStoreQueueAdapterReceiver>());
     }
 

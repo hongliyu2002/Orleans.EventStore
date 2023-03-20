@@ -31,6 +31,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Orleans.Persistence.EventStore\Orleans.Persistence.EventStore.csproj" />
+        <ProjectReference Include="..\..\src\Orleans.Streaming.EventStore\Orleans.Streaming.EventStore.csproj" />
     </ItemGroup>
-    
+
 </Project>

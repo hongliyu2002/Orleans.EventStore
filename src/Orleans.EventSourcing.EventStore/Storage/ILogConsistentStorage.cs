@@ -31,5 +31,5 @@ public interface ILogConsistentStorage
     /// <param name="expectedVersion"></param>
     /// <typeparam name="TLogEntry"></typeparam>
     /// <returns></returns>
-    Task<int> AppendAsync<TLogEntry>(string grainTypeName, GrainId grainId, IEnumerable<TLogEntry> entries, int expectedVersion);
+    Task<int> AppendAsync<TLogEntry>(string grainTypeName, GrainId grainId, IList<TLogEntry> entries, int expectedVersion);
 }

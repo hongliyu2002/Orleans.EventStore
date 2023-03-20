@@ -5,6 +5,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
 using Orleans.Storage;
+using Orleans.Streaming.Providers;
 
 namespace Orleans.Providers.Streams.EventStore;
 
@@ -18,11 +19,14 @@ public class EventStoreQueueStorage
     private readonly EventStoreQueueOptions _queueOptions;
     private readonly ILogger<EventStoreQueueStorage> _logger;
 
-    private EventStoreClient _client = null!;
-    private EventStorePersistentSubscriptionsClient _subscriptionClient = null!;
-    private PersistentSubscription _subscription = null!;
+    private EventStoreClient? _client;
+    private EventStorePersistentSubscriptionsClient? _subscriptionClient;
+    private PersistentSubscription? _subscription;
 
     private readonly ConcurrentQueue<ResolvedEvent> _eventQueue = new();
+    private readonly ResolvedEventsPool _eventsPool = new();
+
+    private bool _initialized;
 
     /// <summary>
     ///     Creates a new instance of the <see cref="EventStoreQueueStorage" /> type.
@@ -76,6 +80,7 @@ public class EventStoreQueueStorage
                 }
             }
             _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _queueOptions.Credentials, _queueOptions.QueueBufferSize);
+            _initialized = true;
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 timer.Stop();
@@ -95,8 +100,13 @@ public class EventStoreQueueStorage
     /// <returns></returns>
     public async Task Close()
     {
+        if (_initialized == false || _subscription == null || _subscriptionClient == null || _client == null)
+        {
+            return;
+        }
         try
         {
+            _eventQueue.Clear();
             _subscription.Dispose();
             await _subscriptionClient.DisposeAsync();
             await _client.DisposeAsync();
@@ -105,6 +115,13 @@ public class EventStoreQueueStorage
         {
             _logger.LogError(ex, "Close: QueueName={QueueName}", _queueName);
             throw new EventStoreStorageException(FormattableString.Invariant($"{ex.GetType()}: {ex.Message}"));
+        }
+        finally
+        {
+            _subscription = null;
+            _subscriptionClient = null;
+            _client = null;
+            _initialized = false;
         }
     }
 
@@ -145,7 +162,7 @@ public class EventStoreQueueStorage
             {
                 case SubscriptionDroppedReason.ServerError:
                     _logger.LogWarning("SubscriptionDropped from subscription: {Subscription} for the queue: {QueueName} with server error: {Error}", subscription.SubscriptionId, _queueName, exception?.Message);
-                    await ResubscribeAsync(5);
+                    await ResubscribeAsync(10);
                     break;
                 case SubscriptionDroppedReason.SubscriberError:
                     _logger.LogWarning("SubscriptionDropped from subscription: {Subscription} for the queue: {QueueName} with client error: {Error}", subscription.SubscriptionId, _queueName, exception?.Message);
@@ -165,6 +182,10 @@ public class EventStoreQueueStorage
 
     private async Task ResubscribeAsync(int retryCount)
     {
+        if (_initialized == false || _subscriptionClient == null)
+        {
+            return;
+        }
         for (var i = 0; i < retryCount; i++)
         {
             try
@@ -198,6 +219,10 @@ public class EventStoreQueueStorage
         {
             _logger.LogTrace("Peeking event from internal queue: {QueueName}", _queueName);
         }
+        if (_initialized == false)
+        {
+            return null;
+        }
         try
         {
             _eventQueue.TryPeek(out var resolvedEvent);
@@ -219,9 +244,13 @@ public class EventStoreQueueStorage
         {
             _logger.LogTrace("Peeking events from internal queue: {QueueName}", _queueName);
         }
+        var resolvedEvents = _eventsPool.GetList();
+        if (_initialized == false)
+        {
+            return resolvedEvents;
+        }
         try
         {
-            var resolvedEvents = new List<ResolvedEvent>(4);
             for (var i = 0; i < maxCount; i++)
             {
                 if (!_eventQueue.TryPeek(out var resolvedEvent))
@@ -237,6 +266,10 @@ public class EventStoreQueueStorage
             _logger.LogError("Failed to peek events from internal queue for the queue {QueueName}.", _queueName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to peek events from internal queue for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
+        finally
+        {
+            _eventsPool.ReturnList(resolvedEvents);
+        }
     }
 
     /// <summary>
@@ -247,6 +280,10 @@ public class EventStoreQueueStorage
         if (_logger.IsEnabled(LogLevel.Trace))
         {
             _logger.LogTrace("Dequeuing event from internal queue: {QueueName}", _queueName);
+        }
+        if (_initialized == false)
+        {
+            return null;
         }
         try
         {
@@ -269,9 +306,13 @@ public class EventStoreQueueStorage
         {
             _logger.LogTrace("Dequeuing events from internal queue: {QueueName}", _queueName);
         }
+        var resolvedEvents = _eventsPool.GetList();
+        if (_initialized == false)
+        {
+            return resolvedEvents;
+        }
         try
         {
-            var resolvedEvents = new List<ResolvedEvent>(4);
             for (var i = 0; i < maxCount; i++)
             {
                 if (!_eventQueue.TryDequeue(out var resolvedEvent))
@@ -287,6 +328,10 @@ public class EventStoreQueueStorage
             _logger.LogError("Failed to dequeue events from internal queue for the queue {QueueName}.", _queueName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to dequeue events from internal queue for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
+        finally
+        {
+            _eventsPool.ReturnList(resolvedEvents);
+        }
     }
 
     /// <summary>
@@ -296,7 +341,11 @@ public class EventStoreQueueStorage
     {
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace("Acknowledge event to queue: {QueueName}", _queueName);
+            _logger.LogTrace("Acknowledging event to queue: {QueueName}", _queueName);
+        }
+        if (_initialized == false || _subscription == null)
+        {
+            return;
         }
         try
         {
@@ -316,7 +365,11 @@ public class EventStoreQueueStorage
     {
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace("Unacknowledge event to queue: {QueueName}", _queueName);
+            _logger.LogTrace("Unacknowledging event to queue: {QueueName}", _queueName);
+        }
+        if (_initialized == false || _subscription == null)
+        {
+            return;
         }
         try
         {
@@ -333,21 +386,49 @@ public class EventStoreQueueStorage
     ///     Adds a new message to the queue.
     /// </summary>
     /// <param name="message">Message to be added to the queue.</param>
-    public async Task<long> AppendAsync(EventData message)
+    public async Task AppendAsync(EventData message)
     {
         if (_logger.IsEnabled(LogLevel.Trace))
         {
             _logger.LogTrace("Appending message to queue: {QueueName}", _queueName);
         }
+        if (_initialized == false || _client == null || message == null)
+        {
+            return;
+        }
         try
         {
-            var writeResult = await _client.AppendToStreamAsync(_queueName, StreamState.Any, new[] { message }, null, null, _queueOptions.Credentials).ConfigureAwait(false);
-            return (long)writeResult.LogPosition.CommitPosition;
+            await _client.AppendToStreamAsync(_queueName, StreamState.Any, new[] { message }, null, null, _queueOptions.Credentials).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             _logger.LogError("Failed to write message for the queue {QueueName}.", _queueName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to write message for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
+        }
+    }
+
+    /// <summary>
+    ///     Adds new messages to the queue.
+    /// </summary>
+    /// <param name="messages">Messages to be added to the queue.</param>
+    public async Task AppendManyAsync(IList<EventData> messages)
+    {
+        if (_logger.IsEnabled(LogLevel.Trace))
+        {
+            _logger.LogTrace("Appending messages to queue: {QueueName}", _queueName);
+        }
+        if (_initialized == false || _client == null || messages == null || messages.Count == 0)
+        {
+            return;
+        }
+        try
+        {
+            await _client.AppendToStreamAsync(_queueName, StreamState.Any, messages, null, null, _queueOptions.Credentials).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to write messages for the queue {QueueName}.", _queueName);
+            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to write messages for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 
@@ -358,6 +439,14 @@ public class EventStoreQueueStorage
     /// <exception cref="EventStoreStorageException"></exception>
     public async Task DeleteQueueAsync()
     {
+        if (_logger.IsEnabled(LogLevel.Trace))
+        {
+            _logger.LogTrace("Deleting queue: {QueueName}", _queueName);
+        }
+        if (_initialized == false || _subscription == null || _subscriptionClient == null || _client == null)
+        {
+            return;
+        }
         try
         {
             _subscription.Dispose();

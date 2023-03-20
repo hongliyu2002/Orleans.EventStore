@@ -19,7 +19,9 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
     private readonly ILogger<EventStoreLogConsistentStorage> _logger;
     private readonly string _serviceId;
 
-    private EventStoreClient _client = null!;
+    private EventStoreClient? _client;
+
+    private bool _initialized;
 
     /// <summary>
     ///     Creates a new instance of the <see cref="EventStoreLogConsistentStorage" /> type.
@@ -65,6 +67,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
                 _logger.LogDebug("EventStoreLogConsistentStorage {Name} is initializing: ServiceId={ServiceId}", _name, _serviceId);
             }
             _client = new EventStoreClient(_storageOptions.ClientSettings);
+            _initialized = true;
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 timer.Stop();
@@ -82,6 +85,10 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
 
     private async Task Close(CancellationToken cancellationToken)
     {
+        if (_initialized == false || _client == null)
+        {
+            return;
+        }
         try
         {
             await _client.DisposeAsync();
@@ -100,7 +107,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
     /// <inheritdoc />
     public async Task<IReadOnlyList<TLogEntry>> ReadAsync<TLogEntry>(string grainTypeName, GrainId grainId, int fromVersion, int maxCount)
     {
-        if (maxCount <= 0)
+        if (_initialized == false || _client == null || maxCount <= 0)
         {
             return new List<TLogEntry>();
         }
@@ -125,6 +132,10 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
     /// <inheritdoc />
     public async Task<int> GetLastVersionAsync(string grainTypeName, GrainId grainId)
     {
+        if (_initialized == false || _client == null)
+        {
+            return -1;
+        }
         var streamName = GetStreamName(grainId);
         try
         {
@@ -145,17 +156,20 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
     }
 
     /// <inheritdoc />
-    public async Task<int> AppendAsync<TLogEntry>(string grainTypeName, GrainId grainId, IEnumerable<TLogEntry> entries, int expectedVersion)
+    public async Task<int> AppendAsync<TLogEntry>(string grainTypeName, GrainId grainId, IList<TLogEntry> entries, int expectedVersion)
     {
+        if (_initialized == false || _client == null)
+        {
+            return -1;
+        }
         var streamName = GetStreamName(grainId);
-        var entriesList = entries as TLogEntry[] ?? entries.ToArray();
-        if (!entriesList.Any())
+        if (entries.Count == 0)
         {
             return await GetLastVersionAsync(grainTypeName, grainId);
         }
         try
         {
-            var serializedEntries = entriesList.Select(SerializeEvent);
+            var serializedEntries = entries.Select(SerializeEvent);
             var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision((ulong)expectedVersion), serializedEntries, null, null, _storageOptions.Credentials).ConfigureAwait(false);
             return (int)writeResult.NextExpectedStreamRevision.ToUInt64();
         }

@@ -7,9 +7,9 @@
         <PackageId>Orleans.Persistence.EventStore</PackageId>
         <Title>EventStore for Microsoft Orleans Grain Storage</Title>
         <Description>EventStore Grpc client implementation of grain storage for Microsoft Orleans Grain Storage.</Description>
-        <Version>7.1.1</Version>
-        <AssemblyVersion>7.1.1.0</AssemblyVersion>
-        <FileVersion>7.1.1.0</FileVersion>
+        <Version>7.1.2</Version>
+        <AssemblyVersion>7.1.2.0</AssemblyVersion>
+        <FileVersion>7.1.2.0</FileVersion>
         <Authors>Leo Hong</Authors>
         <Copyright>Copyright 2023 (c) Leo Hong. All rights reserved.</Copyright>
         <RepositoryUrl>https://github.com/hongliyu2002/Orleans.EventStore</RepositoryUrl>

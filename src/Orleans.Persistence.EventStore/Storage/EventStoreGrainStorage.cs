@@ -18,7 +18,9 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     private readonly ILogger<EventStoreGrainStorage> _logger;
     private readonly string _serviceId;
 
-    private EventStoreClient _client = null!;
+    private EventStoreClient? _client;
+
+    private bool _initialized;
 
     /// <summary>
     ///     Creates a new instance of the <see cref="EventStoreGrainStorage" /> type.
@@ -64,6 +66,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
                 _logger.LogDebug("EventStoreGrainStorage {Name} is initializing: ServiceId={ServiceId}", _name, _serviceId);
             }
             _client = new EventStoreClient(_storageOptions.ClientSettings);
+            _initialized = true;
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 timer.Stop();
@@ -81,6 +84,10 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
 
     private async Task Close(CancellationToken cancellationToken)
     {
+        if (_initialized == false || _client == null)
+        {
+            return;
+        }
         try
         {
             await _client.DisposeAsync();
@@ -89,6 +96,11 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         {
             _logger.LogError(ex, "Close: Name={Name} ServiceId={ServiceId}", _name, _serviceId);
             throw new EventStoreStorageException(FormattableString.Invariant($"{ex.GetType()}: {ex.Message}"));
+        }
+        finally
+        {
+            _client = null;
+            _initialized = false;
         }
     }
 
@@ -99,6 +111,10 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     /// <inheritdoc />
     public async Task ReadStateAsync<T>(string grainTypeName, GrainId grainId, IGrainState<T> grainState)
     {
+        if (_initialized == false || _client == null)
+        {
+            return;
+        }
         var streamName = GetStreamName(grainId);
         try
         {
@@ -128,6 +144,10 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     /// <inheritdoc />
     public async Task WriteStateAsync<T>(string grainTypeName, GrainId grainId, IGrainState<T> grainState)
     {
+        if (_initialized == false || _client == null)
+        {
+            return;
+        }
         var streamName = GetStreamName(grainId);
         try
         {
@@ -152,6 +172,10 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     /// <inheritdoc />
     public async Task ClearStateAsync<T>(string grainTypeName, GrainId grainId, IGrainState<T> grainState)
     {
+        if (_initialized == false || _client == null)
+        {
+            return;
+        }
         var streamName = GetStreamName(grainId);
         try
         {

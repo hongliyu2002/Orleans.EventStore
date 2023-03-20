@@ -36,7 +36,8 @@ public class EventStoreQueueDataAdapterV2 : IQueueDataAdapter<ReadOnlyMemory<byt
     public ReadOnlyMemory<byte> ToQueueMessage<T>(StreamId streamId, IEnumerable<T> events, StreamSequenceToken sequenceToken, Dictionary<string, object> requestContext)
     {
         ArgumentNullException.ThrowIfNull(events, nameof(events));
-        var batchContainer = new EventStoreBatchContainerV2(streamId, events.Cast<object>().ToList(), requestContext, sequenceToken as EventSequenceTokenV2 ?? new EventSequenceTokenV2(sequenceToken.SequenceNumber, sequenceToken.EventIndex));
+        var eventSequenceToken = sequenceToken as EventSequenceTokenV2 ?? new EventSequenceTokenV2(sequenceToken.SequenceNumber, sequenceToken.EventIndex);
+        var batchContainer = new EventStoreBatchContainerV2(streamId, events.Cast<object>().ToList(), requestContext, eventSequenceToken);
         var queueMessageBuffer = _serializer.SerializeToArray(batchContainer);
         return new ReadOnlyMemory<byte>(queueMessageBuffer);
     }

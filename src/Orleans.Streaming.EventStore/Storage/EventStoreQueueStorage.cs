@@ -75,7 +75,7 @@ public class EventStoreQueueStorage
                     _logger.LogDebug("Init: {Message}", ex.Message);
                 }
             }
-            _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _storageOptions.Credentials, _storageOptions.SubscriptionQueueBufferSize);
+            _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _storageOptions.Credentials, _storageOptions.QueueBufferSize);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 timer.Stop();
@@ -169,7 +169,7 @@ public class EventStoreQueueStorage
         {
             try
             {
-                _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _storageOptions.Credentials, _storageOptions.SubscriptionQueueBufferSize);
+                _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _storageOptions.Credentials, _storageOptions.QueueBufferSize);
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug("Successfully reconnected to the queue {QueueName}.", _queueName);

@@ -27,5 +27,10 @@ public class EventStoreStorageOptions
     /// <summary>
     ///     The buffer size used in persistent subscription client queue.
     /// </summary>
-    public int SubscriptionQueueBufferSize { get; set; } = 32;
+    public int QueueBufferSize { get; set; } = 32;
+
+    /// <summary>
+    ///     The stream names (aka queue names) on the EventStore server.
+    /// </summary>
+    public List<string> QueueNames { get; set; } = new();
 }

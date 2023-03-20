@@ -137,14 +137,9 @@ public class EventStoreQueueStorage
         }
         try
         {
-            if (retryCount is null or <= 3)
+            if (_eventQueue.All(evt => evt.Event.EventId != resolvedEvent.Event.EventId))
             {
                 _eventQueue.Enqueue(resolvedEvent);
-            }
-            else
-            {
-                _logger.LogWarning("Failed to handle event from subscription for the queue {QueueName} for 3 times.", _queueName);
-                await subscription.Nack(PersistentSubscriptionNakEventAction.Park, "Retried 3 times.", resolvedEvent);
             }
         }
         catch (Exception ex)

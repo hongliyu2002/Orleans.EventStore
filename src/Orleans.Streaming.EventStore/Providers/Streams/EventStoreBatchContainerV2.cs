@@ -53,8 +53,8 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     /// <summary>
     ///     Ges the stream sequence token for the start of this batch.
     /// </summary>
-    [JsonProperty]
     [Id(0)]
+    [JsonProperty]
     internal EventSequenceTokenV2 Token { get; set; } = new();
 
     /// <summary>
@@ -65,20 +65,21 @@ public class EventStoreBatchContainerV2 : IBatchContainer
 
     /// <summary>
     /// </summary>
-    [JsonProperty]
     [Id(1)]
+    [JsonProperty]
     private List<object> Events { get; } = new();
 
     /// <summary>
     /// </summary>
-    [JsonProperty]
     [Id(2)]
+    [JsonProperty]
     private Dictionary<string, object> RequestContext { get; } = new();
 
     /// <summary>
     ///     Ges the stream identifier for the stream this batch is part of.
     /// </summary>
     [Id(3)]
+    [JsonProperty]
     public StreamId StreamId { get; }
 
     /// <summary>

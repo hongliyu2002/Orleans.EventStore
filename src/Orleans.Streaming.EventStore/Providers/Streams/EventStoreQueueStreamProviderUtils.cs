@@ -17,6 +17,6 @@ public static class EventStoreQueueStreamProviderUtils
     public static List<string> GenerateDefaultEventStoreQueueNames(string serviceId, string providerName)
     {
         var defaultQueueMapper = new HashRingBasedStreamQueueMapper(new HashRingStreamQueueMapperOptions(), providerName);
-        return defaultQueueMapper.GetAllQueues().Select(queueName => $"{serviceId}-{queueName}").ToList();
+        return defaultQueueMapper.GetAllQueues().Select(queueId => $"{serviceId}-{queueId}").ToList();
     }
 }

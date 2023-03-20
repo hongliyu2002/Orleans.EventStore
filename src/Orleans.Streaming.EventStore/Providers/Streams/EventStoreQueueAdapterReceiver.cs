@@ -36,10 +36,6 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
 
     private EventStoreQueueAdapterReceiver(string queueName, EventStoreQueueStorage queueStorage, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILogger<EventStoreQueueAdapterReceiver> logger)
     {
-        ArgumentException.ThrowIfNullOrEmpty(queueName, nameof(queueName));
-        ArgumentNullException.ThrowIfNull(queueStorage, nameof(queueStorage));
-        ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
-        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _queueName = queueName;
         _queueStorage = queueStorage;
         _dataAdapter = dataAdapter;

@@ -33,7 +33,7 @@ public class EventStoreBatchContainerV2 : IBatchContainer
         StreamId = streamId;
         Events = events;
         RequestContext = requestContext;
-        EventSequenceToken = new EventSequenceTokenV2();
+        Token = new EventSequenceTokenV2();
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     public EventStoreBatchContainerV2(StreamId streamId, List<object> events, Dictionary<string, object> requestContext, EventSequenceTokenV2 sequenceToken)
         : this(streamId, events, requestContext)
     {
-        EventSequenceToken = sequenceToken;
+        Token = sequenceToken;
     }
 
     /// <summary>
@@ -55,12 +55,13 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     /// </summary>
     [JsonProperty]
     [Id(0)]
-    internal EventSequenceTokenV2 EventSequenceToken { get; set; } = new();
+    internal EventSequenceTokenV2 Token { get; set; } = new();
 
     /// <summary>
     ///     Ges the stream sequence token for the start of this batch.
     /// </summary>
-    public StreamSequenceToken SequenceToken => EventSequenceToken;
+    [JsonIgnore]
+    public StreamSequenceToken SequenceToken => Token;
 
     /// <summary>
     /// </summary>
@@ -87,7 +88,7 @@ public class EventStoreBatchContainerV2 : IBatchContainer
     /// <returns></returns>
     public IEnumerable<Tuple<T, StreamSequenceToken>> GetEvents<T>()
     {
-        return Events.OfType<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, EventSequenceToken.CreateSequenceTokenForEvent(index)));
+        return Events.OfType<T>().Select((evt, index) => Tuple.Create<T, StreamSequenceToken>(evt, Token.CreateSequenceTokenForEvent(index)));
     }
 
     /// <summary>

@@ -52,7 +52,7 @@ public class EventStoreQueueDataAdapter : IQueueDataAdapter<ReadOnlyMemory<byte>
     public IBatchContainer FromQueueMessage(ReadOnlyMemory<byte> queueMessage, long sequenceId)
     {
         var batchContainer = _serializer.Deserialize<EventStoreBatchContainer>(queueMessage) ?? Activator.CreateInstance<EventStoreBatchContainer>();
-        batchContainer.EventSequenceToken = new EventSequenceToken(sequenceId);
+        batchContainer.Token = new EventSequenceToken(sequenceId);
         return batchContainer;
     }
 

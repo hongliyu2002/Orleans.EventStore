@@ -4,8 +4,70 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="Chat Room"
         Height="450"
         Width="800">
-    <Grid />
+    <Grid ShowGridLines="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid ShowGridLines="False">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="JoinLeaveButton"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Click="JoinLeaveButton_OnClick"
+                    Content="Join"
+                    VerticalAlignment="Top"
+                    Height="30" />
+            <Button x:Name="ReadHistoryButton"
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Click="ReadHistoryButton_OnClick"
+                    Content="Read History"
+                    VerticalAlignment="Top"
+                    Height="30" />
+            <Button x:Name="ShowMembersButton"
+                    Grid.Row="0"
+                    Grid.Column="3"
+                    Click="ShowMembersButton_OnClick"
+                    Content="Show Members"
+                    VerticalAlignment="Top"
+                    Height="30" />
+            <TextBlock x:Name="ChannelText"
+                       Grid.Row="0"
+                       Grid.Column="4"  Background="LavenderBlush" />
+            <TextBlock x:Name="UsernameText"
+                       Grid.Row="0"
+                       Grid.Column="5" Background="LightGreen" />
+            <TextBox x:Name="MessageText"
+                     Grid.Row="1"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="5"
+                     Background="LightYellow" />
+            <Button x:Name="SendMessageButton"
+                    Grid.Row="1"
+                    Grid.Column="5"
+                    Click="SendMessageButton_OnClick"
+                    Content="Send Message"
+                    VerticalAlignment="Top"
+                    Height="30" />
+        </Grid>
+        <ListBox x:Name="MessagesListBox"
+                 Grid.Row="1"
+                 Background="LightCyan" />
+    </Grid>
 </Window>

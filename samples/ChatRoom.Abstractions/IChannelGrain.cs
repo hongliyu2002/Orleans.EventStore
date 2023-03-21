@@ -3,7 +3,7 @@ using Orleans.Runtime;
 
 namespace ChatRoom.Abstractions;
 
-public interface IChannelGrain : IGrainWithGuidKey
+public interface IChannelGrain : IGrainWithStringKey
 {
     Task<StreamId> Join(string nickname);
 

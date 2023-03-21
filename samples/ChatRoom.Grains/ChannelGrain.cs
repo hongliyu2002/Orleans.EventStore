@@ -17,7 +17,7 @@ public class ChannelGrain : Grain, IChannelGrain
     {
         await base.OnActivateAsync(cancellationToken);
         _streamProvider = this.GetStreamProvider(Constants.StreamProviderName);
-        _stream = _streamProvider.GetStream<ChatMessage>(StreamId.Create(Constants.ChatNamespace, this.GetPrimaryKey()));
+        _stream = _streamProvider.GetStream<ChatMessage>(StreamId.Create(Constants.ChatNamespace, this.GetPrimaryKeyString()));
     }
 
     /// <inheritdoc />

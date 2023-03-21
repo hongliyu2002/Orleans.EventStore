@@ -5,7 +5,6 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
 using Orleans.Storage;
-using Orleans.Streaming.Providers;
 
 namespace Orleans.Providers.Streams.EventStore;
 
@@ -24,7 +23,6 @@ public class EventStoreQueueStorage
     private PersistentSubscription? _subscription;
 
     private readonly ConcurrentQueue<ResolvedEvent> _eventQueue = new();
-    private readonly ResolvedEventsPool _eventsPool = new();
 
     private bool _initialized;
 
@@ -72,10 +70,7 @@ public class EventStoreQueueStorage
             }
             catch (RpcException ex) when (ex.StatusCode is StatusCode.AlreadyExists)
             {
-                if (_logger.IsEnabled(LogLevel.Debug))
-                {
-                    _logger.LogDebug("Init: {Message}", ex.Message);
-                }
+                await _subscriptionClient.UpdateAsync(_queueName, _groupName, _queueOptions.SubscriptionSettings, null, _queueOptions.Credentials);
             }
             _subscription = await _subscriptionClient.SubscribeToStreamAsync(_queueName, _groupName, OnEventAppeared, OnSubscriptionDropped, _queueOptions.Credentials, _queueOptions.QueueBufferSize);
             _initialized = true;
@@ -237,13 +232,13 @@ public class EventStoreQueueStorage
         {
             _logger.LogTrace("Peeking events from internal queue: {QueueName}", _queueName);
         }
-        var resolvedEvents = _eventsPool.GetList();
         if (_initialized == false)
         {
-            return resolvedEvents;
+            return Array.Empty<ResolvedEvent>();
         }
         try
         {
+            var resolvedEvents = new List<ResolvedEvent>();
             for (var i = 0; i < maxCount; i++)
             {
                 if (!_eventQueue.TryPeek(out var resolvedEvent))
@@ -258,10 +253,6 @@ public class EventStoreQueueStorage
         {
             _logger.LogError("Failed to peek events from internal queue for the queue {QueueName}.", _queueName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to peek events from internal queue for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
-        }
-        finally
-        {
-            _eventsPool.ReturnList(resolvedEvents);
         }
     }
 
@@ -299,13 +290,13 @@ public class EventStoreQueueStorage
         {
             _logger.LogTrace("Dequeuing events from internal queue: {QueueName}", _queueName);
         }
-        var resolvedEvents = _eventsPool.GetList();
         if (_initialized == false)
         {
-            return resolvedEvents;
+            return Array.Empty<ResolvedEvent>();
         }
         try
         {
+            var resolvedEvents = new List<ResolvedEvent>();
             for (var i = 0; i < maxCount; i++)
             {
                 if (!_eventQueue.TryDequeue(out var resolvedEvent))
@@ -320,10 +311,6 @@ public class EventStoreQueueStorage
         {
             _logger.LogError("Failed to dequeue events from internal queue for the queue {QueueName}.", _queueName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to dequeue events from internal queue for the queue {_queueName}. {ex.GetType()}: {ex.Message}"));
-        }
-        finally
-        {
-            _eventsPool.ReturnList(resolvedEvents);
         }
     }
 

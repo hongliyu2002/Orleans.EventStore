@@ -1,0 +1,1418 @@
+2023-03-22T01:47:58.1877899+08:00 [INF] (Chat Room/BOSSHONG/1) Started "Chat Room" with runtime ".NET 7.0.1" and OS "Microsoft Windows 10.0.19045".
+2023-03-22T01:47:58.4926827+08:00 [INF] (/BOSSHONG/1) Silo starting with GC settings: ServerGC=True GCLatencyMode="Interactive"
+2023-03-22T01:47:58.5211983+08:00 [INF] (/BOSSHONG/1) -------------- Initializing silo on host "BOSSHONG" MachineName "BOSSHONG" at "127.0.0.1:11111", gen 38425678 --------------
+2023-03-22T01:47:58.5213530+08:00 [INF] (/BOSSHONG/1) Starting silo "Silo_1b8d3"
+2023-03-22T01:47:59.6959587+08:00 [WRN] (/BOSSHONG/1) No implementation of IHostEnvironmentStatistics was found. Load shedding will not work yet
+2023-03-22T01:48:00.1685738+08:00 [INF] (/BOSSHONG/1) -------------- Started silo "S127.0.0.1:11111:38425678", ConsistentHashCode "E7589482" --------------
+2023-03-22T01:48:00.1745985+08:00 [INF] (/BOSSHONG/1) Starting Orleans Silo.
+2023-03-22T01:48:00.2826886+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.BroadcastChannel.BroadcastChannelOptions-Broadcast: 
+FireAndForgetDelivery: True
+
+2023-03-22T01:48:00.2828850+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ActivationCountBasedPlacementOptions: 
+ChooseOutOf: 2
+
+2023-03-22T01:48:00.2840967+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterMembershipOptions: 
+NumMissedTableIAmAliveLimit: 2
+LivenessEnabled: True
+ProbeTimeout: 00:00:05
+TableRefreshTimeout: 00:01:00
+DeathVoteExpirationTimeout: 00:02:00
+IAmAliveTablePublishTimeout: 00:05:00
+MaxJoinAttemptTime: 00:05:00
+UseLivenessGossip: True
+NumProbedSilos: 3
+NumMissedProbesLimit: 3
+NumVotesForDeathDeclaration: 2
+DefunctSiloExpiration: 7.00:00:00
+DefunctSiloCleanupPeriod: 01:00:00
+LocalHealthDegradationMonitoringPeriod: 00:00:10
+ExtendProbeTimeoutDuringDegradation: True
+EnableIndirectProbes: True
+
+2023-03-22T01:48:00.2841861+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterOptions: 
+ClusterId: ChatCluster
+ServiceId: ChatService
+
+2023-03-22T01:48:00.2845606+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConnectionOptions: 
+ProtocolVersion: Version1
+ConnectionsPerEndpoint: 1
+ConnectionRetryDelay: 00:00:01
+OpenConnectionTimeout: 00:00:05
+
+2023-03-22T01:48:00.2846429+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConsistentRingOptions: 
+NumVirtualBucketsConsistentRing: 30
+UseVirtualBucketsConsistentRing: True
+
+2023-03-22T01:48:00.2847247+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.DevelopmentClusterMembershipOptions: 
+PrimarySiloEndpoint: 127.0.0.1:11111
+
+2023-03-22T01:48:00.2848172+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EndpointOptions: 
+AdvertisedIPAddress: 127.0.0.1
+SiloPort: 11111
+GatewayPort: 30000
+SiloListeningEndpoint: 
+GatewayListeningEndpoint: 
+
+2023-03-22T01:48:00.2859793+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+TotalQueueCount: 1
+
+2023-03-22T01:48:00.2873725+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+TotalQueueCount: 1
+
+2023-03-22T01:48:00.2885495+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainCollectionOptions: 
+CollectionQuantum: 00:01:00
+CollectionAge: 00:15:00
+ActivationTimeout: 00:00:30
+DeactivationTimeout: 00:00:30
+
+2023-03-22T01:48:00.2906391+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainDirectoryOptions: 
+CachingStrategy: Adaptive
+CacheSize: 1000000
+InitialCacheTTL: 00:00:30
+MaximumCacheTTL: 00:04:00
+CacheTTLExtensionFactor: 2
+LazyDeregistrationDelay: 00:01:00
+
+2023-03-22T01:48:00.2908467+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainVersioningOptions: 
+DefaultCompatibilityStrategy: BackwardCompatible
+DefaultVersionSelectorStrategy: AllCompatibleVersions
+
+2023-03-22T01:48:00.2910021+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.LoadSheddingOptions: 
+LoadSheddingEnabled: False
+LoadSheddingLimit: 95
+
+2023-03-22T01:48:00.2915477+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SchedulingOptions: 
+DelayWarningThreshold: 00:00:10
+ActivationSchedulingQuantum: 00:00:00.1000000
+TurnWarningLengthThreshold: 00:00:01
+MaxPendingWorkItemsSoftLimit: 0
+StoppedActivationWarningInterval: 00:01:00
+
+2023-03-22T01:48:00.2929798+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloMessagingOptions: 
+SiloSenderQueues: 0
+GatewaySenderQueues: 0
+MaxForwardCount: 2
+ClientDropTimeout: 00:01:00
+ClientRegistrationRefresh: 00:05:00
+ClientGatewayShutdownNotificationTimeout: 00:00:05
+MaxEnqueuedRequestsSoftLimit: 0
+MaxEnqueuedRequestsHardLimit: 0
+MaxEnqueuedRequestsSoftLimit_StatelessWorker: 0
+MaxEnqueuedRequestsHardLimit_StatelessWorker: 0
+MaxRequestProcessingTime: 02:00:00
+AssumeHomogenousSilosForTesting: False
+ShutdownRerouteTimeout: 00:00:10
+SystemResponseTimeout: 00:30:00
+GrainWorkloadAnalysisPeriod: 00:00:05
+RequestProcessingWarningTime: 00:00:05
+RequestQueueDelayWarningTime: 00:00:10
+WaitForMessageToBeQueuedForOutboundTime: 00:00:02
+ResponseTimeout: 00:30:00
+ResponseTimeoutWithDebugger: 00:30:00
+DropExpiredMessages: True
+MaxMessageHeaderSize: 10485760
+MaxMessageBodySize: 104857600
+
+2023-03-22T01:48:00.2931480+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloOptions: 
+SiloName: Silo_1b8d3
+
+2023-03-22T01:48:00.2933444+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SimpleQueueCacheOptions-EventStoreStream: 
+CacheSize: 1024
+
+2023-03-22T01:48:00.2935390+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPubSubOptions-EventStoreStream: 
+PubSubType: ExplicitGrainBasedAndImplicit
+
+2023-03-22T01:48:00.2940154+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPullingAgentOptions-EventStoreStream: 
+BatchContainerBatchSize: 10
+GetQueueMsgsTimerPeriod: 00:00:00.2000000
+InitQueueTimeout: 00:00:05
+MaxEventDeliveryTime: 00:01:00
+StreamInactivityPeriod: 00:30:00
+
+2023-03-22T01:48:00.2943186+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Persistence.RedisStorageOptions-PubSubStore: 
+ConnectionString: 123.60.184.85:6379
+DeleteOnClear: True
+DatabaseNumber: 1
+InitStage: 10000
+GrainStorageSerializer: Orleans.Storage.JsonGrainStorageSerializer
+
+2023-03-22T01:48:00.3269584+08:00 [INF] (/BOSSHONG/4) Start InsideRuntimeClient took 1 milliseconds
+2023-03-22T01:48:00.3400485+08:00 [INF] (/BOSSHONG/16) Silo Start()
+2023-03-22T01:48:00.3458909+08:00 [INF] (/BOSSHONG/16) Start
+2023-03-22T01:48:00.3475546+08:00 [INF] (/BOSSHONG/16) "Start local grain directory" took 1 milliseconds to finish
+2023-03-22T01:48:00.3622532+08:00 [INF] (/BOSSHONG/15) MembershipOracle starting on host "BOSSHONG" with SiloAddress "S127.0.0.1:11111:38425678" at "2023-03-21 17:47:59.168 GMT"
+2023-03-22T01:48:00.3665629+08:00 [INF] (/BOSSHONG/15) Creating in-memory membership table
+2023-03-22T01:48:00.3675511+08:00 [INF] (/BOSSHONG/13) "Init grain services" took 2 milliseconds to finish
+2023-03-22T01:48:00.3685165+08:00 [INF] (/BOSSHONG/15) GrainBasedMembershipTable Activated.
+2023-03-22T01:48:00.3834586+08:00 [INF] (/BOSSHONG/13) "Start deployment load collector" took 15 milliseconds to finish
+2023-03-22T01:48:00.3848630+08:00 [INF] (/BOSSHONG/13) Starting Silo Watchdog.
+2023-03-22T01:48:00.6846225+08:00 [INF] (/BOSSHONG/14) Connected to membership table provider.
+2023-03-22T01:48:00.7055571+08:00 [INF] (/BOSSHONG/13) Joining
+2023-03-22T01:48:01.0299791+08:00 [INF] (/BOSSHONG/15) -BecomeActive
+2023-03-22T01:48:01.0426523+08:00 [INF] (/BOSSHONG/15) -Finished BecomeActive.
+2023-03-22T01:48:01.0512963+08:00 [INF] (/BOSSHONG/13) Starting "Orleans.Runtime.ReminderService.LocalReminderService" grain service on: "S127.0.0.1:11111:38425678" x"E7589482", with range "<(0 0], Size=x100000000, %Ring=100%>"
+2023-03-22T01:48:01.0642449+08:00 [INF] (/BOSSHONG/9) Successfully created queue balancer of type "Orleans.Streams.ConsistentRingQueueBalancer" for stream provider "EventStoreStream"
+2023-03-22T01:48:01.0681012+08:00 [INF] (/BOSSHONG/9) Created "PersistentStreamPullingManager" for Stream Provider "EventStoreStream".
+2023-03-22T01:48:01.0794770+08:00 [INF] (/BOSSHONG/4) Init.
+2023-03-22T01:48:01.0892206+08:00 [INF] (/BOSSHONG/4) Initialize: I am now responsible for 1 queues: "[eventstorestream-0]".
+2023-03-22T01:48:01.0956373+08:00 [INF] (/BOSSHONG/4) Starting agents for 1 queues: "[eventstorestream-0]"
+2023-03-22T01:48:01.1008197+08:00 [INF] (/BOSSHONG/4) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38425678" for Queue "eventstorestream-0-0x00000000".
+2023-03-22T01:48:01.1062833+08:00 [INF] (/BOSSHONG/9) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000" on silo "S127.0.0.1:11111:38425678" for queue "eventstorestream-0-0x00000000".
+2023-03-22T01:48:01.1659148+08:00 [INF] (/BOSSHONG/8) Activated
+2023-03-22T01:48:01.1802898+08:00 [INF] (/BOSSHONG/13) My range changed from "<(0 0], Size=x100000000, %Ring=100%>" to "<(0 0], Size=x100000000, %Ring=100%>" increased = True
+2023-03-22T01:48:01.6690827+08:00 [INF] (/BOSSHONG/9) Taking queue "eventstorestream-0-0x00000000" under my responsibility.
+2023-03-22T01:48:01.6740734+08:00 [INF] (/BOSSHONG/6) Added 1 new queues: "[eventstorestream-0]". Now own total of 1 queues: "[eventstorestream-0]"
+2023-03-22T01:48:01.6747070+08:00 [INF] (/BOSSHONG/6) Started agents.
+2023-03-22T01:48:01.6782089+08:00 [INF] (/BOSSHONG/8) Orleans Silo started.
+2023-03-22T01:48:30.3547231+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:28.9445698. Total GC Pause duration during that period: 00:00:00. We are now using a total of 5MB memory. gc=3, 3, 3
+2023-03-22T01:48:30.3924377+08:00 [WRN] (/BOSSHONG/29) Timer should have fired at 03/21/2023 17:48:02 but fired at 03/21/2023 17:48:30, which is 00:00:28.3118109 longer than expected
+2023-03-22T01:48:30.4018694+08:00 [WRN] (/BOSSHONG/29) Timer should have fired at 03/21/2023 17:48:11 but fired at 03/21/2023 17:48:30, which is 00:00:19.3547153 longer than expected
+2023-03-22T01:48:30.4082661+08:00 [WRN] (/BOSSHONG/30) Timer should have fired at 03/21/2023 17:48:06 but fired at 03/21/2023 17:48:30, which is 00:00:24.3751363 longer than expected
+2023-03-22T01:48:30.4334018+08:00 [WRN] (/BOSSHONG/32) Timer should have fired at 03/21/2023 17:48:08 but fired at 03/21/2023 17:48:30, which is 00:00:22.3819914 longer than expected
+2023-03-22T01:48:30.4427166+08:00 [WRN] (/BOSSHONG/33) Timer should have fired at 03/21/2023 17:48:14 but fired at 03/21/2023 17:48:30, which is 00:00:16.0844381 longer than expected
+2023-03-22T01:48:30.4532312+08:00 [WRN] (/BOSSHONG/14) Task "[Id=669, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:28.4176531" for execution, which is longer than 00:00:01. Running on thread "14"
+2023-03-22T01:48:30.4995885+08:00 [WRN] (/BOSSHONG/28) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-0::ChatService" for the queue: "chatservice/streaming/eventstorestream-0" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T01:48:33.9316991+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:03.5758793. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=3, 3, 3
+2023-03-22T01:48:33.9317278+08:00 [WRN] (/BOSSHONG/31) Timer should have fired at 03/21/2023 17:48:30 but fired at 03/21/2023 17:48:33, which is 00:00:03.2326733 longer than expected
+2023-03-22T01:48:33.9323730+08:00 [WRN] (/BOSSHONG/9) Task "[Id=835, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:03.2851618" for execution, which is longer than 00:00:01. Running on thread "9"
+2023-03-22T01:48:36.3172465+08:00 [WRN] (/BOSSHONG/9) Task "[Id=890, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:01.1376329" for execution, which is longer than 00:00:01. Running on thread "9"
+2023-03-22T01:48:39.8341942+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:03.5175986. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=3, 3, 3
+2023-03-22T01:48:39.8343554+08:00 [WRN] (/BOSSHONG/29) Timer should have fired at 03/21/2023 17:48:36 but fired at 03/21/2023 17:48:39, which is 00:00:03.2063540 longer than expected
+2023-03-22T01:48:39.8348175+08:00 [WRN] (/BOSSHONG/32) Task "[Id=919, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:03.3064593" for execution, which is longer than 00:00:01. Running on thread "32"
+2023-03-22T01:48:44.8672470+08:00 [WRN] (/BOSSHONG/33) Timer should have fired at 03/21/2023 17:48:41 but fired at 03/21/2023 17:48:44, which is 00:00:03.2237765 longer than expected
+2023-03-22T01:48:44.8674089+08:00 [WRN] (/BOSSHONG/9) Task "[Id=997, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:03.3237165" for execution, which is longer than 00:00:01. Running on thread "9"
+2023-03-22T01:48:44.8671255+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:04.0243146. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=3, 3, 3
+2023-03-22T01:49:27.3568448+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:03.0058779. Total GC Pause duration during that period: 00:00:00. We are now using a total of 7MB memory. gc=3, 3, 3
+2023-03-22T01:49:30.1508962+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.7938549. Total GC Pause duration during that period: 00:00:00. We are now using a total of 7MB memory. gc=3, 3, 3
+2023-03-22T01:49:32.3760098+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.2248304. Total GC Pause duration during that period: 00:00:00. We are now using a total of 7MB memory. gc=3, 3, 3
+2023-03-22T01:49:35.9348850+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.2834882. Total GC Pause duration during that period: 00:00:00. We are now using a total of 7MB memory. gc=3, 3, 3
+2023-03-22T01:49:35.9361668+08:00 [WRN] (/BOSSHONG/32) Task "[Id=4034, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.load-publisher/127.0.0.1:11111@38425678@f4b42ed60000000090f8c63100000000]" took elapsed time "0:00:01.6164031" for execution, which is longer than 00:00:01. Running on thread "32"
+2023-03-22T01:49:40.6171780+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:03.3476613. Total GC Pause duration during that period: 00:00:00. We are now using a total of 7MB memory. gc=3, 3, 3
+2023-03-22T01:49:40.6172543+08:00 [WRN] (/BOSSHONG/28) Timer should have fired at 03/21/2023 17:49:37 but fired at 03/21/2023 17:49:40, which is 00:00:03.2403121 longer than expected
+2023-03-22T01:49:40.6172571+08:00 [WRN] (/BOSSHONG/33) Timer should have fired at 03/21/2023 17:49:37 but fired at 03/21/2023 17:49:40, which is 00:00:03.2483806 longer than expected
+2023-03-22T01:49:40.6189180+08:00 [WRN] (/BOSSHONG/9) Task "[Id=3962, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:16.2185405" for execution, which is longer than 00:00:01. Running on thread "9"
+2023-03-22T01:49:40.6189827+08:00 [WRN] (/BOSSHONG/31) Task "[Id=4053, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.load-publisher/127.0.0.1:11111@38425678@f4b42ed60000000090f8c63100000000]" took elapsed time "0:00:03.350118" for execution, which is longer than 00:00:01. Running on thread "31"
+2023-03-22T01:49:46.0308428+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:05.4135505. Total GC Pause duration during that period: 00:00:00. We are now using a total of 7MB memory. gc=3, 3, 3
+2023-03-22T01:49:46.0310734+08:00 [WRN] (/BOSSHONG/33) Timer should have fired at 03/21/2023 17:49:42 but fired at 03/21/2023 17:49:46, which is 00:00:03.6549611 longer than expected
+2023-03-22T01:49:46.0311357+08:00 [WRN] (/BOSSHONG/32) Timer should have fired at 03/21/2023 17:49:40 but fired at 03/21/2023 17:49:46, which is 00:00:05.1998707 longer than expected
+2023-03-22T01:49:46.0318564+08:00 [WRN] (/BOSSHONG/28) Task "[Id=4081, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:05.2072992" for execution, which is longer than 00:00:01. Running on thread "28"
+2023-03-22T01:50:03.9049110+08:00 [INF] (/BOSSHONG/9) Recorded opened connection from endpoint "127.0.0.1:65223", client ID "sys.client/d76d4956479c469597716e3a99581c0e".
+2023-03-22T01:50:10.4174550+08:00 [WRN] (/BOSSHONG/32) Task "[Id=5805, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:01.5203072" for execution, which is longer than 00:00:01. Running on thread "32"
+2023-03-22T01:50:14.5148020+08:00 [WRN] (/BOSSHONG/37) Timer should have fired at 03/21/2023 17:50:10 but fired at 03/21/2023 17:50:14, which is 00:00:03.7849546 longer than expected
+2023-03-22T01:50:14.5149653+08:00 [WRN] (/BOSSHONG/34) Timer should have fired at 03/21/2023 17:50:11 but fired at 03/21/2023 17:50:14, which is 00:00:03.4412616 longer than expected
+2023-03-22T01:50:14.5156559+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:04.0978761. Total GC Pause duration during that period: 00:00:00. We are now using a total of 8MB memory. gc=3, 3, 3
+2023-03-22T01:50:14.5157197+08:00 [WRN] (/BOSSHONG/29) Task "[Id=5832, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:03.8849868" for execution, which is longer than 00:00:01. Running on thread "29"
+2023-03-22T01:50:38.3353229+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:04.5914686. Total GC Pause duration during that period: 00:00:00. We are now using a total of 9MB memory. gc=3, 3, 3
+2023-03-22T01:50:38.3353268+08:00 [WRN] (/BOSSHONG/37) Timer should have fired at 03/21/2023 17:50:34 but fired at 03/21/2023 17:50:38, which is 00:00:03.7972532 longer than expected
+2023-03-22T01:50:38.3354080+08:00 [WRN] (/BOSSHONG/31) Timer should have fired at 03/21/2023 17:50:34 but fired at 03/21/2023 17:50:38, which is 00:00:03.7759849 longer than expected
+2023-03-22T01:50:38.3371726+08:00 [WRN] (/BOSSHONG/9) Task "[Id=7578, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38425678/sys.svc.stream.agent/127.0.0.1:11111@38425678+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000bbeed7bf00000000]" took elapsed time "0:00:03.827209" for execution, which is longer than 00:00:01. Running on thread "9"
+2023-03-22T02:01:44.8768404+08:00 [INF] (Chat Room/BOSSHONG/1) Started "Chat Room" with runtime ".NET 7.0.1" and OS "Microsoft Windows 10.0.19045".
+2023-03-22T02:01:45.1068297+08:00 [INF] (/BOSSHONG/1) Silo starting with GC settings: ServerGC=True GCLatencyMode="Interactive"
+2023-03-22T02:01:45.1214928+08:00 [INF] (/BOSSHONG/1) -------------- Initializing silo on host "BOSSHONG" MachineName "BOSSHONG" at "127.0.0.1:11111", gen 38426505 --------------
+2023-03-22T02:01:45.1217062+08:00 [INF] (/BOSSHONG/1) Starting silo "Silo_4f9cc"
+2023-03-22T02:01:46.0806606+08:00 [WRN] (/BOSSHONG/1) No implementation of IHostEnvironmentStatistics was found. Load shedding will not work yet
+2023-03-22T02:01:46.2560153+08:00 [INF] (/BOSSHONG/1) -------------- Started silo "S127.0.0.1:11111:38426505", ConsistentHashCode "B6F232D1" --------------
+2023-03-22T02:01:46.2609699+08:00 [INF] (/BOSSHONG/1) Starting Orleans Silo.
+2023-03-22T02:01:46.3868944+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.BroadcastChannel.BroadcastChannelOptions-Broadcast: 
+FireAndForgetDelivery: True
+
+2023-03-22T02:01:46.3872216+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ActivationCountBasedPlacementOptions: 
+ChooseOutOf: 2
+
+2023-03-22T02:01:46.3887408+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterMembershipOptions: 
+NumMissedTableIAmAliveLimit: 2
+LivenessEnabled: True
+ProbeTimeout: 00:00:05
+TableRefreshTimeout: 00:01:00
+DeathVoteExpirationTimeout: 00:02:00
+IAmAliveTablePublishTimeout: 00:05:00
+MaxJoinAttemptTime: 00:05:00
+UseLivenessGossip: True
+NumProbedSilos: 3
+NumMissedProbesLimit: 3
+NumVotesForDeathDeclaration: 2
+DefunctSiloExpiration: 7.00:00:00
+DefunctSiloCleanupPeriod: 01:00:00
+LocalHealthDegradationMonitoringPeriod: 00:00:10
+ExtendProbeTimeoutDuringDegradation: True
+EnableIndirectProbes: True
+
+2023-03-22T02:01:46.3888290+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterOptions: 
+ClusterId: ChatCluster
+ServiceId: ChatService
+
+2023-03-22T02:01:46.3892191+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConnectionOptions: 
+ProtocolVersion: Version1
+ConnectionsPerEndpoint: 1
+ConnectionRetryDelay: 00:00:01
+OpenConnectionTimeout: 00:00:05
+
+2023-03-22T02:01:46.3893038+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConsistentRingOptions: 
+NumVirtualBucketsConsistentRing: 30
+UseVirtualBucketsConsistentRing: True
+
+2023-03-22T02:01:46.3893841+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.DevelopmentClusterMembershipOptions: 
+PrimarySiloEndpoint: 127.0.0.1:11111
+
+2023-03-22T02:01:46.3894907+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EndpointOptions: 
+AdvertisedIPAddress: 127.0.0.1
+SiloPort: 11111
+GatewayPort: 30000
+SiloListeningEndpoint: 
+GatewayListeningEndpoint: 
+
+2023-03-22T02:01:46.3902708+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+TotalQueueCount: 1
+
+2023-03-22T02:01:46.3909778+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+TotalQueueCount: 1
+
+2023-03-22T02:01:46.3914638+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainCollectionOptions: 
+CollectionQuantum: 00:01:00
+CollectionAge: 00:15:00
+ActivationTimeout: 00:00:30
+DeactivationTimeout: 00:00:30
+
+2023-03-22T02:01:46.3919127+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainDirectoryOptions: 
+CachingStrategy: Adaptive
+CacheSize: 1000000
+InitialCacheTTL: 00:00:30
+MaximumCacheTTL: 00:04:00
+CacheTTLExtensionFactor: 2
+LazyDeregistrationDelay: 00:01:00
+
+2023-03-22T02:01:46.3919986+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainVersioningOptions: 
+DefaultCompatibilityStrategy: BackwardCompatible
+DefaultVersionSelectorStrategy: AllCompatibleVersions
+
+2023-03-22T02:01:46.3920644+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.LoadSheddingOptions: 
+LoadSheddingEnabled: False
+LoadSheddingLimit: 95
+
+2023-03-22T02:01:46.3924042+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SchedulingOptions: 
+DelayWarningThreshold: 00:00:10
+ActivationSchedulingQuantum: 00:00:00.1000000
+TurnWarningLengthThreshold: 00:00:01
+MaxPendingWorkItemsSoftLimit: 0
+StoppedActivationWarningInterval: 00:01:00
+
+2023-03-22T02:01:46.3934648+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloMessagingOptions: 
+SiloSenderQueues: 0
+GatewaySenderQueues: 0
+MaxForwardCount: 2
+ClientDropTimeout: 00:01:00
+ClientRegistrationRefresh: 00:05:00
+ClientGatewayShutdownNotificationTimeout: 00:00:05
+MaxEnqueuedRequestsSoftLimit: 0
+MaxEnqueuedRequestsHardLimit: 0
+MaxEnqueuedRequestsSoftLimit_StatelessWorker: 0
+MaxEnqueuedRequestsHardLimit_StatelessWorker: 0
+MaxRequestProcessingTime: 02:00:00
+AssumeHomogenousSilosForTesting: False
+ShutdownRerouteTimeout: 00:00:10
+SystemResponseTimeout: 00:30:00
+GrainWorkloadAnalysisPeriod: 00:00:05
+RequestProcessingWarningTime: 00:00:05
+RequestQueueDelayWarningTime: 00:00:10
+WaitForMessageToBeQueuedForOutboundTime: 00:00:02
+ResponseTimeout: 00:30:00
+ResponseTimeoutWithDebugger: 00:30:00
+DropExpiredMessages: True
+MaxMessageHeaderSize: 10485760
+MaxMessageBodySize: 104857600
+
+2023-03-22T02:01:46.3935395+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloOptions: 
+SiloName: Silo_4f9cc
+
+2023-03-22T02:01:46.3936625+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SimpleQueueCacheOptions-EventStoreStream: 
+CacheSize: 1024
+
+2023-03-22T02:01:46.3938018+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPubSubOptions-EventStoreStream: 
+PubSubType: ExplicitGrainBasedAndImplicit
+
+2023-03-22T02:01:46.3941758+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPullingAgentOptions-EventStoreStream: 
+BatchContainerBatchSize: 10
+GetQueueMsgsTimerPeriod: 00:00:01
+InitQueueTimeout: 00:00:05
+MaxEventDeliveryTime: 00:01:00
+StreamInactivityPeriod: 00:30:00
+
+2023-03-22T02:01:46.3944343+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Persistence.RedisStorageOptions-PubSubStore: 
+ConnectionString: 123.60.184.85:6379
+DeleteOnClear: True
+DatabaseNumber: 1
+InitStage: 10000
+GrainStorageSerializer: Orleans.Storage.JsonGrainStorageSerializer
+
+2023-03-22T02:01:46.4262752+08:00 [INF] (/BOSSHONG/13) Start InsideRuntimeClient took 1 milliseconds
+2023-03-22T02:01:46.4388356+08:00 [INF] (/BOSSHONG/4) Silo Start()
+2023-03-22T02:01:46.4439867+08:00 [INF] (/BOSSHONG/9) Start
+2023-03-22T02:01:46.4457352+08:00 [INF] (/BOSSHONG/9) "Start local grain directory" took 1 milliseconds to finish
+2023-03-22T02:01:46.4612185+08:00 [INF] (/BOSSHONG/4) MembershipOracle starting on host "BOSSHONG" with SiloAddress "S127.0.0.1:11111:38426505" at "2023-03-21 18:01:45.671 GMT"
+2023-03-22T02:01:46.4641367+08:00 [INF] (/BOSSHONG/4) Creating in-memory membership table
+2023-03-22T02:01:46.4665207+08:00 [INF] (/BOSSHONG/4) GrainBasedMembershipTable Activated.
+2023-03-22T02:01:46.4666037+08:00 [INF] (/BOSSHONG/14) "Init grain services" took 1 milliseconds to finish
+2023-03-22T02:01:46.4858852+08:00 [INF] (/BOSSHONG/9) "Start deployment load collector" took 19 milliseconds to finish
+2023-03-22T02:01:46.4877872+08:00 [INF] (/BOSSHONG/9) Starting Silo Watchdog.
+2023-03-22T02:01:46.5749106+08:00 [INF] (/BOSSHONG/6) Connected to membership table provider.
+2023-03-22T02:01:46.5990714+08:00 [INF] (/BOSSHONG/4) Joining
+2023-03-22T02:01:47.0487927+08:00 [INF] (/BOSSHONG/16) -BecomeActive
+2023-03-22T02:01:47.0598669+08:00 [INF] (/BOSSHONG/15) -Finished BecomeActive.
+2023-03-22T02:01:47.0661597+08:00 [INF] (/BOSSHONG/6) Starting "Orleans.Runtime.ReminderService.LocalReminderService" grain service on: "S127.0.0.1:11111:38426505" x"B6F232D1", with range "<(0 0], Size=x100000000, %Ring=100%>"
+2023-03-22T02:01:47.0766665+08:00 [INF] (/BOSSHONG/14) Successfully created queue balancer of type "Orleans.Streams.ConsistentRingQueueBalancer" for stream provider "EventStoreStream"
+2023-03-22T02:01:47.0793660+08:00 [INF] (/BOSSHONG/14) Created "PersistentStreamPullingManager" for Stream Provider "EventStoreStream".
+2023-03-22T02:01:47.0862897+08:00 [INF] (/BOSSHONG/9) Init.
+2023-03-22T02:01:47.0949514+08:00 [INF] (/BOSSHONG/9) Initialize: I am now responsible for 1 queues: "[eventstorestream-0]".
+2023-03-22T02:01:47.1008431+08:00 [INF] (/BOSSHONG/13) Starting agents for 1 queues: "[eventstorestream-0]"
+2023-03-22T02:01:47.1071033+08:00 [INF] (/BOSSHONG/13) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38426505" for Queue "eventstorestream-0-0x00000000".
+2023-03-22T02:01:47.1119410+08:00 [INF] (/BOSSHONG/9) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000" on silo "S127.0.0.1:11111:38426505" for queue "eventstorestream-0-0x00000000".
+2023-03-22T02:01:47.1632576+08:00 [INF] (/BOSSHONG/8) Activated
+2023-03-22T02:01:47.1763045+08:00 [INF] (/BOSSHONG/15) My range changed from "<(0 0], Size=x100000000, %Ring=100%>" to "<(0 0], Size=x100000000, %Ring=100%>" increased = True
+2023-03-22T02:01:47.7671767+08:00 [INF] (/BOSSHONG/9) Taking queue "eventstorestream-0-0x00000000" under my responsibility.
+2023-03-22T02:01:47.7711253+08:00 [INF] (/BOSSHONG/13) Added 1 new queues: "[eventstorestream-0]". Now own total of 1 queues: "[eventstorestream-0]"
+2023-03-22T02:01:47.7716603+08:00 [INF] (/BOSSHONG/13) Started agents.
+2023-03-22T02:01:47.7751475+08:00 [INF] (/BOSSHONG/4) Orleans Silo started.
+2023-03-22T02:01:56.9482406+08:00 [WRN] (/BOSSHONG/4) Timer should have fired at 03/21/2023 18:01:52 but fired at 03/21/2023 18:01:56, which is 00:00:04.8967292 longer than expected
+2023-03-22T02:01:56.9482338+08:00 [WRN] (/BOSSHONG/6) Timer should have fired at 03/21/2023 18:01:50 but fired at 03/21/2023 18:01:56, which is 00:00:06.9100156 longer than expected
+2023-03-22T02:01:56.9482359+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:07.4138913. Total GC Pause duration during that period: 00:00:00. We are now using a total of 5MB memory. gc=2, 2, 2
+2023-03-22T02:01:56.9747267+08:00 [WRN] (/BOSSHONG/14) Task "[Id=774, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000069d243800000000]" took elapsed time "0:00:06.9379836" for execution, which is longer than 00:00:01. Running on thread "14"
+2023-03-22T02:02:24.3448850+08:00 [WRN] (/BOSSHONG/9) Timer should have fired at 03/21/2023 18:02:20 but fired at 03/21/2023 18:02:24, which is 00:00:04.1665896 longer than expected
+2023-03-22T02:02:24.3451025+08:00 [WRN] (/BOSSHONG/14) Task "[Id=1926, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000069d243800000000]" took elapsed time "0:00:04.1745691" for execution, which is longer than 00:00:01. Running on thread "14"
+2023-03-22T02:02:24.3466090+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:05.1225991. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:02:44.9696438+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:07.4855505. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:02:44.9703074+08:00 [WRN] (/BOSSHONG/14) Timer should have fired at 03/21/2023 18:02:39 but fired at 03/21/2023 18:02:44, which is 00:00:05.6030152 longer than expected
+2023-03-22T02:02:44.9703394+08:00 [WRN] (/BOSSHONG/13) Timer should have fired at 03/21/2023 18:02:38 but fired at 03/21/2023 18:02:44, which is 00:00:06.4129870 longer than expected
+2023-03-22T02:02:44.9704606+08:00 [WRN] (/BOSSHONG/29) Task "[Id=2629, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000069d243800000000]" took elapsed time "0:00:06.4977599" for execution, which is longer than 00:00:01. Running on thread "29"
+2023-03-22T02:02:52.9709230+08:00 [WRN] (/BOSSHONG/15) Timer should have fired at 03/21/2023 18:02:46 but fired at 03/21/2023 18:02:52, which is 00:00:06.8330399 longer than expected
+2023-03-22T02:02:52.9709129+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:06.9909833. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:02:52.9709392+08:00 [WRN] (/BOSSHONG/6) Timer should have fired at 03/21/2023 18:02:49 but fired at 03/21/2023 18:02:52, which is 00:00:03.0005601 longer than expected
+2023-03-22T02:02:52.9711050+08:00 [WRN] (/BOSSHONG/4) Task "[Id=2690, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.load-publisher/127.0.0.1:11111@38426505@f4b42ed6000000007a9a3c1c00000000]" took elapsed time "0:00:06.9907726" for execution, which is longer than 00:00:01. Running on thread "4"
+2023-03-22T02:02:52.9711105+08:00 [WRN] (/BOSSHONG/8) Task "[Id=2691, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000069d243800000000]" took elapsed time "0:00:06.9909242" for execution, which is longer than 00:00:01. Running on thread "8"
+2023-03-22T02:02:52.9711153+08:00 [WRN] (/BOSSHONG/16) Timer should have fired at 03/21/2023 18:02:46 but fired at 03/21/2023 18:02:52, which is 00:00:06.9073456 longer than expected
+2023-03-22T02:02:52.9711774+08:00 [WRN] (/BOSSHONG/8) Timer should have fired at 03/21/2023 18:02:46 but fired at 03/21/2023 18:02:52, which is 00:00:06.5303089 longer than expected
+2023-03-22T02:02:52.9711245+08:00 [WRN] (/BOSSHONG/9) Timer should have fired at 03/21/2023 18:02:47 but fired at 03/21/2023 18:02:52, which is 00:00:05.8776674 longer than expected
+2023-03-22T02:02:52.9729154+08:00 [WRN] (/BOSSHONG/17) Watchdog had 1 health Check failure(s) out of 5 health Check participants: "Orleans.Runtime.ActivationCollector failed health check with reason \"ActivationCollector timer should have fired at 2023-03-21 18:02:46, which is 00:00:06.5300963 ago\"."
+2023-03-22T02:02:56.3526049+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.3737342. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:03:04.9424466+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:08.5884327. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:03:04.9427323+08:00 [WRN] (/BOSSHONG/13) Timer should have fired at 03/21/2023 18:02:56 but fired at 03/21/2023 18:03:04, which is 00:00:08.4899453 longer than expected
+2023-03-22T02:03:04.9428772+08:00 [WRN] (/BOSSHONG/8) Task "[Id=2780, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.load-publisher/127.0.0.1:11111@38426505@f4b42ed6000000007a9a3c1c00000000]" took elapsed time "0:00:08.5902952" for execution, which is longer than 00:00:01. Running on thread "8"
+2023-03-22T02:03:04.9428932+08:00 [WRN] (/BOSSHONG/9) Task "[Id=2762, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000069d243800000000]" took elapsed time "0:00:10.963149" for execution, which is longer than 00:00:01. Running on thread "9"
+2023-03-22T02:03:04.9428875+08:00 [WRN] (/BOSSHONG/6) Timer should have fired at 03/21/2023 18:02:57 but fired at 03/21/2023 18:03:04, which is 00:00:06.9717924 longer than expected
+2023-03-22T02:03:09.4456517+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:03.4975368. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:03:09.4470393+08:00 [WRN] (/BOSSHONG/16) Timer should have fired at 03/21/2023 18:03:06 but fired at 03/21/2023 18:03:09, which is 00:00:03.4283949 longer than expected
+2023-03-22T02:03:09.4482807+08:00 [WRN] (/BOSSHONG/6) Task "[Id=2839, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000069d243800000000]" took elapsed time "0:00:03.4989545" for execution, which is longer than 00:00:01. Running on thread "6"
+2023-03-22T02:03:09.4485967+08:00 [WRN] (/BOSSHONG/13) Task "[Id=2840, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.load-publisher/127.0.0.1:11111@38426505@f4b42ed6000000007a9a3c1c00000000]" took elapsed time "0:00:03.4971319" for execution, which is longer than 00:00:01. Running on thread "13"
+2023-03-22T02:03:12.7758057+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.3218971. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:03:12.7760672+08:00 [WRN] (/BOSSHONG/6) Task "[Id=2892, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000069d243800000000]" took elapsed time "0:00:02.3215502" for execution, which is longer than 00:00:01. Running on thread "6"
+2023-03-22T02:03:12.7760686+08:00 [WRN] (/BOSSHONG/16) Task "[Id=2893, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.load-publisher/127.0.0.1:11111@38426505@f4b42ed6000000007a9a3c1c00000000]" took elapsed time "0:00:02.3217313" for execution, which is longer than 00:00:01. Running on thread "16"
+2023-03-22T02:03:16.9961731+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:03.2169382. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:03:16.9964175+08:00 [WRN] (/BOSSHONG/29) Timer should have fired at 03/21/2023 18:03:13 but fired at 03/21/2023 18:03:16, which is 00:00:03.1478941 longer than expected
+2023-03-22T02:03:16.9964451+08:00 [WRN] (/BOSSHONG/8) Task "[Id=2942, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.load-publisher/127.0.0.1:11111@38426505@f4b42ed6000000007a9a3c1c00000000]" took elapsed time "0:00:03.2168334" for execution, which is longer than 00:00:01. Running on thread "8"
+2023-03-22T02:03:16.9964474+08:00 [WRN] (/BOSSHONG/4) Task "[Id=2943, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000069d243800000000]" took elapsed time "0:00:03.2168511" for execution, which is longer than 00:00:01. Running on thread "4"
+2023-03-22T02:03:20.8288306+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.8201311. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:03:20.8290870+08:00 [WRN] (/BOSSHONG/6) Task "[Id=3004, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.load-publisher/127.0.0.1:11111@38426505@f4b42ed6000000007a9a3c1c00000000]" took elapsed time "0:00:02.8199252" for execution, which is longer than 00:00:01. Running on thread "6"
+2023-03-22T02:03:20.8290905+08:00 [WRN] (/BOSSHONG/15) Task "[Id=3000, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38426505/sys.svc.stream.agent/127.0.0.1:11111@38426505+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000069d243800000000]" took elapsed time "0:00:02.8198651" for execution, which is longer than 00:00:01. Running on thread "15"
+2023-03-22T02:03:30.0148354+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:08.1791055. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:03:30.0149977+08:00 [WRN] (/BOSSHONG/6) Timer should have fired at 03/21/2023 18:03:21 but fired at 03/21/2023 18:03:30, which is 00:00:08.0185304 longer than expected
+2023-03-22T02:03:30.0150000+08:00 [WRN] (/BOSSHONG/29) Timer should have fired at 03/21/2023 18:03:21 but fired at 03/21/2023 18:03:30, which is 00:00:08.1102366 longer than expected
+2023-03-22T02:57:56.2352281+08:00 [INF] (Chat Room/BOSSHONG/1) Started "Chat Room" with runtime ".NET 7.0.1" and OS "Microsoft Windows 10.0.19045".
+2023-03-22T02:57:56.4357789+08:00 [INF] (/BOSSHONG/1) Silo starting with GC settings: ServerGC=True GCLatencyMode="Interactive"
+2023-03-22T02:57:56.4402459+08:00 [INF] (/BOSSHONG/1) -------------- Initializing silo on host "BOSSHONG" MachineName "BOSSHONG" at "127.0.0.1:11111", gen 38429876 --------------
+2023-03-22T02:57:56.4403943+08:00 [INF] (/BOSSHONG/1) Starting silo "Silo_59c4a"
+2023-03-22T02:57:57.2777009+08:00 [WRN] (/BOSSHONG/1) No implementation of IHostEnvironmentStatistics was found. Load shedding will not work yet
+2023-03-22T02:57:57.6804965+08:00 [INF] (/BOSSHONG/1) -------------- Started silo "S127.0.0.1:11111:38429876", ConsistentHashCode "7F15120A" --------------
+2023-03-22T02:57:57.6901527+08:00 [INF] (/BOSSHONG/1) Starting Orleans Silo.
+2023-03-22T02:57:57.7875976+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.BroadcastChannel.BroadcastChannelOptions-Broadcast: 
+FireAndForgetDelivery: True
+
+2023-03-22T02:57:57.7878296+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ActivationCountBasedPlacementOptions: 
+ChooseOutOf: 2
+
+2023-03-22T02:57:57.7889713+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterMembershipOptions: 
+NumMissedTableIAmAliveLimit: 2
+LivenessEnabled: True
+ProbeTimeout: 00:00:05
+TableRefreshTimeout: 00:01:00
+DeathVoteExpirationTimeout: 00:02:00
+IAmAliveTablePublishTimeout: 00:05:00
+MaxJoinAttemptTime: 00:05:00
+UseLivenessGossip: True
+NumProbedSilos: 3
+NumMissedProbesLimit: 3
+NumVotesForDeathDeclaration: 2
+DefunctSiloExpiration: 7.00:00:00
+DefunctSiloCleanupPeriod: 01:00:00
+LocalHealthDegradationMonitoringPeriod: 00:00:10
+ExtendProbeTimeoutDuringDegradation: True
+EnableIndirectProbes: True
+
+2023-03-22T02:57:57.7890711+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterOptions: 
+ClusterId: ChatCluster
+ServiceId: ChatService
+
+2023-03-22T02:57:57.7894852+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConnectionOptions: 
+ProtocolVersion: Version1
+ConnectionsPerEndpoint: 1
+ConnectionRetryDelay: 00:00:01
+OpenConnectionTimeout: 00:00:05
+
+2023-03-22T02:57:57.7895692+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConsistentRingOptions: 
+NumVirtualBucketsConsistentRing: 30
+UseVirtualBucketsConsistentRing: True
+
+2023-03-22T02:57:57.7896671+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.DevelopmentClusterMembershipOptions: 
+PrimarySiloEndpoint: 127.0.0.1:11111
+
+2023-03-22T02:57:57.7897853+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EndpointOptions: 
+AdvertisedIPAddress: 127.0.0.1
+SiloPort: 11111
+GatewayPort: 30000
+SiloListeningEndpoint: 
+GatewayListeningEndpoint: 
+
+2023-03-22T02:57:57.7906328+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+TotalQueueCount: 1
+
+2023-03-22T02:57:57.7920933+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+TotalQueueCount: 1
+
+2023-03-22T02:57:57.7930587+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainCollectionOptions: 
+CollectionQuantum: 00:01:00
+CollectionAge: 00:15:00
+ActivationTimeout: 00:00:30
+DeactivationTimeout: 00:00:30
+
+2023-03-22T02:57:57.7941290+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainDirectoryOptions: 
+CachingStrategy: Adaptive
+CacheSize: 1000000
+InitialCacheTTL: 00:00:30
+MaximumCacheTTL: 00:04:00
+CacheTTLExtensionFactor: 2
+LazyDeregistrationDelay: 00:01:00
+
+2023-03-22T02:57:57.7944112+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainVersioningOptions: 
+DefaultCompatibilityStrategy: BackwardCompatible
+DefaultVersionSelectorStrategy: AllCompatibleVersions
+
+2023-03-22T02:57:57.7947046+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.LoadSheddingOptions: 
+LoadSheddingEnabled: False
+LoadSheddingLimit: 95
+
+2023-03-22T02:57:57.7955235+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SchedulingOptions: 
+DelayWarningThreshold: 00:00:10
+ActivationSchedulingQuantum: 00:00:00.1000000
+TurnWarningLengthThreshold: 00:00:01
+MaxPendingWorkItemsSoftLimit: 0
+StoppedActivationWarningInterval: 00:01:00
+
+2023-03-22T02:57:57.7982815+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloMessagingOptions: 
+SiloSenderQueues: 0
+GatewaySenderQueues: 0
+MaxForwardCount: 2
+ClientDropTimeout: 00:01:00
+ClientRegistrationRefresh: 00:05:00
+ClientGatewayShutdownNotificationTimeout: 00:00:05
+MaxEnqueuedRequestsSoftLimit: 0
+MaxEnqueuedRequestsHardLimit: 0
+MaxEnqueuedRequestsSoftLimit_StatelessWorker: 0
+MaxEnqueuedRequestsHardLimit_StatelessWorker: 0
+MaxRequestProcessingTime: 02:00:00
+AssumeHomogenousSilosForTesting: False
+ShutdownRerouteTimeout: 00:00:10
+SystemResponseTimeout: 00:30:00
+GrainWorkloadAnalysisPeriod: 00:00:05
+RequestProcessingWarningTime: 00:00:05
+RequestQueueDelayWarningTime: 00:00:10
+WaitForMessageToBeQueuedForOutboundTime: 00:00:02
+ResponseTimeout: 00:30:00
+ResponseTimeoutWithDebugger: 00:30:00
+DropExpiredMessages: True
+MaxMessageHeaderSize: 10485760
+MaxMessageBodySize: 104857600
+
+2023-03-22T02:57:57.7985499+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloOptions: 
+SiloName: Silo_59c4a
+
+2023-03-22T02:57:57.7988646+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SimpleQueueCacheOptions-EventStoreStream: 
+CacheSize: 1024
+
+2023-03-22T02:57:57.7991990+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPubSubOptions-EventStoreStream: 
+PubSubType: ExplicitGrainBasedAndImplicit
+
+2023-03-22T02:57:57.8001460+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPullingAgentOptions-EventStoreStream: 
+BatchContainerBatchSize: 10
+GetQueueMsgsTimerPeriod: 00:00:01
+InitQueueTimeout: 00:00:05
+MaxEventDeliveryTime: 00:01:00
+StreamInactivityPeriod: 00:30:00
+
+2023-03-22T02:57:57.8007022+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Persistence.RedisStorageOptions-PubSubStore: 
+ConnectionString: 123.60.184.85:6379
+DeleteOnClear: True
+DatabaseNumber: 1
+InitStage: 10000
+GrainStorageSerializer: Orleans.Storage.JsonGrainStorageSerializer
+
+2023-03-22T02:57:57.8301105+08:00 [INF] (/BOSSHONG/6) Start InsideRuntimeClient took 1 milliseconds
+2023-03-22T02:57:57.8408978+08:00 [INF] (/BOSSHONG/8) Silo Start()
+2023-03-22T02:57:57.8461714+08:00 [INF] (/BOSSHONG/6) Start
+2023-03-22T02:57:57.8482862+08:00 [INF] (/BOSSHONG/6) "Start local grain directory" took 2 milliseconds to finish
+2023-03-22T02:57:57.8602840+08:00 [INF] (/BOSSHONG/4) MembershipOracle starting on host "BOSSHONG" with SiloAddress "S127.0.0.1:11111:38429876" at "2023-03-21 18:57:56.905 GMT"
+2023-03-22T02:57:57.8725970+08:00 [INF] (/BOSSHONG/4) Creating in-memory membership table
+2023-03-22T02:57:57.8741601+08:00 [INF] (/BOSSHONG/4) GrainBasedMembershipTable Activated.
+2023-03-22T02:57:57.8770475+08:00 [INF] (/BOSSHONG/14) "Init grain services" took 2 milliseconds to finish
+2023-03-22T02:57:57.8931409+08:00 [INF] (/BOSSHONG/15) "Start deployment load collector" took 16 milliseconds to finish
+2023-03-22T02:57:57.8944218+08:00 [INF] (/BOSSHONG/15) Starting Silo Watchdog.
+2023-03-22T02:57:57.9489894+08:00 [INF] (/BOSSHONG/8) Connected to membership table provider.
+2023-03-22T02:57:57.9721648+08:00 [INF] (/BOSSHONG/15) Joining
+2023-03-22T02:57:59.3112840+08:00 [INF] (/BOSSHONG/6) -BecomeActive
+2023-03-22T02:57:59.3224793+08:00 [INF] (/BOSSHONG/8) -Finished BecomeActive.
+2023-03-22T02:57:59.3309679+08:00 [INF] (/BOSSHONG/17) Starting "Orleans.Runtime.ReminderService.LocalReminderService" grain service on: "S127.0.0.1:11111:38429876" x"7F15120A", with range "<(0 0], Size=x100000000, %Ring=100%>"
+2023-03-22T02:57:59.3409796+08:00 [INF] (/BOSSHONG/15) Successfully created queue balancer of type "Orleans.Streams.ConsistentRingQueueBalancer" for stream provider "EventStoreStream"
+2023-03-22T02:57:59.3435577+08:00 [INF] (/BOSSHONG/15) Created "PersistentStreamPullingManager" for Stream Provider "EventStoreStream".
+2023-03-22T02:57:59.3495321+08:00 [INF] (/BOSSHONG/13) Init.
+2023-03-22T02:57:59.3587460+08:00 [INF] (/BOSSHONG/13) Initialize: I am now responsible for 1 queues: "[eventstorestream-0]".
+2023-03-22T02:57:59.3654614+08:00 [INF] (/BOSSHONG/6) Starting agents for 1 queues: "[eventstorestream-0]"
+2023-03-22T02:57:59.3705237+08:00 [INF] (/BOSSHONG/6) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38429876+EventStoreStream_1_eventstorestream-0-0x00000000" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38429876" for Queue "eventstorestream-0-0x00000000".
+2023-03-22T02:57:59.3756905+08:00 [INF] (/BOSSHONG/13) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38429876+EventStoreStream_1_eventstorestream-0-0x00000000" on silo "S127.0.0.1:11111:38429876" for queue "eventstorestream-0-0x00000000".
+2023-03-22T02:57:59.4622533+08:00 [INF] (/BOSSHONG/6) Activated
+2023-03-22T02:57:59.4780269+08:00 [INF] (/BOSSHONG/9) My range changed from "<(0 0], Size=x100000000, %Ring=100%>" to "<(0 0], Size=x100000000, %Ring=100%>" increased = True
+2023-03-22T02:58:00.0486480+08:00 [INF] (/BOSSHONG/13) Taking queue "eventstorestream-0-0x00000000" under my responsibility.
+2023-03-22T02:58:00.0540834+08:00 [INF] (/BOSSHONG/9) Added 1 new queues: "[eventstorestream-0]". Now own total of 1 queues: "[eventstorestream-0]"
+2023-03-22T02:58:00.0551030+08:00 [INF] (/BOSSHONG/9) Started agents.
+2023-03-22T02:58:00.0965907+08:00 [INF] (/BOSSHONG/8) Orleans Silo started.
+2023-03-22T02:58:00.1890503+08:00 [ERR] (/BOSSHONG/15) Init: QueueName="chatservice/streaming/eventstorestream-0", errored in "776.64" ms.
+Grpc.Core.RpcException: Status(StatusCode="Internal", Detail="Error starting gRPC call. HttpRequestException: Requesting HTTP version 2.0 with version policy RequestVersionOrHigher while unable to establish HTTP/2 connection.", DebugException="System.Net.Http.HttpRequestException: Requesting HTTP version 2.0 with version policy RequestVersionOrHigher while unable to establish HTTP/2 connection.")
+ ---> System.Net.Http.HttpRequestException: Requesting HTTP version 2.0 with version policy RequestVersionOrHigher while unable to establish HTTP/2 connection.
+   at System.Net.Http.HttpConnectionPool.ThrowGetVersionException(HttpRequestMessage request, Int32 desiredVersion, Exception inner)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Grpc.Net.Client.Internal.GrpcCall`2.RunCall(HttpRequestMessage request, Nullable`1 timeout)
+   --- End of inner exception stack trace ---
+   at EventStore.Client.Interceptors.TypedExceptionInterceptor.<AsyncUnaryCall>b__5_0[TRequest,TResponse](Task`1 t)
+   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at EventStore.Client.GrpcServerCapabilitiesClient.GetAsync(CallInvoker callInvoker, CancellationToken cancellationToken)
+   at EventStore.Client.EventStoreClientBase.GetChannelInfoExpensive(ReconnectionRequired reconnectionRequired, Action`1 onReconnectionRequired, IChannelSelector channelSelector, CancellationToken cancellationToken)
+   at EventStore.Client.SharingProvider`2.FillBoxAsync(TaskCompletionSource`1 box, TInput input)
+   at EventStore.Client.TaskExtensions.WithCancellation[T](Task`1 task, CancellationToken cancellationToken)
+   at EventStore.Client.EventStoreClientBase.GetChannelInfo(CancellationToken cancellationToken)
+   at EventStore.Client.EventStorePersistentSubscriptionsClient.CreateInternalAsync(String streamName, String groupName, IEventFilter eventFilter, PersistentSubscriptionSettings settings, Nullable`1 deadline, UserCredentials userCredentials, CancellationToken cancellationToken)
+   at EventStore.Client.EventStorePersistentSubscriptionsClient.CreateAsync(String streamName, String groupName, PersistentSubscriptionSettings settings, Nullable`1 deadline, UserCredentials userCredentials, CancellationToken cancellationToken)
+   at Orleans.Providers.Streams.EventStore.EventStoreQueueStorage.Init() in F:\RiderProjects\Orleans.EventStore\src\Orleans.Streaming.EventStore\Providers\Streams\EventStoreQueueStorage.cs:line 69
+2023-03-22T02:58:00.2896664+08:00 [ERR] (/BOSSHONG/15) "QueueAdapterReceiver eventstorestream-0-0x00000000 failed to Initialize."
+Orleans.Providers.Streams.EventStore.EventStoreStorageException: Grpc.Core.RpcException: Status(StatusCode="Internal", Detail="Error starting gRPC call. HttpRequestException: Requesting HTTP version 2.0 with version policy RequestVersionOrHigher while unable to establish HTTP/2 connection.", DebugException="System.Net.Http.HttpRequestException: Requesting HTTP version 2.0 with version policy RequestVersionOrHigher while unable to establish HTTP/2 connection.")
+   at Orleans.Providers.Streams.EventStore.EventStoreQueueStorage.Init() in F:\RiderProjects\Orleans.EventStore\src\Orleans.Streaming.EventStore\Providers\Streams\EventStoreQueueStorage.cs:line 90
+   at Orleans.Internal.OrleansTaskExtentions.SafeExecute(Func`1 action) in /_/src/Orleans.Core/Async/TaskExtensions.cs:line 30
+   at Orleans.Internal.OrleansTaskExtentions.LogException(Task task, ILogger logger, ErrorCode errorCode, String message) in /_/src/Orleans.Core/Async/TaskExtensions.cs:line 18
+   at Orleans.Streams.PersistentStreamPullingAgent.AsyncTimerCallback(Object state) in /_/src/Orleans.Streaming/PersistentStreams/PersistentStreamPullingAgent.cs:line 377
+2023-03-22T02:58:00.3341873+08:00 [ERR] (/BOSSHONG/15) Giving up reading from queue "eventstorestream-0" after retry attempts 6
+Orleans.Providers.Streams.EventStore.EventStoreStorageException: Grpc.Core.RpcException: Status(StatusCode="Internal", Detail="Error starting gRPC call. HttpRequestException: Requesting HTTP version 2.0 with version policy RequestVersionOrHigher while unable to establish HTTP/2 connection.", DebugException="System.Net.Http.HttpRequestException: Requesting HTTP version 2.0 with version policy RequestVersionOrHigher while unable to establish HTTP/2 connection.")
+   at Orleans.Providers.Streams.EventStore.EventStoreQueueStorage.Init() in F:\RiderProjects\Orleans.EventStore\src\Orleans.Streaming.EventStore\Providers\Streams\EventStoreQueueStorage.cs:line 90
+   at Orleans.Internal.OrleansTaskExtentions.SafeExecute(Func`1 action) in /_/src/Orleans.Core/Async/TaskExtensions.cs:line 30
+   at Orleans.Internal.OrleansTaskExtentions.LogException(Task task, ILogger logger, ErrorCode errorCode, String message) in /_/src/Orleans.Core/Async/TaskExtensions.cs:line 18
+   at Orleans.Streams.PersistentStreamPullingAgent.AsyncTimerCallback(Object state) in /_/src/Orleans.Streaming/PersistentStreams/PersistentStreamPullingAgent.cs:line 377
+2023-03-22T02:58:10.2485317+08:00 [INF] (/BOSSHONG/17) Stopping Orleans Silo
+2023-03-22T02:58:10.8375651+08:00 [INF] (/BOSSHONG/6) Stopping "Orleans.Runtime.ReminderService.LocalReminderService" grain service
+2023-03-22T02:58:10.9177177+08:00 [INF] (/BOSSHONG/4) Stopping agents for 1 queues: "[eventstorestream-0]"
+2023-03-22T02:58:10.9636732+08:00 [INF] (/BOSSHONG/4) About to remove 1 agents from my responsibility: "[eventstorestream-0]"
+2023-03-22T02:58:11.1678292+08:00 [INF] (/BOSSHONG/13) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-0-0x00000000"
+2023-03-22T02:58:11.3112233+08:00 [INF] (/BOSSHONG/13) Removed 1 queues: "[eventstorestream-0]". Now own total of 0 queues: "[]"
+2023-03-22T02:58:11.3294460+08:00 [INF] (/BOSSHONG/13) Stopped agents.
+2023-03-22T02:58:19.3220796+08:00 [INF] (Chat Room/BOSSHONG/1) Started "Chat Room" with runtime ".NET 7.0.1" and OS "Microsoft Windows 10.0.19045".
+2023-03-22T02:58:19.4806379+08:00 [INF] (/BOSSHONG/1) Silo starting with GC settings: ServerGC=True GCLatencyMode="Interactive"
+2023-03-22T02:58:19.4854486+08:00 [INF] (/BOSSHONG/1) -------------- Initializing silo on host "BOSSHONG" MachineName "BOSSHONG" at "127.0.0.1:11111", gen 38429899 --------------
+2023-03-22T02:58:19.4855611+08:00 [INF] (/BOSSHONG/1) Starting silo "Silo_4cfe0"
+2023-03-22T02:58:20.5672333+08:00 [WRN] (/BOSSHONG/1) No implementation of IHostEnvironmentStatistics was found. Load shedding will not work yet
+2023-03-22T02:58:20.7279586+08:00 [INF] (/BOSSHONG/1) -------------- Started silo "S127.0.0.1:11111:38429899", ConsistentHashCode "71D825F" --------------
+2023-03-22T02:58:20.7334199+08:00 [INF] (/BOSSHONG/1) Starting Orleans Silo.
+2023-03-22T02:58:20.8361488+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.BroadcastChannel.BroadcastChannelOptions-Broadcast: 
+FireAndForgetDelivery: True
+
+2023-03-22T02:58:20.8365891+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ActivationCountBasedPlacementOptions: 
+ChooseOutOf: 2
+
+2023-03-22T02:58:20.8387382+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterMembershipOptions: 
+NumMissedTableIAmAliveLimit: 2
+LivenessEnabled: True
+ProbeTimeout: 00:00:05
+TableRefreshTimeout: 00:01:00
+DeathVoteExpirationTimeout: 00:02:00
+IAmAliveTablePublishTimeout: 00:05:00
+MaxJoinAttemptTime: 00:05:00
+UseLivenessGossip: True
+NumProbedSilos: 3
+NumMissedProbesLimit: 3
+NumVotesForDeathDeclaration: 2
+DefunctSiloExpiration: 7.00:00:00
+DefunctSiloCleanupPeriod: 01:00:00
+LocalHealthDegradationMonitoringPeriod: 00:00:10
+ExtendProbeTimeoutDuringDegradation: True
+EnableIndirectProbes: True
+
+2023-03-22T02:58:20.8388520+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterOptions: 
+ClusterId: ChatCluster
+ServiceId: ChatService
+
+2023-03-22T02:58:20.8393694+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConnectionOptions: 
+ProtocolVersion: Version1
+ConnectionsPerEndpoint: 1
+ConnectionRetryDelay: 00:00:01
+OpenConnectionTimeout: 00:00:05
+
+2023-03-22T02:58:20.8394609+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConsistentRingOptions: 
+NumVirtualBucketsConsistentRing: 30
+UseVirtualBucketsConsistentRing: True
+
+2023-03-22T02:58:20.8395475+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.DevelopmentClusterMembershipOptions: 
+PrimarySiloEndpoint: 127.0.0.1:11111
+
+2023-03-22T02:58:20.8396520+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EndpointOptions: 
+AdvertisedIPAddress: 127.0.0.1
+SiloPort: 11111
+GatewayPort: 30000
+SiloListeningEndpoint: 
+GatewayListeningEndpoint: 
+
+2023-03-22T02:58:20.8408536+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+TotalQueueCount: 1
+
+2023-03-22T02:58:20.8420373+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+TotalQueueCount: 1
+
+2023-03-22T02:58:20.8428359+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainCollectionOptions: 
+CollectionQuantum: 00:01:00
+CollectionAge: 00:15:00
+ActivationTimeout: 00:00:30
+DeactivationTimeout: 00:00:30
+
+2023-03-22T02:58:20.8450926+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainDirectoryOptions: 
+CachingStrategy: Adaptive
+CacheSize: 1000000
+InitialCacheTTL: 00:00:30
+MaximumCacheTTL: 00:04:00
+CacheTTLExtensionFactor: 2
+LazyDeregistrationDelay: 00:01:00
+
+2023-03-22T02:58:20.8453896+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainVersioningOptions: 
+DefaultCompatibilityStrategy: BackwardCompatible
+DefaultVersionSelectorStrategy: AllCompatibleVersions
+
+2023-03-22T02:58:20.8456720+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.LoadSheddingOptions: 
+LoadSheddingEnabled: False
+LoadSheddingLimit: 95
+
+2023-03-22T02:58:20.8465385+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SchedulingOptions: 
+DelayWarningThreshold: 00:00:10
+ActivationSchedulingQuantum: 00:00:00.1000000
+TurnWarningLengthThreshold: 00:00:01
+MaxPendingWorkItemsSoftLimit: 0
+StoppedActivationWarningInterval: 00:01:00
+
+2023-03-22T02:58:20.8489801+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloMessagingOptions: 
+SiloSenderQueues: 0
+GatewaySenderQueues: 0
+MaxForwardCount: 2
+ClientDropTimeout: 00:01:00
+ClientRegistrationRefresh: 00:05:00
+ClientGatewayShutdownNotificationTimeout: 00:00:05
+MaxEnqueuedRequestsSoftLimit: 0
+MaxEnqueuedRequestsHardLimit: 0
+MaxEnqueuedRequestsSoftLimit_StatelessWorker: 0
+MaxEnqueuedRequestsHardLimit_StatelessWorker: 0
+MaxRequestProcessingTime: 02:00:00
+AssumeHomogenousSilosForTesting: False
+ShutdownRerouteTimeout: 00:00:10
+SystemResponseTimeout: 00:30:00
+GrainWorkloadAnalysisPeriod: 00:00:05
+RequestProcessingWarningTime: 00:00:05
+RequestQueueDelayWarningTime: 00:00:10
+WaitForMessageToBeQueuedForOutboundTime: 00:00:02
+ResponseTimeout: 00:30:00
+ResponseTimeoutWithDebugger: 00:30:00
+DropExpiredMessages: True
+MaxMessageHeaderSize: 10485760
+MaxMessageBodySize: 104857600
+
+2023-03-22T02:58:20.8491046+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloOptions: 
+SiloName: Silo_4cfe0
+
+2023-03-22T02:58:20.8493331+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SimpleQueueCacheOptions-EventStoreStream: 
+CacheSize: 1024
+
+2023-03-22T02:58:20.8495595+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPubSubOptions-EventStoreStream: 
+PubSubType: ExplicitGrainBasedAndImplicit
+
+2023-03-22T02:58:20.8511635+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPullingAgentOptions-EventStoreStream: 
+BatchContainerBatchSize: 10
+GetQueueMsgsTimerPeriod: 00:00:01
+InitQueueTimeout: 00:00:05
+MaxEventDeliveryTime: 00:01:00
+StreamInactivityPeriod: 00:30:00
+
+2023-03-22T02:58:20.8522047+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Persistence.RedisStorageOptions-PubSubStore: 
+ConnectionString: 123.60.184.85:6379
+DeleteOnClear: True
+DatabaseNumber: 1
+InitStage: 10000
+GrainStorageSerializer: Orleans.Storage.JsonGrainStorageSerializer
+
+2023-03-22T02:58:20.8962635+08:00 [INF] (/BOSSHONG/8) Start InsideRuntimeClient took 2 milliseconds
+2023-03-22T02:58:20.9112964+08:00 [INF] (/BOSSHONG/6) Silo Start()
+2023-03-22T02:58:20.9211364+08:00 [INF] (/BOSSHONG/9) Start
+2023-03-22T02:58:20.9229174+08:00 [INF] (/BOSSHONG/9) "Start local grain directory" took 2 milliseconds to finish
+2023-03-22T02:58:20.9404908+08:00 [INF] (/BOSSHONG/15) MembershipOracle starting on host "BOSSHONG" with SiloAddress "S127.0.0.1:11111:38429899" at "2023-03-21 18:58:20.053 GMT"
+2023-03-22T02:58:20.9440627+08:00 [INF] (/BOSSHONG/15) Creating in-memory membership table
+2023-03-22T02:58:20.9463694+08:00 [INF] (/BOSSHONG/15) GrainBasedMembershipTable Activated.
+2023-03-22T02:58:20.9469036+08:00 [INF] (/BOSSHONG/14) "Init grain services" took 1 milliseconds to finish
+2023-03-22T02:58:20.9661514+08:00 [INF] (/BOSSHONG/6) "Start deployment load collector" took 19 milliseconds to finish
+2023-03-22T02:58:20.9676154+08:00 [INF] (/BOSSHONG/6) Starting Silo Watchdog.
+2023-03-22T02:58:21.0404626+08:00 [INF] (/BOSSHONG/9) Connected to membership table provider.
+2023-03-22T02:58:21.0626025+08:00 [INF] (/BOSSHONG/6) Joining
+2023-03-22T02:58:21.9412300+08:00 [INF] (/BOSSHONG/8) -BecomeActive
+2023-03-22T02:58:21.9549183+08:00 [INF] (/BOSSHONG/16) -Finished BecomeActive.
+2023-03-22T02:58:21.9618188+08:00 [INF] (/BOSSHONG/13) Starting "Orleans.Runtime.ReminderService.LocalReminderService" grain service on: "S127.0.0.1:11111:38429899" x"071D825F", with range "<(0 0], Size=x100000000, %Ring=100%>"
+2023-03-22T02:58:21.9725816+08:00 [INF] (/BOSSHONG/15) Successfully created queue balancer of type "Orleans.Streams.ConsistentRingQueueBalancer" for stream provider "EventStoreStream"
+2023-03-22T02:58:21.9754501+08:00 [INF] (/BOSSHONG/15) Created "PersistentStreamPullingManager" for Stream Provider "EventStoreStream".
+2023-03-22T02:58:21.9839849+08:00 [INF] (/BOSSHONG/6) Init.
+2023-03-22T02:58:21.9919786+08:00 [INF] (/BOSSHONG/6) Initialize: I am now responsible for 1 queues: "[eventstorestream-0]".
+2023-03-22T02:58:21.9978961+08:00 [INF] (/BOSSHONG/9) Starting agents for 1 queues: "[eventstorestream-0]"
+2023-03-22T02:58:22.0037606+08:00 [INF] (/BOSSHONG/9) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38429899+EventStoreStream_1_eventstorestream-0-0x00000000" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38429899" for Queue "eventstorestream-0-0x00000000".
+2023-03-22T02:58:22.0088873+08:00 [INF] (/BOSSHONG/16) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38429899+EventStoreStream_1_eventstorestream-0-0x00000000" on silo "S127.0.0.1:11111:38429899" for queue "eventstorestream-0-0x00000000".
+2023-03-22T02:58:22.0715394+08:00 [INF] (/BOSSHONG/15) Activated
+2023-03-22T02:58:22.0853039+08:00 [INF] (/BOSSHONG/4) My range changed from "<(0 0], Size=x100000000, %Ring=100%>" to "<(0 0], Size=x100000000, %Ring=100%>" increased = True
+2023-03-22T02:58:22.5966092+08:00 [INF] (/BOSSHONG/16) Taking queue "eventstorestream-0-0x00000000" under my responsibility.
+2023-03-22T02:58:22.6023782+08:00 [INF] (/BOSSHONG/16) Added 1 new queues: "[eventstorestream-0]". Now own total of 1 queues: "[eventstorestream-0]"
+2023-03-22T02:58:22.6029890+08:00 [INF] (/BOSSHONG/16) Started agents.
+2023-03-22T02:58:22.6058501+08:00 [INF] (/BOSSHONG/15) Orleans Silo started.
+2023-03-22T02:58:31.2142745+08:00 [WRN] (/BOSSHONG/15) Timer should have fired at 03/21/2023 18:58:24 but fired at 03/21/2023 18:58:31, which is 00:00:06.4468575 longer than expected
+2023-03-22T02:58:31.2143485+08:00 [WRN] (/BOSSHONG/8) Timer should have fired at 03/21/2023 18:58:26 but fired at 03/21/2023 18:58:31, which is 00:00:04.2680160 longer than expected
+2023-03-22T02:58:31.2145724+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:07.2035279. Total GC Pause duration during that period: 00:00:00. We are now using a total of 5MB memory. gc=2, 2, 2
+2023-03-22T02:58:38.4009320+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:07.1860723. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:58:38.4009398+08:00 [WRN] (/BOSSHONG/9) Timer should have fired at 03/21/2023 18:58:31 but fired at 03/21/2023 18:58:38, which is 00:00:06.7676703 longer than expected
+2023-03-22T02:58:38.4014595+08:00 [WRN] (/BOSSHONG/9) Timer should have fired at 03/21/2023 18:58:31 but fired at 03/21/2023 18:58:38, which is 00:00:06.4434593 longer than expected
+2023-03-22T02:58:43.8314412+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:04.3076140. Total GC Pause duration during that period: 00:00:00. We are now using a total of 6MB memory. gc=2, 2, 2
+2023-03-22T02:58:43.8320166+08:00 [WRN] (/BOSSHONG/16) Timer should have fired at 03/21/2023 18:58:39 but fired at 03/21/2023 18:58:43, which is 00:00:04.2083295 longer than expected
+2023-03-22T02:58:43.8379730+08:00 [WRN] (/BOSSHONG/4) Task "[Id=849, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38429899/sys.svc.load-publisher/127.0.0.1:11111@38429899@f4b42ed600000000f46421f500000000]" took elapsed time "0:00:04.3077077" for execution, which is longer than 00:00:01. Running on thread "4"
+2023-03-22T02:58:43.8609758+08:00 [WRN] (/BOSSHONG/6) Task "[Id=776, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38429899/sys.svc.stream.agent/127.0.0.1:11111@38429899+EventStoreStream_1_eventstorestream-0-0x00000000@5e60282000000000f4e5dce400000000]" took elapsed time "0:00:19.2902845" for execution, which is longer than 00:00:01. Running on thread "6"
+2023-03-22T02:58:44.0853584+08:00 [WRN] (/BOSSHONG/14) Consumer "GrainReference:sys.client/9c12aada6dd940bc965ed8308c6609ff+b81d57089d2b4fcb8e74eadd602b7750:Orleans.Streams.IStreamConsumerExtension" on stream "EventStoreStream/Chat/Fuck" is no longer active - permanently removing Consumer.
+2023-03-22T02:58:44.0898952+08:00 [WRN] (/BOSSHONG/14) Consumer "GrainReference:sys.client/7cbde5a423a149f98746de33da35c779+a36b5fd7799a465f948619c5ffe14176:Orleans.Streams.IStreamConsumerExtension" on stream "EventStoreStream/Chat/Fuck" is no longer active - permanently removing Consumer.
+2023-03-22T02:58:44.0917566+08:00 [WRN] (/BOSSHONG/14) Consumer "GrainReference:sys.client/d76d4956479c469597716e3a99581c0e+a337fa72098241df95e5f62b088f8f87:Orleans.Streams.IStreamConsumerExtension" on stream "EventStoreStream/Chat/Fuck" is no longer active - permanently removing Consumer.
+2023-03-22T02:59:07.8859252+08:00 [INF] (/BOSSHONG/29) Recorded opened connection from endpoint "127.0.0.1:50225", client ID "sys.client/b20b729d8cd5441b9aae0bc5c657215a".
+2023-03-22T03:00:58.3932424+08:00 [INF] (/BOSSHONG/6) Recorded opened connection from endpoint "127.0.0.1:50566", client ID "sys.client/d536d7651437416b8ec86f080dee1289".
+2023-03-22T03:03:22.0036529+08:00 [INF] (/BOSSHONG/8) I am responsible for a total of 1 queues on stream provider "EventStoreStream": "[eventstorestream-0]".
+2023-03-22T03:04:06.8679274+08:00 [WRN] (/BOSSHONG/4) CleanupDefunctSiloEntries operation is not supported by the current implementation of IMembershipTable. Disabling the timer now.
+2023-03-22T03:08:22.0100027+08:00 [INF] (/BOSSHONG/6) I am responsible for a total of 1 queues on stream provider "EventStoreStream": "[eventstorestream-0]".
+2023-03-22T03:13:22.0139214+08:00 [INF] (/BOSSHONG/4) I am responsible for a total of 1 queues on stream provider "EventStoreStream": "[eventstorestream-0]".
+2023-03-22T03:17:30.5817609+08:00 [INF] (/BOSSHONG/6) Closing connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:50566, ConnectionId: 0HMPA7PCM0ICA]"
+2023-03-22T03:17:30.5893173+08:00 [INF] (/BOSSHONG/9) Recorded closed socket from endpoint "127.0.0.1:50566", client ID "sys.client/d536d7651437416b8ec86f080dee1289".
+2023-03-22T03:17:30.5913774+08:00 [INF] (/BOSSHONG/9) Connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:50566, ConnectionId: 0HMPA7PCM0ICA]" terminated
+2023-03-22T03:17:37.1813493+08:00 [INF] (/BOSSHONG/6) Closing connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:50225, ConnectionId: 0HMPA7PCM0IC9]"
+2023-03-22T03:17:37.1815706+08:00 [INF] (/BOSSHONG/4) Recorded closed socket from endpoint "127.0.0.1:50225", client ID "sys.client/b20b729d8cd5441b9aae0bc5c657215a".
+2023-03-22T03:17:37.1851359+08:00 [INF] (/BOSSHONG/29) Connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:50225, ConnectionId: 0HMPA7PCM0IC9]" terminated
+2023-03-22T03:18:18.1146877+08:00 [INF] (/BOSSHONG/8) Recorded opened connection from endpoint "127.0.0.1:51011", client ID "sys.client/dcc04a08728a459ab790d5366543b680".
+2023-03-22T03:18:22.0257130+08:00 [INF] (/BOSSHONG/4) I am responsible for a total of 1 queues on stream provider "EventStoreStream": "[eventstorestream-0]".
+2023-03-22T03:19:20.7324343+08:00 [INF] (/BOSSHONG/8) Dropping client "sys.client/b20b729d8cd5441b9aae0bc5c657215a", 00:01:43.5470000 after disconnect with no reconnect
+2023-03-22T03:19:20.7334530+08:00 [INF] (/BOSSHONG/8) Dropping client "sys.client/d536d7651437416b8ec86f080dee1289", 00:01:50.1410000 after disconnect with no reconnect
+2023-03-22T03:19:35.1135512+08:00 [INF] (/BOSSHONG/6) Closing connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51011, ConnectionId: 0HMPA7PCM0ICB]"
+Microsoft.AspNetCore.Connections.ConnectionAbortedException: Underlying connection closed
+2023-03-22T03:19:35.1138111+08:00 [INF] (/BOSSHONG/4) Recorded closed socket from endpoint "127.0.0.1:51011", client ID "sys.client/dcc04a08728a459ab790d5366543b680".
+2023-03-22T03:19:35.1141538+08:00 [INF] (/BOSSHONG/8) Connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51011, ConnectionId: 0HMPA7PCM0ICB]" terminated
+2023-03-22T03:21:20.7441331+08:00 [INF] (/BOSSHONG/29) Dropping client "sys.client/dcc04a08728a459ab790d5366543b680", 00:01:45.6250000 after disconnect with no reconnect
+2023-03-22T03:23:22.0383693+08:00 [INF] (/BOSSHONG/9) I am responsible for a total of 1 queues on stream provider "EventStoreStream": "[eventstorestream-0]".
+2023-03-22T03:25:49.2099155+08:00 [INF] (/BOSSHONG/15) Stopping Orleans Silo
+2023-03-22T03:25:49.2232452+08:00 [INF] (/BOSSHONG/29) Stopping "Orleans.Runtime.ReminderService.LocalReminderService" grain service
+2023-03-22T03:25:49.2267112+08:00 [INF] (/BOSSHONG/15) Stopping agents for 1 queues: "[eventstorestream-0]"
+2023-03-22T03:25:49.2296701+08:00 [INF] (/BOSSHONG/15) About to remove 1 agents from my responsibility: "[eventstorestream-0]"
+2023-03-22T03:25:49.2342643+08:00 [INF] (/BOSSHONG/4) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-0-0x00000000"
+2023-03-22T03:25:49.2388196+08:00 [INF] (/BOSSHONG/4) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-0::ChatService" for the queue: "chatservice/streaming/eventstorestream-0" successfully
+2023-03-22T03:25:49.2704646+08:00 [INF] (/BOSSHONG/4) Unregister PersistentStreamPullingAgent Producer for stream "EventStoreStream/Chat/Fuck".
+2023-03-22T03:25:49.3239371+08:00 [INF] (/BOSSHONG/8) Removed 1 queues: "[eventstorestream-0]". Now own total of 0 queues: "[]"
+2023-03-22T03:25:49.3249254+08:00 [INF] (/BOSSHONG/8) Stopped agents.
+2023-03-22T03:25:56.4133352+08:00 [INF] (/BOSSHONG/15) Orleans Silo stopped.
+2023-03-22T03:25:56.4207738+08:00 [INF] (Chat Room/BOSSHONG/15) Stopped "Chat Room" with runtime ".NET 7.0.1" and OS "Microsoft Windows 10.0.19045".
+2023-03-22T03:28:36.7190052+08:00 [INF] (Chat Room/BOSSHONG/1) Started "Chat Room" with runtime ".NET 7.0.1" and OS "Microsoft Windows 10.0.19045".
+2023-03-22T03:28:36.8830852+08:00 [INF] (/BOSSHONG/1) Silo starting with GC settings: ServerGC=True GCLatencyMode="Interactive"
+2023-03-22T03:28:36.8873250+08:00 [INF] (/BOSSHONG/1) -------------- Initializing silo on host "BOSSHONG" MachineName "BOSSHONG" at "127.0.0.1:11111", gen 38431716 --------------
+2023-03-22T03:28:36.8874557+08:00 [INF] (/BOSSHONG/1) Starting silo "Silo_918ea"
+2023-03-22T03:28:37.8504173+08:00 [WRN] (/BOSSHONG/1) No implementation of IHostEnvironmentStatistics was found. Load shedding will not work yet
+2023-03-22T03:28:38.0732027+08:00 [INF] (/BOSSHONG/1) -------------- Started silo "S127.0.0.1:11111:38431716", ConsistentHashCode "FA91BA52" --------------
+2023-03-22T03:28:38.0786881+08:00 [INF] (/BOSSHONG/1) Starting Orleans Silo.
+2023-03-22T03:28:38.2672325+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.BroadcastChannel.BroadcastChannelOptions-Broadcast: 
+FireAndForgetDelivery: True
+
+2023-03-22T03:28:38.2675549+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ActivationCountBasedPlacementOptions: 
+ChooseOutOf: 2
+
+2023-03-22T03:28:38.2694415+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterMembershipOptions: 
+NumMissedTableIAmAliveLimit: 2
+LivenessEnabled: True
+ProbeTimeout: 00:00:05
+TableRefreshTimeout: 00:01:00
+DeathVoteExpirationTimeout: 00:02:00
+IAmAliveTablePublishTimeout: 00:05:00
+MaxJoinAttemptTime: 00:05:00
+UseLivenessGossip: True
+NumProbedSilos: 3
+NumMissedProbesLimit: 3
+NumVotesForDeathDeclaration: 2
+DefunctSiloExpiration: 7.00:00:00
+DefunctSiloCleanupPeriod: 01:00:00
+LocalHealthDegradationMonitoringPeriod: 00:00:10
+ExtendProbeTimeoutDuringDegradation: True
+EnableIndirectProbes: True
+
+2023-03-22T03:28:38.2697724+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterOptions: 
+ClusterId: ChatCluster
+ServiceId: ChatService
+
+2023-03-22T03:28:38.2704828+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConnectionOptions: 
+ProtocolVersion: Version1
+ConnectionsPerEndpoint: 1
+ConnectionRetryDelay: 00:00:01
+OpenConnectionTimeout: 00:00:05
+
+2023-03-22T03:28:38.2706782+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConsistentRingOptions: 
+NumVirtualBucketsConsistentRing: 30
+UseVirtualBucketsConsistentRing: True
+
+2023-03-22T03:28:38.2709133+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.DevelopmentClusterMembershipOptions: 
+PrimarySiloEndpoint: 127.0.0.1:11111
+
+2023-03-22T03:28:38.2711309+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EndpointOptions: 
+AdvertisedIPAddress: 127.0.0.1
+SiloPort: 11111
+GatewayPort: 30000
+SiloListeningEndpoint: 
+GatewayListeningEndpoint: 
+
+2023-03-22T03:28:38.2726135+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+QueueNames.1: ChatService/streaming/eventstorestream-1
+QueueNames.2: ChatService/streaming/eventstorestream-2
+QueueNames.3: ChatService/streaming/eventstorestream-3
+TotalQueueCount: 4
+
+2023-03-22T03:28:38.2739966+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+QueueNames.1: ChatService/streaming/eventstorestream-1
+QueueNames.2: ChatService/streaming/eventstorestream-2
+QueueNames.3: ChatService/streaming/eventstorestream-3
+TotalQueueCount: 4
+
+2023-03-22T03:28:38.2748583+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainCollectionOptions: 
+CollectionQuantum: 00:01:00
+CollectionAge: 00:15:00
+ActivationTimeout: 00:00:30
+DeactivationTimeout: 00:00:30
+
+2023-03-22T03:28:38.2761137+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainDirectoryOptions: 
+CachingStrategy: Adaptive
+CacheSize: 1000000
+InitialCacheTTL: 00:00:30
+MaximumCacheTTL: 00:04:00
+CacheTTLExtensionFactor: 2
+LazyDeregistrationDelay: 00:01:00
+
+2023-03-22T03:28:38.2763409+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainVersioningOptions: 
+DefaultCompatibilityStrategy: BackwardCompatible
+DefaultVersionSelectorStrategy: AllCompatibleVersions
+
+2023-03-22T03:28:38.2764829+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.LoadSheddingOptions: 
+LoadSheddingEnabled: False
+LoadSheddingLimit: 95
+
+2023-03-22T03:28:38.2770746+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SchedulingOptions: 
+DelayWarningThreshold: 00:00:10
+ActivationSchedulingQuantum: 00:00:00.1000000
+TurnWarningLengthThreshold: 00:00:01
+MaxPendingWorkItemsSoftLimit: 0
+StoppedActivationWarningInterval: 00:01:00
+
+2023-03-22T03:28:38.2790574+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloMessagingOptions: 
+SiloSenderQueues: 0
+GatewaySenderQueues: 0
+MaxForwardCount: 2
+ClientDropTimeout: 00:01:00
+ClientRegistrationRefresh: 00:05:00
+ClientGatewayShutdownNotificationTimeout: 00:00:05
+MaxEnqueuedRequestsSoftLimit: 0
+MaxEnqueuedRequestsHardLimit: 0
+MaxEnqueuedRequestsSoftLimit_StatelessWorker: 0
+MaxEnqueuedRequestsHardLimit_StatelessWorker: 0
+MaxRequestProcessingTime: 02:00:00
+AssumeHomogenousSilosForTesting: False
+ShutdownRerouteTimeout: 00:00:10
+SystemResponseTimeout: 00:30:00
+GrainWorkloadAnalysisPeriod: 00:00:05
+RequestProcessingWarningTime: 00:00:05
+RequestQueueDelayWarningTime: 00:00:10
+WaitForMessageToBeQueuedForOutboundTime: 00:00:02
+ResponseTimeout: 00:30:00
+ResponseTimeoutWithDebugger: 00:30:00
+DropExpiredMessages: True
+MaxMessageHeaderSize: 10485760
+MaxMessageBodySize: 104857600
+
+2023-03-22T03:28:38.2792867+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloOptions: 
+SiloName: Silo_918ea
+
+2023-03-22T03:28:38.2795654+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SimpleQueueCacheOptions-EventStoreStream: 
+CacheSize: 1024
+
+2023-03-22T03:28:38.2798571+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPubSubOptions-EventStoreStream: 
+PubSubType: ExplicitGrainBasedAndImplicit
+
+2023-03-22T03:28:38.2808238+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPullingAgentOptions-EventStoreStream: 
+BatchContainerBatchSize: 10
+GetQueueMsgsTimerPeriod: 00:00:00.2000000
+InitQueueTimeout: 00:00:05
+MaxEventDeliveryTime: 00:01:00
+StreamInactivityPeriod: 00:30:00
+
+2023-03-22T03:28:38.2812932+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Persistence.RedisStorageOptions-PubSubStore: 
+ConnectionString: 123.60.184.85:6379
+DeleteOnClear: True
+DatabaseNumber: 1
+InitStage: 10000
+GrainStorageSerializer: Orleans.Storage.JsonGrainStorageSerializer
+
+2023-03-22T03:28:38.3611123+08:00 [INF] (/BOSSHONG/8) Start InsideRuntimeClient took 3 milliseconds
+2023-03-22T03:28:38.3792157+08:00 [INF] (/BOSSHONG/8) Silo Start()
+2023-03-22T03:28:38.3932861+08:00 [INF] (/BOSSHONG/16) Start
+2023-03-22T03:28:38.3964317+08:00 [INF] (/BOSSHONG/16) "Start local grain directory" took 3 milliseconds to finish
+2023-03-22T03:28:38.4153190+08:00 [INF] (/BOSSHONG/8) MembershipOracle starting on host "BOSSHONG" with SiloAddress "S127.0.0.1:11111:38431716" at "2023-03-21 19:28:37.355 GMT"
+2023-03-22T03:28:38.4189450+08:00 [INF] (/BOSSHONG/8) Creating in-memory membership table
+2023-03-22T03:28:38.4197552+08:00 [INF] (/BOSSHONG/13) "Init grain services" took 1 milliseconds to finish
+2023-03-22T03:28:38.4208062+08:00 [INF] (/BOSSHONG/8) GrainBasedMembershipTable Activated.
+2023-03-22T03:28:38.4415201+08:00 [INF] (/BOSSHONG/13) "Start deployment load collector" took 21 milliseconds to finish
+2023-03-22T03:28:38.4430880+08:00 [INF] (/BOSSHONG/13) Starting Silo Watchdog.
+2023-03-22T03:28:38.5167179+08:00 [INF] (/BOSSHONG/9) Connected to membership table provider.
+2023-03-22T03:28:38.5426838+08:00 [INF] (/BOSSHONG/6) Joining
+2023-03-22T03:28:38.9126972+08:00 [INF] (/BOSSHONG/15) -BecomeActive
+2023-03-22T03:28:38.9238539+08:00 [INF] (/BOSSHONG/8) -Finished BecomeActive.
+2023-03-22T03:28:38.9302681+08:00 [INF] (/BOSSHONG/13) Starting "Orleans.Runtime.ReminderService.LocalReminderService" grain service on: "S127.0.0.1:11111:38431716" x"FA91BA52", with range "<(0 0], Size=x100000000, %Ring=100%>"
+2023-03-22T03:28:38.9402858+08:00 [INF] (/BOSSHONG/9) Successfully created queue balancer of type "Orleans.Streams.ConsistentRingQueueBalancer" for stream provider "EventStoreStream"
+2023-03-22T03:28:38.9433415+08:00 [INF] (/BOSSHONG/9) Created "PersistentStreamPullingManager" for Stream Provider "EventStoreStream".
+2023-03-22T03:28:38.9512528+08:00 [INF] (/BOSSHONG/4) Init.
+2023-03-22T03:28:38.9649568+08:00 [INF] (/BOSSHONG/4) Initialize: I am now responsible for 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]".
+2023-03-22T03:28:38.9738352+08:00 [INF] (/BOSSHONG/9) Starting agents for 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]"
+2023-03-22T03:28:38.9814768+08:00 [INF] (/BOSSHONG/9) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_1_eventstorestream-0-0x00000000" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38431716" for Queue "eventstorestream-0-0x00000000".
+2023-03-22T03:28:38.9818662+08:00 [INF] (/BOSSHONG/9) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_2_eventstorestream-1-0x40000001" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38431716" for Queue "eventstorestream-1-0x40000001".
+2023-03-22T03:28:38.9819694+08:00 [INF] (/BOSSHONG/9) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_3_eventstorestream-2-0x80000002" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38431716" for Queue "eventstorestream-2-0x80000002".
+2023-03-22T03:28:38.9820461+08:00 [INF] (/BOSSHONG/9) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_4_eventstorestream-3-0xC0000003" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38431716" for Queue "eventstorestream-3-0xC0000003".
+2023-03-22T03:28:38.9897038+08:00 [INF] (/BOSSHONG/15) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_1_eventstorestream-0-0x00000000" on silo "S127.0.0.1:11111:38431716" for queue "eventstorestream-0-0x00000000".
+2023-03-22T03:28:38.9935627+08:00 [INF] (/BOSSHONG/8) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_3_eventstorestream-2-0x80000002" on silo "S127.0.0.1:11111:38431716" for queue "eventstorestream-2-0x80000002".
+2023-03-22T03:28:38.9936793+08:00 [INF] (/BOSSHONG/14) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_4_eventstorestream-3-0xC0000003" on silo "S127.0.0.1:11111:38431716" for queue "eventstorestream-3-0xC0000003".
+2023-03-22T03:28:38.9938339+08:00 [INF] (/BOSSHONG/6) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_2_eventstorestream-1-0x40000001" on silo "S127.0.0.1:11111:38431716" for queue "eventstorestream-1-0x40000001".
+2023-03-22T03:28:39.0514376+08:00 [INF] (/BOSSHONG/16) Activated
+2023-03-22T03:28:39.0675625+08:00 [INF] (/BOSSHONG/4) My range changed from "<(0 0], Size=x100000000, %Ring=100%>" to "<(0 0], Size=x100000000, %Ring=100%>" increased = True
+2023-03-22T03:28:39.6682876+08:00 [INF] (/BOSSHONG/15) Taking queue "eventstorestream-0-0x00000000" under my responsibility.
+2023-03-22T03:28:39.6682876+08:00 [INF] (/BOSSHONG/8) Taking queue "eventstorestream-2-0x80000002" under my responsibility.
+2023-03-22T03:28:39.6682838+08:00 [INF] (/BOSSHONG/14) Taking queue "eventstorestream-3-0xC0000003" under my responsibility.
+2023-03-22T03:28:39.6682830+08:00 [INF] (/BOSSHONG/6) Taking queue "eventstorestream-1-0x40000001" under my responsibility.
+2023-03-22T03:28:39.6784246+08:00 [INF] (/BOSSHONG/15) Added 4 new queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]". Now own total of 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]"
+2023-03-22T03:28:39.6801992+08:00 [INF] (/BOSSHONG/15) Started agents.
+2023-03-22T03:28:39.6843604+08:00 [INF] (/BOSSHONG/15) Orleans Silo started.
+2023-03-22T03:28:57.2024998+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:16.7206724. Total GC Pause duration during that period: 00:00:00. We are now using a total of 7MB memory. gc=2, 2, 2
+2023-03-22T03:28:57.2032742+08:00 [WRN] (/BOSSHONG/9) Timer should have fired at 03/21/2023 19:28:43 but fired at 03/21/2023 19:28:57, which is 00:00:13.2887966 longer than expected
+2023-03-22T03:28:57.2038052+08:00 [WRN] (/BOSSHONG/6) Timer should have fired at 03/21/2023 19:28:41 but fired at 03/21/2023 19:28:57, which is 00:00:16.1858261 longer than expected
+2023-03-22T03:28:57.2451182+08:00 [WRN] (/BOSSHONG/16) Timer should have fired at 03/21/2023 19:28:42 but fired at 03/21/2023 19:28:57, which is 00:00:14.6459933 longer than expected
+2023-03-22T03:28:57.2453099+08:00 [WRN] (/BOSSHONG/28) Timer should have fired at 03/21/2023 19:28:48 but fired at 03/21/2023 19:28:57, which is 00:00:08.3188129 longer than expected
+2023-03-22T03:28:57.2475249+08:00 [WRN] (/BOSSHONG/17) Watchdog had 1 health Check failure(s) out of 5 health Check participants: "Orleans.Runtime.MembershipService.MembershipTableManager failed health check with reason \"PeriodicallyRefreshMembershipTable timer should have fired at 2023-03-21 19:28:43, which is 00:00:14.0068102 ago\"."
+2023-03-22T03:28:57.2476235+08:00 [WRN] (/BOSSHONG/29) Timer should have fired at 03/21/2023 19:28:43 but fired at 03/21/2023 19:28:57, which is 00:00:14.0493766 longer than expected
+2023-03-22T03:28:57.2763294+08:00 [WRN] (/BOSSHONG/4) Task "[Id=1449, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38431716/sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_3_eventstorestream-2-0x80000002@5e60282000000000a0741c7c00000000]" took elapsed time "0:00:16.2785126" for execution, which is longer than 00:00:01. Running on thread "4"
+2023-03-22T03:30:04.3065349+08:00 [INF] (/BOSSHONG/6) Recorded opened connection from endpoint "127.0.0.1:51193", client ID "sys.client/795dca0c3ed5443c9e2b583928d39683".
+2023-03-22T03:30:39.4302871+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:23.1282474. Total GC Pause duration during that period: 00:00:00. We are now using a total of 7MB memory. gc=3, 3, 2
+2023-03-22T03:30:39.4714323+08:00 [WRN] (/BOSSHONG/29) Task "[Id=15337, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38431716/sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_3_eventstorestream-2-0x80000002@5e60282000000000a0741c7c00000000]" took elapsed time "0:00:22.9165825" for execution, which is longer than 00:00:01. Running on thread "29"
+2023-03-22T03:30:39.4714757+08:00 [WRN] (/BOSSHONG/32) Timer should have fired at 03/21/2023 19:30:17 but fired at 03/21/2023 19:30:39, which is 00:00:22.1770610 longer than expected
+2023-03-22T03:30:39.4794338+08:00 [WRN] (/BOSSHONG/29) Timer should have fired at 03/21/2023 19:30:16 but fired at 03/21/2023 19:30:39, which is 00:00:22.8250001 longer than expected
+2023-03-22T03:30:39.5179381+08:00 [WRN] (/BOSSHONG/36) Timer should have fired at 03/21/2023 19:30:17 but fired at 03/21/2023 19:30:39, which is 00:00:22.1017293 longer than expected
+2023-03-22T03:30:39.5435581+08:00 [ERR] (/BOSSHONG/36) Failed to acknowledge event for the queue "chatservice/streaming/eventstorestream-2".
+2023-03-22T03:30:39.5958274+08:00 [WRN] (/BOSSHONG/36) Exception upon Acknowledge on queue "ChatService/streaming/eventstorestream-2". Ignoring.
+Orleans.Providers.Streams.EventStore.EventStoreStorageException: Failed to acknowledge event for the queue chatservice/streaming/eventstorestream-2. System.IO.IOException: The request was aborted.
+   at Orleans.Providers.Streams.EventStore.EventStoreQueueStorage.AcknowledgeAsync(ResolvedEvent[] resolvedEvents) in F:\RiderProjects\Orleans.EventStore\src\Orleans.Streaming.EventStore\Providers\Streams\EventStoreQueueStorage.cs:line 340
+   at Orleans.Providers.Streams.EventStore.EventStoreQueueAdapterReceiver.MessagesDeliveredAsync(IList`1 deliveredContainers) in F:\RiderProjects\Orleans.EventStore\src\Orleans.Streaming.EventStore\Providers\Streams\EventStoreQueueAdapterReceiver.cs:line 161
+2023-03-22T03:30:39.7691085+08:00 [WRN] (/BOSSHONG/35) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-2::ChatService" for the queue: "chatservice/streaming/eventstorestream-2" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T03:30:39.7691356+08:00 [WRN] (/BOSSHONG/34) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-2::ChatService" for the queue: "chatservice/streaming/eventstorestream-2" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T03:30:39.7691362+08:00 [WRN] (/BOSSHONG/14) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-1::ChatService" for the queue: "chatservice/streaming/eventstorestream-1" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T03:30:39.7691571+08:00 [WRN] (/BOSSHONG/29) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-0::ChatService" for the queue: "chatservice/streaming/eventstorestream-0" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T03:30:39.7691641+08:00 [WRN] (/BOSSHONG/33) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-3::ChatService" for the queue: "chatservice/streaming/eventstorestream-3" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T03:31:11.0447398+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:06.2933289. Total GC Pause duration during that period: 00:00:00. We are now using a total of 10MB memory. gc=3, 3, 2
+2023-03-22T03:31:11.0463496+08:00 [WRN] (/BOSSHONG/38) Timer should have fired at 03/21/2023 19:31:05 but fired at 03/21/2023 19:31:11, which is 00:00:05.2603071 longer than expected
+2023-03-22T03:31:16.2737201+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:05.2274147. Total GC Pause duration during that period: 00:00:00. We are now using a total of 10MB memory. gc=3, 3, 2
+2023-03-22T03:31:16.2757489+08:00 [WRN] (/BOSSHONG/38) Timer should have fired at 03/21/2023 19:31:11 but fired at 03/21/2023 19:31:16, which is 00:00:05.1292130 longer than expected
+2023-03-22T03:31:16.3002616+08:00 [WRN] (/BOSSHONG/32) Task "[Id=20593, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38431716/sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_3_eventstorestream-2-0x80000002@5e60282000000000a0741c7c00000000]" took elapsed time "0:00:10.6141712" for execution, which is longer than 00:00:01. Running on thread "32"
+2023-03-22T03:31:21.0555747+08:00 [WRN] (/BOSSHONG/29) .NET Thread Pool is exhibiting delays of 5.2284441s. This can indicate .NET Thread Pool starvation, very long .NET GC pauses, or other runtime or machine pauses.
+2023-03-22T03:31:21.0560194+08:00 [WRN] (/BOSSHONG/29) Self-monitoring determined that local health is degraded. Degradation score is 5/8 (lower is better). Complaints: ".NET Thread Pool is exhibiting delays of 5.2284441s. This can indicate .NET Thread Pool starvation, very long .NET GC pauses, or other runtime or machine pauses."
+2023-03-22T03:31:51.1417424+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:19.6924792. Total GC Pause duration during that period: 00:00:00. We are now using a total of 10MB memory. gc=3, 3, 2
+2023-03-22T03:31:51.1422603+08:00 [WRN] (/BOSSHONG/29) Timer should have fired at 03/21/2023 19:31:32 but fired at 03/21/2023 19:31:51, which is 00:00:18.6270803 longer than expected
+2023-03-22T03:31:51.1422973+08:00 [WRN] (/BOSSHONG/37) Timer should have fired at 03/21/2023 19:31:41 but fired at 03/21/2023 19:31:51, which is 00:00:10.0843360 longer than expected
+2023-03-22T03:31:51.1424309+08:00 [WRN] (/BOSSHONG/17) Watchdog had 1 health Check failure(s) out of 5 health Check participants: "Orleans.Runtime.ActivationCollector failed health check with reason \"ActivationCollector timer should have fired at 2023-03-21 19:31:39, which is 00:00:11.6590076 ago\"."
+2023-03-22T03:31:51.1424375+08:00 [WRN] (/BOSSHONG/32) Timer should have fired at 03/21/2023 19:31:39 but fired at 03/21/2023 19:31:51, which is 00:00:11.6242906 longer than expected
+2023-03-22T03:31:51.1426488+08:00 [WRN] (/BOSSHONG/37) Health check participant "Orleans.Runtime.ActivationCollector" is reporting that it is unhealthy with complaint: "ActivationCollector timer should have fired at 2023-03-21 19:31:39, which is 00:00:11.6594464 ago"
+2023-03-22T03:31:51.1427106+08:00 [WRN] (/BOSSHONG/37) Self-monitoring determined that local health is degraded. Degradation score is 1/8 (lower is better). Complaints: "Health check participant Orleans.Runtime.ActivationCollector is reporting that it is unhealthy with complaint: ActivationCollector timer should have fired at 2023-03-21 19:31:39, which is 00:00:11.6594464 ago"
+2023-03-22T03:31:51.1520921+08:00 [WRN] (/BOSSHONG/37) Timer should have fired at 03/21/2023 19:31:35 but fired at 03/21/2023 19:31:51, which is 00:00:15.1939105 longer than expected
+2023-03-22T03:31:51.1530333+08:00 [WRN] (/BOSSHONG/37) Timer should have fired at 03/21/2023 19:31:36 but fired at 03/21/2023 19:31:51, which is 00:00:14.8608298 longer than expected
+2023-03-22T03:31:51.1535126+08:00 [WRN] (/BOSSHONG/37) Timer should have fired at 03/21/2023 19:31:39 but fired at 03/21/2023 19:31:51, which is 00:00:11.6703411 longer than expected
+2023-03-22T03:31:51.1591331+08:00 [WRN] (/BOSSHONG/34) Task "[Id=23491, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38431716/sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_3_eventstorestream-2-0x80000002@5e60282000000000a0741c7c00000000]" took elapsed time "0:00:18.7080739" for execution, which is longer than 00:00:01. Running on thread "34"
+2023-03-22T03:31:51.2709007+08:00 [WRN] (/BOSSHONG/41) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-2::ChatService" for the queue: "chatservice/streaming/eventstorestream-2" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T03:31:51.2717508+08:00 [WRN] (/BOSSHONG/32) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-1::ChatService" for the queue: "chatservice/streaming/eventstorestream-1" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T03:31:51.3261578+08:00 [WRN] (/BOSSHONG/14) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-3::ChatService" for the queue: "chatservice/streaming/eventstorestream-3" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T03:31:51.3273498+08:00 [WRN] (/BOSSHONG/36) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-0::ChatService" for the queue: "chatservice/streaming/eventstorestream-0" with server error: "Status(StatusCode=\"Unavailable\", Detail=\"Error reading next message. IOException: The request was aborted. IOException: The response ended prematurely while waiting for the next frame from the server.\", DebugException=\"System.IO.IOException: The request was aborted.\")"
+2023-03-22T03:32:00.2374722+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:09.0952263. Total GC Pause duration during that period: 00:00:00. We are now using a total of 11MB memory. gc=3, 3, 2
+2023-03-22T03:32:00.2378383+08:00 [WRN] (/BOSSHONG/47) Timer should have fired at 03/21/2023 19:31:51 but fired at 03/21/2023 19:32:00, which is 00:00:08.7651241 longer than expected
+2023-03-22T03:32:00.2389217+08:00 [WRN] (/BOSSHONG/45) Timer should have fired at 03/21/2023 19:31:56 but fired at 03/21/2023 19:32:00, which is 00:00:04.0855810 longer than expected
+2023-03-22T03:32:00.2449327+08:00 [WRN] (/BOSSHONG/46) Task "[Id=23970, Status=RanToCompletion]" in WorkGroup "[SystemTarget: S127.0.0.1:11111:38431716/sys.svc.stream.agent/127.0.0.1:11111@38431716+EventStoreStream_3_eventstorestream-2-0x80000002@5e60282000000000a0741c7c00000000]" took elapsed time "0:00:08.7977196" for execution, which is longer than 00:00:01. Running on thread "46"
+2023-03-22T03:32:29.0610531+08:00 [WRN] (/BOSSHONG/14) CleanupDefunctSiloEntries operation is not supported by the current implementation of IMembershipTable. Disabling the timer now.
+2023-03-22T03:32:32.7992950+08:00 [WRN] (/BOSSHONG/14) Exception while processing messages from remote endpoint "127.0.0.1:51193"
+Microsoft.AspNetCore.Connections.ConnectionResetException: 远程主机强迫关闭了一个现有的连接。
+ ---> System.Net.Sockets.SocketException (10054): 远程主机强迫关闭了一个现有的连接。
+   at Orleans.Networking.Shared.SocketAwaitableEventArgs.<GetResult>g__ThrowSocketException|7_0(SocketError e) in /_/src/Orleans.Core/Networking/Shared/SocketAwaitableEventArgs.cs:line 42
+   at Orleans.Networking.Shared.SocketAwaitableEventArgs.GetResult() in /_/src/Orleans.Core/Networking/Shared/SocketAwaitableEventArgs.cs:line 35
+   at Orleans.Networking.Shared.SocketConnection.ProcessReceives() in /_/src/Orleans.Core/Networking/Shared/SocketConnection.cs:line 186
+   at Orleans.Networking.Shared.SocketConnection.DoReceive() in /_/src/Orleans.Core/Networking/Shared/SocketConnection.cs:line 135
+   --- End of inner exception stack trace ---
+   at System.IO.Pipelines.Pipe.GetReadResult(ReadResult& result)
+   at System.IO.Pipelines.Pipe.GetReadAsyncResult()
+   at Orleans.Runtime.Messaging.Connection.ProcessIncoming() in /_/src/Orleans.Core/Networking/Connection.cs:line 294
+2023-03-22T03:32:32.8004496+08:00 [INF] (/BOSSHONG/14) Closing connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51193, ConnectionId: 0HMPA8ALU6VSB]"
+Microsoft.AspNetCore.Connections.ConnectionResetException: 远程主机强迫关闭了一个现有的连接。
+ ---> System.Net.Sockets.SocketException (10054): 远程主机强迫关闭了一个现有的连接。
+   at Orleans.Networking.Shared.SocketAwaitableEventArgs.<GetResult>g__ThrowSocketException|7_0(SocketError e) in /_/src/Orleans.Core/Networking/Shared/SocketAwaitableEventArgs.cs:line 42
+   at Orleans.Networking.Shared.SocketAwaitableEventArgs.GetResult() in /_/src/Orleans.Core/Networking/Shared/SocketAwaitableEventArgs.cs:line 35
+   at Orleans.Networking.Shared.SocketConnection.ProcessReceives() in /_/src/Orleans.Core/Networking/Shared/SocketConnection.cs:line 186
+   at Orleans.Networking.Shared.SocketConnection.DoReceive() in /_/src/Orleans.Core/Networking/Shared/SocketConnection.cs:line 135
+   --- End of inner exception stack trace ---
+   at System.IO.Pipelines.Pipe.GetReadResult(ReadResult& result)
+   at System.IO.Pipelines.Pipe.GetReadAsyncResult()
+   at Orleans.Runtime.Messaging.Connection.ProcessIncoming() in /_/src/Orleans.Core/Networking/Connection.cs:line 294
+2023-03-22T03:32:32.8050692+08:00 [INF] (/BOSSHONG/29) Recorded closed socket from endpoint "127.0.0.1:51193", client ID "sys.client/795dca0c3ed5443c9e2b583928d39683".
+2023-03-22T03:32:32.8070113+08:00 [INF] (/BOSSHONG/8) Connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51193, ConnectionId: 0HMPA8ALU6VSB]" terminated
+2023-03-22T03:33:27.5444634+08:00 [INF] (/BOSSHONG/29) Recorded opened connection from endpoint "127.0.0.1:51252", client ID "sys.client/608ef5c2cc10450b9a8e77504ed0e67a".
+2023-03-22T03:33:38.9783326+08:00 [INF] (/BOSSHONG/32) I am responsible for a total of 4 queues on stream provider "EventStoreStream": "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]".
+2023-03-22T03:33:51.1536746+08:00 [INF] (/BOSSHONG/29) Dropping client "sys.client/795dca0c3ed5443c9e2b583928d39683", 00:01:18.3440000 after disconnect with no reconnect
+2023-03-22T03:35:46.0298614+08:00 [INF] (/BOSSHONG/8) Closing connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51252, ConnectionId: 0HMPA8ALU6VSC]"
+Microsoft.AspNetCore.Connections.ConnectionAbortedException: Underlying connection closed
+2023-03-22T03:35:46.0300289+08:00 [INF] (/BOSSHONG/8) Recorded closed socket from endpoint "127.0.0.1:51252", client ID "sys.client/608ef5c2cc10450b9a8e77504ed0e67a".
+2023-03-22T03:35:46.0302256+08:00 [INF] (/BOSSHONG/33) Connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51252, ConnectionId: 0HMPA8ALU6VSC]" terminated
+2023-03-22T03:36:30.8347058+08:00 [INF] (/BOSSHONG/29) Recorded opened connection from endpoint "127.0.0.1:51299", client ID "sys.client/5a3f2412b6e84cfe87c3e5c7e7472e2a".
+2023-03-22T03:36:51.1698541+08:00 [INF] (/BOSSHONG/32) Dropping client "sys.client/608ef5c2cc10450b9a8e77504ed0e67a", 00:01:05.1400000 after disconnect with no reconnect
+2023-03-22T03:36:51.2148165+08:00 [WRN] (/BOSSHONG/32) Discarding rejection of message "Response [S127.0.0.1:30000:0 channel/Fuck]->[ sys.client/608ef5c2cc10450b9a8e77504ed0e67a] Chat/Fuck #13" with reason '"Client dropped"' (Transient)
+Orleans.Runtime.ClientNotAvailableException: No activation for client sys.client/608ef5c2cc10450b9a8e77504ed0e67a
+2023-03-22T03:37:19.9082143+08:00 [INF] (/BOSSHONG/36) Closing connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51299, ConnectionId: 0HMPA8ALU6VSD]"
+2023-03-22T03:37:19.9084214+08:00 [INF] (/BOSSHONG/36) Recorded closed socket from endpoint "127.0.0.1:51299", client ID "sys.client/5a3f2412b6e84cfe87c3e5c7e7472e2a".
+2023-03-22T03:37:19.9107524+08:00 [INF] (/BOSSHONG/8) Connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51299, ConnectionId: 0HMPA8ALU6VSD]" terminated
+2023-03-22T03:37:27.6312428+08:00 [INF] (/BOSSHONG/8) Stopping Orleans Silo
+2023-03-22T03:37:27.6457965+08:00 [INF] (/BOSSHONG/8) Stopping "Orleans.Runtime.ReminderService.LocalReminderService" grain service
+2023-03-22T03:37:27.6487235+08:00 [INF] (/BOSSHONG/36) Stopping agents for 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]"
+2023-03-22T03:37:27.6521048+08:00 [INF] (/BOSSHONG/36) About to remove 4 agents from my responsibility: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]"
+2023-03-22T03:37:27.6576539+08:00 [INF] (/BOSSHONG/43) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-0-0x00000000"
+2023-03-22T03:37:27.6576537+08:00 [INF] (/BOSSHONG/14) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-1-0x40000001"
+2023-03-22T03:37:27.6576551+08:00 [INF] (/BOSSHONG/32) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-3-0xC0000003"
+2023-03-22T03:37:27.6576529+08:00 [INF] (/BOSSHONG/29) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-2-0x80000002"
+2023-03-22T03:37:27.6615798+08:00 [INF] (/BOSSHONG/43) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-0::ChatService" for the queue: "chatservice/streaming/eventstorestream-0" successfully
+2023-03-22T03:37:27.6615782+08:00 [INF] (/BOSSHONG/14) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-1::ChatService" for the queue: "chatservice/streaming/eventstorestream-1" successfully
+2023-03-22T03:37:27.6615829+08:00 [INF] (/BOSSHONG/32) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-3::ChatService" for the queue: "chatservice/streaming/eventstorestream-3" successfully
+2023-03-22T03:37:27.6615857+08:00 [INF] (/BOSSHONG/29) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-2::ChatService" for the queue: "chatservice/streaming/eventstorestream-2" successfully
+2023-03-22T03:37:27.8207610+08:00 [INF] (/BOSSHONG/29) Unregister PersistentStreamPullingAgent Producer for stream "EventStoreStream/Chat/Fuck".
+2023-03-22T03:37:27.9089502+08:00 [INF] (/BOSSHONG/33) Removed 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]". Now own total of 0 queues: "[]"
+2023-03-22T03:37:27.9117861+08:00 [INF] (/BOSSHONG/33) Stopped agents.
+2023-03-22T03:37:29.9430105+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.1247360. Total GC Pause duration during that period: 00:00:00.0097460. We are now using a total of 29MB memory. gc=4, 3, 2
+2023-03-22T03:37:32.0435016+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.1000758. Total GC Pause duration during that period: 00:00:00.0231690. We are now using a total of 37MB memory. gc=5, 4, 3
+2023-03-22T03:37:34.1613638+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.1173073. Total GC Pause duration during that period: 00:00:00.0231720. We are now using a total of 32MB memory. gc=6, 5, 3
+2023-03-22T03:37:35.4671049+08:00 [INF] (/BOSSHONG/43) Orleans Silo stopped.
+2023-03-22T03:37:35.5004876+08:00 [INF] (Chat Room/BOSSHONG/43) Stopped "Chat Room" with runtime ".NET 7.0.1" and OS "Microsoft Windows 10.0.19045".
+2023-03-22T03:58:25.2422934+08:00 [INF] (Chat Room/BOSSHONG/1) Started "Chat Room" with runtime ".NET 7.0.1" and OS "Microsoft Windows 10.0.19045".
+2023-03-22T03:58:25.3710453+08:00 [INF] (/BOSSHONG/1) Silo starting with GC settings: ServerGC=True GCLatencyMode="Interactive"
+2023-03-22T03:58:25.3781742+08:00 [INF] (/BOSSHONG/1) -------------- Initializing silo on host "BOSSHONG" MachineName "BOSSHONG" at "127.0.0.1:11111", gen 38433505 --------------
+2023-03-22T03:58:25.3783679+08:00 [INF] (/BOSSHONG/1) Starting silo "Silo_fe61f"
+2023-03-22T03:58:26.2633307+08:00 [WRN] (/BOSSHONG/1) No implementation of IHostEnvironmentStatistics was found. Load shedding will not work yet
+2023-03-22T03:58:26.5715892+08:00 [INF] (/BOSSHONG/1) -------------- Started silo "S127.0.0.1:11111:38433505", ConsistentHashCode "22359DE0" --------------
+2023-03-22T03:58:26.5776895+08:00 [INF] (/BOSSHONG/1) Starting Orleans Silo.
+2023-03-22T03:58:26.6814062+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.BroadcastChannel.BroadcastChannelOptions-Broadcast: 
+FireAndForgetDelivery: True
+
+2023-03-22T03:58:26.6817114+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ActivationCountBasedPlacementOptions: 
+ChooseOutOf: 2
+
+2023-03-22T03:58:26.6839159+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterMembershipOptions: 
+NumMissedTableIAmAliveLimit: 2
+LivenessEnabled: True
+ProbeTimeout: 00:00:05
+TableRefreshTimeout: 00:01:00
+DeathVoteExpirationTimeout: 00:02:00
+IAmAliveTablePublishTimeout: 00:05:00
+MaxJoinAttemptTime: 00:05:00
+UseLivenessGossip: True
+NumProbedSilos: 3
+NumMissedProbesLimit: 3
+NumVotesForDeathDeclaration: 2
+DefunctSiloExpiration: 7.00:00:00
+DefunctSiloCleanupPeriod: 01:00:00
+LocalHealthDegradationMonitoringPeriod: 00:00:10
+ExtendProbeTimeoutDuringDegradation: True
+EnableIndirectProbes: True
+
+2023-03-22T03:58:26.6841110+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ClusterOptions: 
+ClusterId: ChatCluster
+ServiceId: ChatService
+
+2023-03-22T03:58:26.6846913+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConnectionOptions: 
+ProtocolVersion: Version1
+ConnectionsPerEndpoint: 1
+ConnectionRetryDelay: 00:00:01
+OpenConnectionTimeout: 00:00:05
+
+2023-03-22T03:58:26.6848335+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.ConsistentRingOptions: 
+NumVirtualBucketsConsistentRing: 30
+UseVirtualBucketsConsistentRing: True
+
+2023-03-22T03:58:26.6849658+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.DevelopmentClusterMembershipOptions: 
+PrimarySiloEndpoint: 127.0.0.1:11111
+
+2023-03-22T03:58:26.6850712+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EndpointOptions: 
+AdvertisedIPAddress: 127.0.0.1
+SiloPort: 11111
+GatewayPort: 30000
+SiloListeningEndpoint: 
+GatewayListeningEndpoint: 
+
+2023-03-22T03:58:26.6860588+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+QueueNames.1: ChatService/streaming/eventstorestream-1
+QueueNames.2: ChatService/streaming/eventstorestream-2
+QueueNames.3: ChatService/streaming/eventstorestream-3
+TotalQueueCount: 4
+
+2023-03-22T03:58:26.6868802+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.EventStoreQueueOptions-EventStoreStream: 
+ClientSettings: REDACTED
+Credentials: REDACTED
+SubscriptionSettings: EventStore.Client.PersistentSubscriptionSettings
+QueueBufferSize: 10
+QueueNames.0: ChatService/streaming/eventstorestream-0
+QueueNames.1: ChatService/streaming/eventstorestream-1
+QueueNames.2: ChatService/streaming/eventstorestream-2
+QueueNames.3: ChatService/streaming/eventstorestream-3
+TotalQueueCount: 4
+
+2023-03-22T03:58:26.6873717+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainCollectionOptions: 
+CollectionQuantum: 00:01:00
+CollectionAge: 00:15:00
+ActivationTimeout: 00:00:30
+DeactivationTimeout: 00:00:30
+
+2023-03-22T03:58:26.6879056+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainDirectoryOptions: 
+CachingStrategy: Adaptive
+CacheSize: 1000000
+InitialCacheTTL: 00:00:30
+MaximumCacheTTL: 00:04:00
+CacheTTLExtensionFactor: 2
+LazyDeregistrationDelay: 00:01:00
+
+2023-03-22T03:58:26.6879951+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.GrainVersioningOptions: 
+DefaultCompatibilityStrategy: BackwardCompatible
+DefaultVersionSelectorStrategy: AllCompatibleVersions
+
+2023-03-22T03:58:26.6880705+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.LoadSheddingOptions: 
+LoadSheddingEnabled: False
+LoadSheddingLimit: 95
+
+2023-03-22T03:58:26.6884589+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SchedulingOptions: 
+DelayWarningThreshold: 00:00:10
+ActivationSchedulingQuantum: 00:00:00.1000000
+TurnWarningLengthThreshold: 00:00:01
+MaxPendingWorkItemsSoftLimit: 0
+StoppedActivationWarningInterval: 00:01:00
+
+2023-03-22T03:58:26.6896545+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloMessagingOptions: 
+SiloSenderQueues: 0
+GatewaySenderQueues: 0
+MaxForwardCount: 2
+ClientDropTimeout: 00:01:00
+ClientRegistrationRefresh: 00:05:00
+ClientGatewayShutdownNotificationTimeout: 00:00:05
+MaxEnqueuedRequestsSoftLimit: 0
+MaxEnqueuedRequestsHardLimit: 0
+MaxEnqueuedRequestsSoftLimit_StatelessWorker: 0
+MaxEnqueuedRequestsHardLimit_StatelessWorker: 0
+MaxRequestProcessingTime: 02:00:00
+AssumeHomogenousSilosForTesting: False
+ShutdownRerouteTimeout: 00:00:10
+SystemResponseTimeout: 00:30:00
+GrainWorkloadAnalysisPeriod: 00:00:05
+RequestProcessingWarningTime: 00:00:05
+RequestQueueDelayWarningTime: 00:00:10
+WaitForMessageToBeQueuedForOutboundTime: 00:00:02
+ResponseTimeout: 00:30:00
+ResponseTimeoutWithDebugger: 00:30:00
+DropExpiredMessages: True
+MaxMessageHeaderSize: 10485760
+MaxMessageBodySize: 104857600
+
+2023-03-22T03:58:26.6897509+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SiloOptions: 
+SiloName: Silo_fe61f
+
+2023-03-22T03:58:26.6898954+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.SimpleQueueCacheOptions-EventStoreStream: 
+CacheSize: 1024
+
+2023-03-22T03:58:26.6900532+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPubSubOptions-EventStoreStream: 
+PubSubType: ExplicitGrainBasedAndImplicit
+
+2023-03-22T03:58:26.6904894+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Configuration.StreamPullingAgentOptions-EventStoreStream: 
+BatchContainerBatchSize: 10
+GetQueueMsgsTimerPeriod: 00:00:00.2000000
+InitQueueTimeout: 00:00:05
+MaxEventDeliveryTime: 00:01:00
+StreamInactivityPeriod: 00:30:00
+
+2023-03-22T03:58:26.6907395+08:00 [INF] (/BOSSHONG/4) Configuration Orleans.Persistence.RedisStorageOptions-PubSubStore: 
+ConnectionString: 123.60.184.85:6379
+DeleteOnClear: True
+DatabaseNumber: 1
+InitStage: 10000
+GrainStorageSerializer: Orleans.Storage.JsonGrainStorageSerializer
+
+2023-03-22T03:58:26.7253816+08:00 [INF] (/BOSSHONG/15) Start InsideRuntimeClient took 1 milliseconds
+2023-03-22T03:58:26.7398302+08:00 [INF] (/BOSSHONG/16) Silo Start()
+2023-03-22T03:58:26.7507298+08:00 [INF] (/BOSSHONG/4) Start
+2023-03-22T03:58:26.7537941+08:00 [INF] (/BOSSHONG/4) "Start local grain directory" took 3 milliseconds to finish
+2023-03-22T03:58:26.7763434+08:00 [INF] (/BOSSHONG/6) MembershipOracle starting on host "BOSSHONG" with SiloAddress "S127.0.0.1:11111:38433505" at "2023-03-21 19:58:25.859 GMT"
+2023-03-22T03:58:26.7793700+08:00 [INF] (/BOSSHONG/6) Creating in-memory membership table
+2023-03-22T03:58:26.7819396+08:00 [INF] (/BOSSHONG/6) GrainBasedMembershipTable Activated.
+2023-03-22T03:58:26.7838789+08:00 [INF] (/BOSSHONG/15) "Init grain services" took 2 milliseconds to finish
+2023-03-22T03:58:26.8036516+08:00 [INF] (/BOSSHONG/9) "Start deployment load collector" took 19 milliseconds to finish
+2023-03-22T03:58:26.8050602+08:00 [INF] (/BOSSHONG/9) Starting Silo Watchdog.
+2023-03-22T03:58:26.8653060+08:00 [INF] (/BOSSHONG/8) Connected to membership table provider.
+2023-03-22T03:58:26.8820970+08:00 [INF] (/BOSSHONG/16) Joining
+2023-03-22T03:58:28.1986531+08:00 [INF] (/BOSSHONG/8) -BecomeActive
+2023-03-22T03:58:28.2154734+08:00 [INF] (/BOSSHONG/6) -Finished BecomeActive.
+2023-03-22T03:58:28.2238325+08:00 [INF] (/BOSSHONG/15) Starting "Orleans.Runtime.ReminderService.LocalReminderService" grain service on: "S127.0.0.1:11111:38433505" x"22359DE0", with range "<(0 0], Size=x100000000, %Ring=100%>"
+2023-03-22T03:58:28.2376919+08:00 [INF] (/BOSSHONG/9) Successfully created queue balancer of type "Orleans.Streams.ConsistentRingQueueBalancer" for stream provider "EventStoreStream"
+2023-03-22T03:58:28.2409738+08:00 [INF] (/BOSSHONG/9) Created "PersistentStreamPullingManager" for Stream Provider "EventStoreStream".
+2023-03-22T03:58:28.2499603+08:00 [INF] (/BOSSHONG/4) Init.
+2023-03-22T03:58:28.2597250+08:00 [INF] (/BOSSHONG/4) Initialize: I am now responsible for 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]".
+2023-03-22T03:58:28.2669089+08:00 [INF] (/BOSSHONG/13) Starting agents for 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]"
+2023-03-22T03:58:28.2730292+08:00 [INF] (/BOSSHONG/13) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38433505+EventStoreStream_1_eventstorestream-0-0x00000000" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38433505" for Queue "eventstorestream-0-0x00000000".
+2023-03-22T03:58:28.2734966+08:00 [INF] (/BOSSHONG/13) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38433505+EventStoreStream_2_eventstorestream-1-0x40000001" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38433505" for Queue "eventstorestream-1-0x40000001".
+2023-03-22T03:58:28.2736376+08:00 [INF] (/BOSSHONG/13) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38433505+EventStoreStream_3_eventstorestream-2-0x80000002" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38433505" for Queue "eventstorestream-2-0x80000002".
+2023-03-22T03:58:28.2737357+08:00 [INF] (/BOSSHONG/13) Created "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38433505+EventStoreStream_4_eventstorestream-3-0xC0000003" for Stream Provider "EventStoreStream" on silo "S127.0.0.1:11111:38433505" for Queue "eventstorestream-3-0xC0000003".
+2023-03-22T03:58:28.2830647+08:00 [INF] (/BOSSHONG/16) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38433505+EventStoreStream_1_eventstorestream-0-0x00000000" on silo "S127.0.0.1:11111:38433505" for queue "eventstorestream-0-0x00000000".
+2023-03-22T03:58:28.2865774+08:00 [INF] (/BOSSHONG/4) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38433505+EventStoreStream_2_eventstorestream-1-0x40000001" on silo "S127.0.0.1:11111:38433505" for queue "eventstorestream-1-0x40000001".
+2023-03-22T03:58:28.2868479+08:00 [INF] (/BOSSHONG/8) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38433505+EventStoreStream_3_eventstorestream-2-0x80000002" on silo "S127.0.0.1:11111:38433505" for queue "eventstorestream-2-0x80000002".
+2023-03-22T03:58:28.2868484+08:00 [INF] (/BOSSHONG/6) Init of "PersistentStreamPullingAgent" "sys.svc.stream.agent/127.0.0.1:11111@38433505+EventStoreStream_4_eventstorestream-3-0xC0000003" on silo "S127.0.0.1:11111:38433505" for queue "eventstorestream-3-0xC0000003".
+2023-03-22T03:58:28.3512118+08:00 [INF] (/BOSSHONG/9) Activated
+2023-03-22T03:58:28.3666465+08:00 [INF] (/BOSSHONG/13) My range changed from "<(0 0], Size=x100000000, %Ring=100%>" to "<(0 0], Size=x100000000, %Ring=100%>" increased = True
+2023-03-22T03:58:28.9325260+08:00 [INF] (/BOSSHONG/8) Taking queue "eventstorestream-2-0x80000002" under my responsibility.
+2023-03-22T03:58:28.9326089+08:00 [INF] (/BOSSHONG/6) Taking queue "eventstorestream-3-0xC0000003" under my responsibility.
+2023-03-22T03:58:28.9326184+08:00 [INF] (/BOSSHONG/16) Taking queue "eventstorestream-0-0x00000000" under my responsibility.
+2023-03-22T03:58:28.9326916+08:00 [INF] (/BOSSHONG/4) Taking queue "eventstorestream-1-0x40000001" under my responsibility.
+2023-03-22T03:58:28.9406317+08:00 [INF] (/BOSSHONG/8) Added 4 new queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]". Now own total of 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]"
+2023-03-22T03:58:28.9414446+08:00 [INF] (/BOSSHONG/8) Started agents.
+2023-03-22T03:58:28.9455007+08:00 [INF] (/BOSSHONG/8) Orleans Silo started.
+2023-03-22T03:58:41.7636447+08:00 [INF] (/BOSSHONG/9) Recorded opened connection from endpoint "127.0.0.1:51546", client ID "sys.client/77a34a26688549d29f6807be7ae0b50c".
+2023-03-22T04:03:28.2747880+08:00 [INF] (/BOSSHONG/13) I am responsible for a total of 4 queues on stream provider "EventStoreStream": "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]".
+2023-03-22T04:03:49.9892176+08:00 [WRN] (/BOSSHONG/6) Exception while processing messages from remote endpoint "127.0.0.1:51546"
+Microsoft.AspNetCore.Connections.ConnectionResetException: 远程主机强迫关闭了一个现有的连接。
+ ---> System.Net.Sockets.SocketException (10054): 远程主机强迫关闭了一个现有的连接。
+   at Orleans.Networking.Shared.SocketAwaitableEventArgs.<GetResult>g__ThrowSocketException|7_0(SocketError e) in /_/src/Orleans.Core/Networking/Shared/SocketAwaitableEventArgs.cs:line 42
+   at Orleans.Networking.Shared.SocketAwaitableEventArgs.GetResult() in /_/src/Orleans.Core/Networking/Shared/SocketAwaitableEventArgs.cs:line 35
+   at Orleans.Networking.Shared.SocketConnection.ProcessReceives() in /_/src/Orleans.Core/Networking/Shared/SocketConnection.cs:line 186
+   at Orleans.Networking.Shared.SocketConnection.DoReceive() in /_/src/Orleans.Core/Networking/Shared/SocketConnection.cs:line 135
+   --- End of inner exception stack trace ---
+   at System.IO.Pipelines.Pipe.GetReadResult(ReadResult& result)
+   at System.IO.Pipelines.Pipe.GetReadAsyncResult()
+   at Orleans.Runtime.Messaging.Connection.ProcessIncoming() in /_/src/Orleans.Core/Networking/Connection.cs:line 294
+2023-03-22T04:03:49.9904002+08:00 [INF] (/BOSSHONG/6) Closing connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51546, ConnectionId: 0HMPA8QLP5SA7]"
+Microsoft.AspNetCore.Connections.ConnectionResetException: 远程主机强迫关闭了一个现有的连接。
+ ---> System.Net.Sockets.SocketException (10054): 远程主机强迫关闭了一个现有的连接。
+   at Orleans.Networking.Shared.SocketAwaitableEventArgs.<GetResult>g__ThrowSocketException|7_0(SocketError e) in /_/src/Orleans.Core/Networking/Shared/SocketAwaitableEventArgs.cs:line 42
+   at Orleans.Networking.Shared.SocketAwaitableEventArgs.GetResult() in /_/src/Orleans.Core/Networking/Shared/SocketAwaitableEventArgs.cs:line 35
+   at Orleans.Networking.Shared.SocketConnection.ProcessReceives() in /_/src/Orleans.Core/Networking/Shared/SocketConnection.cs:line 186
+   at Orleans.Networking.Shared.SocketConnection.DoReceive() in /_/src/Orleans.Core/Networking/Shared/SocketConnection.cs:line 135
+   --- End of inner exception stack trace ---
+   at System.IO.Pipelines.Pipe.GetReadResult(ReadResult& result)
+   at System.IO.Pipelines.Pipe.GetReadAsyncResult()
+   at Orleans.Runtime.Messaging.Connection.ProcessIncoming() in /_/src/Orleans.Core/Networking/Connection.cs:line 294
+2023-03-22T04:03:50.0064332+08:00 [INF] (/BOSSHONG/6) Recorded closed socket from endpoint "127.0.0.1:51546", client ID "sys.client/77a34a26688549d29f6807be7ae0b50c".
+2023-03-22T04:03:50.0171790+08:00 [INF] (/BOSSHONG/6) Connection "[Local: 127.0.0.1:30000, Remote: 127.0.0.1:51546, ConnectionId: 0HMPA8QLP5SA7]" terminated
+2023-03-22T04:05:26.4488237+08:00 [INF] (/BOSSHONG/9) Dropping client "sys.client/77a34a26688549d29f6807be7ae0b50c", 00:01:36.4380000 after disconnect with no reconnect
+2023-03-22T04:05:26.4712663+08:00 [WRN] (/BOSSHONG/9) Discarding rejection of message "Response [S127.0.0.1:30000:0 pubsubrendezvous/EventStoreStream/Chat/Fuck]->[ sys.client/77a34a26688549d29f6807be7ae0b50c] [Completed] #14" with reason '"Client dropped"' (Transient)
+Orleans.Runtime.ClientNotAvailableException: No activation for client sys.client/77a34a26688549d29f6807be7ae0b50c
+2023-03-22T04:06:19.0367844+08:00 [INF] (/BOSSHONG/28) Stopping Orleans Silo
+2023-03-22T04:06:19.0525042+08:00 [INF] (/BOSSHONG/29) Stopping "Orleans.Runtime.ReminderService.LocalReminderService" grain service
+2023-03-22T04:06:19.0564123+08:00 [INF] (/BOSSHONG/8) Stopping agents for 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]"
+2023-03-22T04:06:19.0585341+08:00 [INF] (/BOSSHONG/8) About to remove 4 agents from my responsibility: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]"
+2023-03-22T04:06:19.0632601+08:00 [INF] (/BOSSHONG/15) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-2-0x80000002"
+2023-03-22T04:06:19.0632623+08:00 [INF] (/BOSSHONG/3) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-0-0x00000000"
+2023-03-22T04:06:19.0632616+08:00 [INF] (/BOSSHONG/13) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-1-0x40000001"
+2023-03-22T04:06:19.0632778+08:00 [INF] (/BOSSHONG/4) Shutdown of "PersistentStreamPullingAgent" responsible for queue: "eventstorestream-3-0xC0000003"
+2023-03-22T04:06:19.0702392+08:00 [INF] (/BOSSHONG/13) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-1::ChatService" for the queue: "chatservice/streaming/eventstorestream-1" successfully
+2023-03-22T04:06:19.0702417+08:00 [INF] (/BOSSHONG/3) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-0::ChatService" for the queue: "chatservice/streaming/eventstorestream-0" successfully
+2023-03-22T04:06:19.0703445+08:00 [INF] (/BOSSHONG/15) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-2::ChatService" for the queue: "chatservice/streaming/eventstorestream-2" successfully
+2023-03-22T04:06:19.0704249+08:00 [INF] (/BOSSHONG/4) SubscriptionDropped from subscription: "chatservice/streaming/eventstorestream-3::ChatService" for the queue: "chatservice/streaming/eventstorestream-3" successfully
+2023-03-22T04:06:19.1000630+08:00 [INF] (/BOSSHONG/15) Unregister PersistentStreamPullingAgent Producer for stream "EventStoreStream/Chat/Fuck".
+2023-03-22T04:06:19.5005264+08:00 [INF] (/BOSSHONG/16) Removed 4 queues: "[eventstorestream-0, eventstorestream-1, eventstorestream-2, eventstorestream-3]". Now own total of 0 queues: "[]"
+2023-03-22T04:06:19.5029121+08:00 [INF] (/BOSSHONG/16) Stopped agents.
+2023-03-22T04:06:23.5127491+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.0204625. Total GC Pause duration during that period: 00:00:00. We are now using a total of 53MB memory. gc=4, 2, 2
+2023-03-22T04:06:25.5202125+08:00 [WRN] (/BOSSHONG/17) .NET Runtime Platform stalled for 00:00:02.0072240. Total GC Pause duration during that period: 00:00:00.0232010. We are now using a total of 49MB memory. gc=5, 3, 3
+2023-03-22T04:06:27.1017932+08:00 [INF] (/BOSSHONG/14) Orleans Silo stopped.
+2023-03-22T04:06:27.1382695+08:00 [INF] (Chat Room/BOSSHONG/14) Stopped "Chat Room" with runtime ".NET 7.0.1" and OS "Microsoft Windows 10.0.19045".

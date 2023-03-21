@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
-using Orleans.Streaming.Providers;
 using Orleans.Streams;
 
 namespace Orleans.Providers.Streams.EventStore;
@@ -19,8 +18,7 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
     private readonly IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> _dataAdapter;
     private readonly ILogger<EventStoreQueueAdapterReceiver> _logger;
     private readonly List<PendingDelivery> _pendingDeliveries = new(32);
-    private readonly BatchContainersPool _containersPool = new();
-    
+
     private Task? _task;
 
     public static IQueueAdapterReceiver Create(string queueName, EventStoreQueueOptions queueOptions, IOptions<ClusterOptions> clusterOptions, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILoggerFactory loggerFactory)
@@ -95,20 +93,20 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
     public Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
     {
         const int MaxNumberOfMessagesToPeek = 32;
-        var batchContainers = _containersPool.GetList();
         try
         {
             // store direct ref, in case we are somehow asked to shutdown while we are receiving.
             var queueStorage = _queueStorage;
             if (queueStorage == null)
             {
-                return Task.FromResult<IList<IBatchContainer>>(batchContainers);
+                return Task.FromResult<IList<IBatchContainer>>(Array.Empty<IBatchContainer>());
             }
             var count = maxCount < 0 ? MaxNumberOfMessagesToPeek : Math.Min(maxCount, MaxNumberOfMessagesToPeek);
             var resolvedEvents = queueStorage.DequeueMany(count);
+            var batchContainers = new List<IBatchContainer>(resolvedEvents.Count);
             foreach (var resolvedEvent in resolvedEvents)
             {
-                var batchContainer = _dataAdapter.FromQueueMessage(resolvedEvent.Event.Data, resolvedEvent.Event.EventNumber.ToInt64());
+                var batchContainer = _dataAdapter.FromQueueMessage(resolvedEvent.Event.Data, (long)resolvedEvent.Event.Position.CommitPosition);
                 batchContainers.Add(batchContainer);
                 _pendingDeliveries.Add(new PendingDelivery(batchContainer.SequenceToken, resolvedEvent));
             }
@@ -117,7 +115,6 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
         finally
         {
             _task = null;
-            _containersPool.ReturnList(batchContainers);
         }
     }
 

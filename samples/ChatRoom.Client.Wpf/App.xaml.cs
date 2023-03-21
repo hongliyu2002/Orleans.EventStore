@@ -43,7 +43,7 @@ public partial class App
 
     private static IHostBuilder CreateHostBuilder()
     {
-        var redisConnectionString = "123.60.184.85:6379";
+        // var redisConnectionString = "123.60.184.85:6379";
         var eventStoreConnectionString = "esdb://123.60.184.85:2113?tls=false";
         return Host.CreateDefaultBuilder()
                    .ConfigureServices(services =>
@@ -58,11 +58,12 @@ public partial class App
                                                                               options.ServiceId = "ChatService";
                                                                               options.ClusterId = "ChatCluster";
                                                                           });
-                                         client.UseRedisClustering(options =>
-                                                                   {
-                                                                       options.ConnectionString = redisConnectionString;
-                                                                       options.Database = 0;
-                                                                   });
+                                         client.UseLocalhostClustering();
+                                         // client.UseRedisClustering(options =>
+                                         //                           {
+                                         //                               options.ConnectionString = redisConnectionString;
+                                         //                               options.Database = 0;
+                                         //                           });
                                          // Configure streaming
                                          client.AddStreaming();
                                          client.AddEventStoreQueueStreams(Constants.StreamProviderName,
@@ -74,6 +75,8 @@ public partial class App
                                                                                                                                                  {
                                                                                                                                                      options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
                                                                                                                                                      options.SubscriptionSettings = new PersistentSubscriptionSettings(checkPointAfter: TimeSpan.FromSeconds(30));
+                                                                                                                                                     options.TotalQueueCount = 1;
+                                                                                                                                                     options.QueueBufferSize = 10;
                                                                                                                                                  });
                                                                                                                     });
                                                                               configurator.ConfigureStreamPubSub();

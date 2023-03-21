@@ -114,7 +114,11 @@ public partial class MainWindow
         {
             MessageBox.Show(this, "Message text should be input...", "Error occurred, Please try again...");
         }
-        await SendMessage(text);
+        else
+        {
+            await SendMessage(text);
+            MessageText.Text = string.Empty;
+        }
     }
 
     private async Task JoinChannel(string? username, string? channel)

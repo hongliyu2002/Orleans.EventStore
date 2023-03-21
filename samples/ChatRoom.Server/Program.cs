@@ -52,18 +52,22 @@ public static class Program
                                                                        options.SiloPort = 11111;
                                                                        options.GatewayPort = 30000;
                                                                    });
-                                   silo.UseRedisClustering(options =>
-                                                           {
-                                                               options.ConnectionString = redisConnectionString;
-                                                               options.Database = 0;
-                                                           });
+                                   // silo.UseRedisClustering(options =>
+                                   //                         {
+                                   //                             options.ConnectionString = redisConnectionString;
+                                   //                             options.Database = 0;
+                                   //                         });
+                                   silo.UseLocalhostClustering();
+
                                    // Configure reminder service.
                                    silo.AddReminders();
-                                   silo.UseRedisReminderService(options =>
-                                                                {
-                                                                    options.ConnectionString = redisConnectionString;
-                                                                    options.DatabaseNumber = 0;
-                                                                });
+                                   // silo.UseRedisReminderService(options =>
+                                   //                              {
+                                   //                                  options.ConnectionString = redisConnectionString;
+                                   //                                  options.DatabaseNumber = 0;
+                                   //                              });
+                                   silo.UseInMemoryReminderService();
+
                                    // Configure grain storage
                                    silo.AddRedisGrainStorage(Constants.PubSubStoreName,
                                                              options =>
@@ -82,7 +86,8 @@ public static class Program
                                                                                                                 optionsBuilder.Configure(options =>
                                                                                                                                          {
                                                                                                                                              options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
-                                                                                                                                             options.SubscriptionSettings = new PersistentSubscriptionSettings(checkPointAfter: TimeSpan.FromSeconds(30));
+                                                                                                                                             options.SubscriptionSettings =
+                                                                                                                                                 new PersistentSubscriptionSettings(checkPointAfter: TimeSpan.FromSeconds(10), checkPointLowerBound: 1);
                                                                                                                                              options.TotalQueueCount = 4;
                                                                                                                                              options.QueueBufferSize = 10;
                                                                                                                                          });

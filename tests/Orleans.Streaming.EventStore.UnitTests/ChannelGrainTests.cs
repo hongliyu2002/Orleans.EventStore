@@ -9,44 +9,28 @@ namespace Orleans.Streaming.EventStore.UnitTests;
 [TestFixture]
 public class ChannelGrainTests
 {
-    public TestCluster Cluster { get; set; } = null!;
+    private TestCluster _cluster = null!;
 
     [OneTimeSetUp]
     public async Task Setup()
     {
         var clusterBuilder = new TestClusterBuilder().AddClientBuilderConfigurator<ClientBuilderConfigurator>().AddSiloBuilderConfigurator<SiloConfigurator>();
         clusterBuilder.Options.ServiceId = "TestService";
-        Cluster = clusterBuilder.Build();
-        await Cluster.DeployAsync();
+        _cluster = clusterBuilder.Build();
+        await _cluster.DeployAsync();
     }
 
     [OneTimeTearDown]
-    public Task TearDown()
+    public async Task TearDown()
     {
-        return Cluster.DisposeAsync().AsTask();
+        await _cluster.DisposeAsync();
     }
 
-    private IClusterClient Client => Cluster.Client;
-
     [Test]
-    [Order(0)]
-    public async Task Join_Test()
-    {
-        // Arrange
-        var channel = Client.GetGrain<IChannelGrain>(Guid.NewGuid());
-        var nickname = "Boss";
-
-        // Act
-        var streamId = await channel.Join(nickname);
-        var history = await channel.ReadHistory(10);
-    }
-    
-    [Test]
-    [Order(1)]
     public async Task Join_And_Send_Message_Test()
     {
         // Arrange
-        var channel = Client.GetGrain<IChannelGrain>(Guid.NewGuid());
+        var channel = _cluster.Client.GetGrain<IChannelGrain>(Guid.NewGuid());
         var nickname = "Boss";
         var sentMessage = new ChatMessage(nickname, "Fuck, everyone!", DateTimeOffset.UtcNow);
 
@@ -59,12 +43,29 @@ public class ChannelGrainTests
         history.Should().Contain(m => m.Author == sentMessage.Author && m.Text == sentMessage.Text);
     }
 
+    [TestCase("Boss", "Hey, everyone!")]
+    [TestCase("UserA", "Hello!")]
+    [TestCase("UserB", "What's up?")]
+    public async Task SendMessage_Test(string author, string text)
+    {
+        // Arrange
+        var channel = _cluster.Client.GetGrain<IChannelGrain>(Guid.NewGuid());
+        await channel.Join(author);
+        var sentMessage = new ChatMessage(author, text, DateTimeOffset.UtcNow);
+
+        // Act
+        await channel.SendMessage(sentMessage);
+        var history = await channel.ReadHistory(10);
+
+        // Assert
+        history.Should().ContainSingle(m => m.Author == author && m.Text == text);
+    }
+
     [Test]
-    [Order(2)]
     public async Task Leave_Test()
     {
         // Arrange
-        var channel = Client.GetGrain<IChannelGrain>(Guid.NewGuid());
+        var channel = _cluster.Client.GetGrain<IChannelGrain>(Guid.NewGuid());
         var nickname = "TestUser";
         await channel.Join(nickname);
 
@@ -77,11 +78,10 @@ public class ChannelGrainTests
     }
 
     [Test]
-    [Order(3)]
     public async Task Multiple_Clients_Test()
     {
         // Arrange
-        var channel = Client.GetGrain<IChannelGrain>(Guid.NewGuid());
+        var channel = _cluster.Client.GetGrain<IChannelGrain>(Guid.NewGuid());
         var nicknames = new[]
                         {
                             "UserA",
@@ -111,11 +111,10 @@ public class ChannelGrainTests
     }
 
     [Test]
-    [Order(4)]
     public async Task Chat_History_Test()
     {
         // Arrange
-        var channel = Client.GetGrain<IChannelGrain>(Guid.NewGuid());
+        var channel = _cluster.Client.GetGrain<IChannelGrain>(Guid.NewGuid());
         var nickname = "TestUser";
         var sentMessages = new List<ChatMessage>
                            {
@@ -134,5 +133,32 @@ public class ChannelGrainTests
 
         // Assert
         history.Should().BeEquivalentTo(sentMessages);
+    }
+
+    [Test]
+    public async Task Test_Send_Message_And_Subscribe()
+    {
+        // Arrange
+        var nickname = "TestUser";
+        var messageText = "Hello, world!";
+        var grainFactory = _cluster.GrainFactory;
+        var channelGrain = grainFactory.GetGrain<IChannelGrain>(Guid.NewGuid());
+        var subscriberGrain = grainFactory.GetGrain<ISubscriberGrain>(Guid.NewGuid());
+
+        // Act
+        var streamId = await channelGrain.Join(nickname);
+        await subscriberGrain.Subscribe(streamId);
+        for (var i = 0; i < 5; i++)
+        {
+            await channelGrain.SendMessage(new ChatMessage(nickname, $"{messageText} {i}", DateTimeOffset.UtcNow));
+            await Task.Delay(500);
+        }
+        await channelGrain.Leave(nickname);
+        await subscriberGrain.Unsubscribe();
+
+        // Assert
+        var history = await channelGrain.ReadHistory(10);
+        history.Length.Should().BeGreaterOrEqualTo(5);
+        history.Should().Contain(x => x.Author == nickname && x.Text.StartsWith($"{messageText}"));
     }
 }

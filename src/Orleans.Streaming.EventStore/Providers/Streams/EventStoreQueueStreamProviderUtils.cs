@@ -13,10 +13,13 @@ public static class EventStoreQueueStreamProviderUtils
     /// </summary>
     /// <param name="serviceId"></param>
     /// <param name="providerName"></param>
+    /// <param name="totalQueueCount"></param>
     /// <returns></returns>
-    public static List<string> GenerateDefaultEventStoreQueueNames(string serviceId, string providerName)
+    public static List<string> GenerateDefaultQueueNames(string serviceId, string providerName, int totalQueueCount)
     {
-        var defaultQueueMapper = new HashRingBasedStreamQueueMapper(new HashRingStreamQueueMapperOptions(), providerName);
-        return defaultQueueMapper.GetAllQueues().Select(queueId => $"{serviceId}-{queueId}").ToList();
+        var options = new HashRingStreamQueueMapperOptions();
+        options.TotalQueueCount = totalQueueCount;
+        var defaultQueueMapper = new HashRingBasedStreamQueueMapper(options, providerName);
+        return defaultQueueMapper.GetAllQueues().Select(queueId => $"{serviceId}/streaming/{queueId}").ToList();
     }
 }

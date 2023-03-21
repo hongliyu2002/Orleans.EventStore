@@ -24,7 +24,7 @@ public class SiloEventStoreQueueStreamConfigurator : SiloPersistentStreamConfigu
                                                                                           {
                                                                                               if (queueOptions.QueueNames == null || queueOptions.QueueNames.Count == 0)
                                                                                               {
-                                                                                                  queueOptions.QueueNames = EventStoreQueueStreamProviderUtils.GenerateDefaultEventStoreQueueNames(clusterOptions.Value.ServiceId, Name);
+                                                                                                  queueOptions.QueueNames = EventStoreQueueStreamProviderUtils.GenerateDefaultQueueNames(clusterOptions.Value.ServiceId, Name, queueOptions.TotalQueueCount);
                                                                                               }
                                                                                           });
                                       });

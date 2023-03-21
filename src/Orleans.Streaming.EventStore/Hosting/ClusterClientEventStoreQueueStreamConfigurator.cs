@@ -20,9 +20,9 @@ public class ClusterClientEventStoreQueueStreamConfigurator : ClusterClientPersi
                                       {
                                           optionsBuilder.PostConfigure<IOptions<ClusterOptions>>((queueOptions, clusterOptions) =>
                                                                                                  {
-                                                                                                     if (queueOptions.QueueNames == null || queueOptions.QueueNames?.Count == 0)
+                                                                                                     if (queueOptions.QueueNames == null || queueOptions.QueueNames.Count == 0)
                                                                                                      {
-                                                                                                         queueOptions.QueueNames = EventStoreQueueStreamProviderUtils.GenerateDefaultEventStoreQueueNames(clusterOptions.Value.ServiceId, Name);
+                                                                                                         queueOptions.QueueNames = EventStoreQueueStreamProviderUtils.GenerateDefaultQueueNames(clusterOptions.Value.ServiceId, Name, queueOptions.TotalQueueCount);
                                                                                                      }
                                                                                                  });
                                       });

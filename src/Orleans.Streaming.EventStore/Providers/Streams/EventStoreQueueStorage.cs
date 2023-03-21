@@ -41,9 +41,7 @@ public class EventStoreQueueStorage
         ArgumentException.ThrowIfNullOrEmpty(groupName, nameof(groupName));
         ArgumentNullException.ThrowIfNull(queueOptions, nameof(queueOptions));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-        queueName = SanitizeQueueName(queueName);
-        ValidateQueueName(queueName);
-        _queueName = queueName;
+        _queueName = SanitizeQueueName(queueName);
         _groupName = groupName;
         _queueOptions = queueOptions;
         _logger = logger;
@@ -463,8 +461,7 @@ public class EventStoreQueueStorage
     {
         var sanitizedName = queueName;
         sanitizedName = sanitizedName.ToLowerInvariant();
-        sanitizedName = sanitizedName.Replace('/', '-') // Forward slash
-                                     .Replace('\\', '-') // Backslash
+        sanitizedName = sanitizedName.Replace('\\', '-') // Backslash
                                      .Replace('#', '-') // Pound sign
                                      .Replace('?', '-') // Question mark
                                      .Replace('&', '-')
@@ -473,40 +470,6 @@ public class EventStoreQueueStorage
                                      .Replace('.', '-')
                                      .Replace('%', '-');
         return sanitizedName;
-    }
-
-    private void ValidateQueueName(string queueName)
-    {
-        if (!(queueName.Length is >= 3 and <= 63))
-        {
-            // A queue name must be from 3 through 63 characters long.
-            throw new ArgumentException(string.Format("A queue name must be from 3 through 63 characters long, while your queueName length is {0}, queueName is {1}.", queueName.Length, queueName), queueName);
-        }
-        if (!char.IsLetterOrDigit(queueName.First()))
-        {
-            // A queue name must start with a letter or number
-            throw new ArgumentException(string.Format("A queue name must start with a letter or number, while your queueName is {0}.", queueName), queueName);
-        }
-        if (!char.IsLetterOrDigit(queueName.Last()))
-        {
-            // The first and last letters in the queue name must be alphanumeric. The dash (-) character cannot be the first or last character.
-            throw new ArgumentException(string.Format("The last letter in the queue name must be alphanumeric, while your queueName is {0}.", queueName), queueName);
-        }
-        if (!queueName.All(c => char.IsLetterOrDigit(c) || c.Equals('-')))
-        {
-            // A queue name can only contain letters, numbers, and the dash (-) character.
-            throw new ArgumentException(string.Format("A queue name can only contain letters, numbers, and the dash (-) character, while your queueName is {0}.", queueName), queueName);
-        }
-        if (queueName.Contains("--"))
-        {
-            // Consecutive dash characters are not permitted in the queue name.
-            throw new ArgumentException(string.Format("Consecutive dash characters are not permitted in the queue name, while your queueName is {0}.", queueName), queueName);
-        }
-        if (queueName.Where(char.IsLetter).Any(c => !char.IsLower(c)))
-        {
-            // All letters in a queue name must be lowercase.
-            throw new ArgumentException(string.Format("All letters in a queue name must be lowercase, while your queueName is {0}.", queueName), queueName);
-        }
     }
 
     #endregion

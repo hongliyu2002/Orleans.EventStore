@@ -30,7 +30,12 @@ public class EventStoreQueueOptions
     public int QueueBufferSize { get; set; } = 32;
 
     /// <summary>
-    ///     The stream names (aka queue names) on the EventStore server.
+    ///     The queue names (aka stream names) on the EventStore server.
     /// </summary>
     public List<string> QueueNames { get; set; } = new();
+        
+    /// <summary>
+    ///     The total number of queues should be created if QueueNames are not specified.
+    /// </summary>
+    public int TotalQueueCount { get; set; } = 8;
 }

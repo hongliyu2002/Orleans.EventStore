@@ -5,8 +5,8 @@ namespace Orleans.Streaming.EventStore.UnitTests.Grains;
 
 public class ChannelGrain : Grain, IChannelGrain
 {
-    private readonly string _provider;
-    private readonly string _nameSpace;
+    private readonly string _provider = Constants.StreamProviderName;
+    private readonly string _namespace = Constants.ChatNamespace;
 
     private IStreamProvider _streamProvider = null!;
     private IAsyncStream<ChatMessage> _stream = null!;
@@ -14,17 +14,11 @@ public class ChannelGrain : Grain, IChannelGrain
     private readonly List<ChatMessage> _messages = new(128);
     private readonly List<string> _onlineMembers = new(8);
 
-    public ChannelGrain()
-    {
-        _provider = Constants.StreamProviderName;
-        _nameSpace = Constants.ChatNamespace;
-    }
-
     public override async Task OnActivateAsync(CancellationToken cancellationToken)
     {
         await base.OnActivateAsync(cancellationToken);
         _streamProvider = this.GetStreamProvider(_provider);
-        _stream = _streamProvider.GetStream<ChatMessage>(StreamId.Create(_nameSpace, this.GetPrimaryKey()));
+        _stream = _streamProvider.GetStream<ChatMessage>(StreamId.Create(_namespace, this.GetPrimaryKey()));
     }
 
     public async Task<StreamId> Join(string nickname)

@@ -1,4 +1,6 @@
 ﻿using EventStore.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Orleans.TestingHost;
 
 namespace Orleans.Streaming.EventStore.UnitTests.Hosts;
@@ -9,6 +11,7 @@ public class SiloConfigurator : ISiloConfigurator
     public void Configure(ISiloBuilder siloBuilder)
     {
         var connectionString = "esdb://123.60.184.85:2113?tls=false";
+        siloBuilder.Services.AddLogging(builder => builder.AddProvider(new TestOutputLoggerProvider()));
         siloBuilder.AddStreaming();
         siloBuilder.AddEventStoreQueueStreams(Constants.StreamProviderName,
                                               configurator =>
@@ -18,10 +21,7 @@ public class SiloConfigurator : ISiloConfigurator
                                                                                             builder.Configure(options =>
                                                                                                               {
                                                                                                                   options.ClientSettings = EventStoreClientSettings.Create(connectionString);
-                                                                                                                  options.QueueNames = new List<string>
-                                                                                                                                       {
-                                                                                                                                           "Test-12345"
-                                                                                                                                       };
+                                                                                                                  options.TotalQueueCount = 4;
                                                                                                               });
                                                                                         });
                                                   configurator.ConfigureCacheSize(1024);
@@ -29,7 +29,7 @@ public class SiloConfigurator : ISiloConfigurator
                                                                                      {
                                                                                          builder.Configure(options =>
                                                                                                            {
-                                                                                                               options.GetQueueMsgsTimerPeriod = TimeSpan.FromMicroseconds(1000);
+                                                                                                               options.GetQueueMsgsTimerPeriod = TimeSpan.FromMicroseconds(200);
                                                                                                                options.BatchContainerBatchSize = 10;
                                                                                                            });
                                                                                      });

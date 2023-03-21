@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
@@ -39,6 +39,12 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Orleans.Persistence.EventStore\Orleans.Persistence.EventStore.csproj" />
         <ProjectReference Include="..\..\src\Orleans.Streaming.EventStore\Orleans.Streaming.EventStore.csproj" />
+        <ProjectReference Include="..\ChatRoom.Abstractions\ChatRoom.Abstractions.csproj" />
+        <ProjectReference Include="..\ChatRoom.Grains\ChatRoom.Grains.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Logs" />
     </ItemGroup>
 
 </Project>

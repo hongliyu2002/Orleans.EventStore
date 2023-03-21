@@ -1,7 +1,6 @@
-﻿using System.Net;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using ChatRoom.Abstractions;
 using EventStore.Client;
-using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
 using Serilog;
 using Serilog.Events;
@@ -38,7 +37,7 @@ public static class Program
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
         var redisConnectionString = "123.60.184.85:6379";
-        var eventStoreConnectionString = "esdb://123.60.184.85:2113";
+        var eventStoreConnectionString = "esdb://123.60.184.85:2113?tls=false";
         return Host.CreateDefaultBuilder(args)
                    .UseOrleans(silo =>
                                {
@@ -50,7 +49,6 @@ public static class Program
                                                                   });
                                    silo.Configure<EndpointOptions>(options =>
                                                                    {
-                                                                       options.AdvertisedIPAddress = IPAddress.Loopback;
                                                                        options.SiloPort = 11111;
                                                                        options.GatewayPort = 30000;
                                                                    });

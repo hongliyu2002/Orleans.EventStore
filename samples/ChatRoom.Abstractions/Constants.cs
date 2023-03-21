@@ -1,4 +1,4 @@
-﻿namespace ChatRoom.Server;
+﻿namespace ChatRoom.Abstractions;
 
 public static class Constants
 {

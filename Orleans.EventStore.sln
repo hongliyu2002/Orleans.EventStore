@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "documents", "documents", "{EC027A30-BE83-4F48-9A31-2424C27F9E68}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{6459E4B4-E0F4-4EF3-9E36-3519AADD9984}"
@@ -8,34 +11,34 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{31C4AB96-B3C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8E05DFCF-813B-458F-A429-D8BBA1B1ADF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.EventSourcing.EventStore", "src\Orleans.EventSourcing.EventStore\Orleans.EventSourcing.EventStore.csproj", "{001D97C7-6E25-47C4-9AB1-9469E45C0D26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orleans.EventSourcing.EventStore", "src\Orleans.EventSourcing.EventStore\Orleans.EventSourcing.EventStore.csproj", "{001D97C7-6E25-47C4-9AB1-9469E45C0D26}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "icons", "icons", "{A81E18C8-5B22-40B4-98B2-E2EC01DA5B03}"
 	ProjectSection(SolutionItems) = preProject
 		resources\icons\logo_128.png = resources\icons\logo_128.png
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.UnitTests", "tests\EventStore.UnitTests\EventStore.UnitTests.csproj", "{6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStore.UnitTests", "tests\EventStore.UnitTests\EventStore.UnitTests.csproj", "{6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Persistence.EventStore", "src\Orleans.Persistence.EventStore\Orleans.Persistence.EventStore.csproj", "{AB5BEB2B-55AE-4872-8E3D-3EBC76FF7C54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orleans.Persistence.EventStore", "src\Orleans.Persistence.EventStore\Orleans.Persistence.EventStore.csproj", "{AB5BEB2B-55AE-4872-8E3D-3EBC76FF7C54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.EventSourcing.EventStore.UnitTests", "tests\Orleans.EventSourcing.EventStore.UnitTests\Orleans.EventSourcing.EventStore.UnitTests.csproj", "{3FE85E59-ADAD-4E87-9108-C66752DA39E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orleans.EventSourcing.EventStore.UnitTests", "tests\Orleans.EventSourcing.EventStore.UnitTests\Orleans.EventSourcing.EventStore.UnitTests.csproj", "{3FE85E59-ADAD-4E87-9108-C66752DA39E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Persistence.EventStore.UnitTests", "tests\Orleans.Persistence.EventStore.UnitTests\Orleans.Persistence.EventStore.UnitTests.csproj", "{A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orleans.Persistence.EventStore.UnitTests", "tests\Orleans.Persistence.EventStore.UnitTests\Orleans.Persistence.EventStore.UnitTests.csproj", "{A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Streaming.EventStore", "src\Orleans.Streaming.EventStore\Orleans.Streaming.EventStore.csproj", "{6F31B4A6-E745-4603-88FB-B11AF5C6B377}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orleans.Streaming.EventStore", "src\Orleans.Streaming.EventStore\Orleans.Streaming.EventStore.csproj", "{6F31B4A6-E745-4603-88FB-B11AF5C6B377}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Streaming.EventStore.UnitTests", "tests\Orleans.Streaming.EventStore.UnitTests\Orleans.Streaming.EventStore.UnitTests.csproj", "{41A65AB5-8758-4558-8541-ACF4F504096D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orleans.Streaming.EventStore.UnitTests", "tests\Orleans.Streaming.EventStore.UnitTests\Orleans.Streaming.EventStore.UnitTests.csproj", "{41A65AB5-8758-4558-8541-ACF4F504096D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{64164A78-C7BF-487B-835D-F693F79456B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatRoom.Server", "samples\ChatRoom.Server\ChatRoom.Server.csproj", "{650703C3-85BC-48FC-B9A9-A59D05AE9DA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatRoom.Server", "samples\ChatRoom.Server\ChatRoom.Server.csproj", "{650703C3-85BC-48FC-B9A9-A59D05AE9DA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatRoom.Abstractions", "samples\ChatRoom.Abstractions\ChatRoom.Abstractions.csproj", "{42A11F13-7176-46A3-B480-F3E42A7A443B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatRoom.Abstractions", "samples\ChatRoom.Abstractions\ChatRoom.Abstractions.csproj", "{42A11F13-7176-46A3-B480-F3E42A7A443B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatRoom.Grains", "samples\ChatRoom.Grains\ChatRoom.Grains.csproj", "{662ED07C-0B4C-4DFD-88D7-881364906638}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatRoom.Grains", "samples\ChatRoom.Grains\ChatRoom.Grains.csproj", "{662ED07C-0B4C-4DFD-88D7-881364906638}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatRoom.Client.Wpf", "samples\ChatRoom.Client.Wpf\ChatRoom.Client.Wpf.csproj", "{A7BA334C-AB86-4464-8B13-39B419C3F194}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatRoom.Client.Wpf", "samples\ChatRoom.Client.Wpf\ChatRoom.Client.Wpf.csproj", "{A7BA334C-AB86-4464-8B13-39B419C3F194}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,6 +91,9 @@ Global
 		{A7BA334C-AB86-4464-8B13-39B419C3F194}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7BA334C-AB86-4464-8B13-39B419C3F194}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{001D97C7-6E25-47C4-9AB1-9469E45C0D26} = {31C4AB96-B3CE-4EA6-802B-CF8268415146}
 		{A81E18C8-5B22-40B4-98B2-E2EC01DA5B03} = {6459E4B4-E0F4-4EF3-9E36-3519AADD9984}
@@ -101,5 +107,8 @@ Global
 		{42A11F13-7176-46A3-B480-F3E42A7A443B} = {64164A78-C7BF-487B-835D-F693F79456B1}
 		{662ED07C-0B4C-4DFD-88D7-881364906638} = {64164A78-C7BF-487B-835D-F693F79456B1}
 		{A7BA334C-AB86-4464-8B13-39B419C3F194} = {64164A78-C7BF-487B-835D-F693F79456B1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6CDACC8E-0175-4DA7-91D5-3013B289B65B}
 	EndGlobalSection
 EndGlobal

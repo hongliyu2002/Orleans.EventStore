@@ -2,6 +2,7 @@
 using System.Windows;
 using ChatRoom.Abstractions;
 using EventStore.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -13,32 +14,42 @@ namespace ChatRoom.Client.Wpf;
 /// </summary>
 public partial class App
 {
-    public IHost? AppHost { get; set; }
+    private readonly IHost _host;
 
     /// <inheritdoc />
-    protected override void OnStartup(StartupEventArgs args)
+    public App()
+    {
+        _host = CreateHostBuilder().Build();
+    }
+
+    /// <inheritdoc />
+    protected override async void OnStartup(StartupEventArgs args)
     {
         base.OnStartup(args);
-        var hostBuilder = CreateHostBuilder(args.Args);
-        AppHost = hostBuilder.Build();
-        AppHost.Start();
+        await _host.StartAsync();
+        var mainWindow = _host.Services.GetRequiredService<MainWindow>();
+        mainWindow.Show();
     }
 
     /// <inheritdoc />
-    protected override void OnExit(ExitEventArgs args)
+    protected override async void OnExit(ExitEventArgs args)
     {
-        base.OnExit(args);
-        if (AppHost != null)
+        using (_host)
         {
-            AppHost.WaitForShutdown();
+            await _host.StopAsync(TimeSpan.FromSeconds(5));
         }
+        base.OnExit(args);
     }
 
-    private static IHostBuilder CreateHostBuilder(string[] args)
+    private static IHostBuilder CreateHostBuilder()
     {
         var redisConnectionString = "123.60.184.85:6379";
         var eventStoreConnectionString = "esdb://123.60.184.85:2113?tls=false";
-        return Host.CreateDefaultBuilder(args)
+        return Host.CreateDefaultBuilder()
+                   .ConfigureServices(services =>
+                                      {
+                                          services.AddSingleton<MainWindow>();
+                                      })
                    .UseOrleansClient(client =>
                                      {
                                          // Configure cluster.

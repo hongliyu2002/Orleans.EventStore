@@ -6,7 +6,9 @@
         mc:Ignorable="d"
         Title="Chat Room"
         Height="450"
-        Width="800">
+        Width="800"
+        Loaded="MainWindow_OnLoaded"
+        Closed="MainWindow_OnClosed">
     <Grid ShowGridLines="False">
         <Grid.RowDefinitions>
             <RowDefinition Height="60" />
@@ -49,10 +51,12 @@
                     Height="30" />
             <TextBlock x:Name="ChannelText"
                        Grid.Row="0"
-                       Grid.Column="4"  Background="LavenderBlush" />
+                       Grid.Column="4"
+                       Background="LavenderBlush" />
             <TextBlock x:Name="UsernameText"
                        Grid.Row="0"
-                       Grid.Column="5" Background="LightGreen" />
+                       Grid.Column="5"
+                       Background="LightGreen" />
             <TextBox x:Name="MessageText"
                      Grid.Row="1"
                      Grid.Column="0"

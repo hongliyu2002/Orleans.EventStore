@@ -74,8 +74,6 @@ public partial class App
                                                                                                                                                  {
                                                                                                                                                      options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
                                                                                                                                                      options.SubscriptionSettings = new PersistentSubscriptionSettings(checkPointAfter: TimeSpan.FromSeconds(30));
-                                                                                                                                                     options.TotalQueueCount = 4;
-                                                                                                                                                     options.QueueBufferSize = 10;
                                                                                                                                                  });
                                                                                                                     });
                                                                               configurator.ConfigureStreamPubSub();

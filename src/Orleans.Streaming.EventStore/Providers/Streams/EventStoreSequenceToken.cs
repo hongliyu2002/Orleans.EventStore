@@ -15,7 +15,7 @@ namespace Orleans.Providers.Streams.EventStore;
 /// </summary>
 [Serializable]
 [GenerateSerializer]
-public class EventStoreSequenceToken : EventSequenceToken
+public class EventStoreSequenceToken : EventSequenceToken, IEventStoreLocation
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="EventStoreSequenceToken" /> class.

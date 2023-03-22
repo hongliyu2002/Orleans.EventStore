@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using EventStore.Client;
+using Newtonsoft.Json;
 using Orleans.Runtime;
 using Orleans.Serialization;
 using Orleans.Streams;
@@ -95,6 +96,22 @@ public class EventStoreBatchContainer : IBatchContainer
             return true;
         }
         return false;
+    }
+
+    #endregion
+
+    #region Static Method
+
+    /// <summary>
+    ///     Put events list and its context into a EventData object
+    /// </summary>
+    public static EventData ToEventData<T>(Serializer serializer, StreamId streamId, IEnumerable<T> events, Dictionary<string, object> requestContext)
+    {
+        ArgumentNullException.ThrowIfNull(events);
+        var payload = new MessageBody(events.Cast<object>().ToList(), requestContext);
+        var payloadBuffer = serializer.SerializeToArray(payload);
+        var eventData = new EventData(Uuid.NewUuid(), typeof(T).Name, new ReadOnlyMemory<byte>(payloadBuffer), streamId.FullKey, "application/octet-stream");
+        return eventData;
     }
 
     #endregion

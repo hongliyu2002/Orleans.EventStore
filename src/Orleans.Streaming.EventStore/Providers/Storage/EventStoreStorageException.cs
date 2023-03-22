@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Orleans.Providers.Streams.EventStore;
+namespace Orleans.Streaming.EventStoreStorage;
 
 /// <summary>
 ///     Exception for throwing from EventStore stream storage.

@@ -4,7 +4,7 @@ using Orleans.Storage;
 namespace Orleans.Configuration;
 
 /// <summary>
-///     EventStore log consistent storage options.
+///     EventStore persistent storage options.
 /// </summary>
 public class EventStoreStorageOptions : IStorageProviderSerializerOptions
 {
@@ -18,7 +18,9 @@ public class EventStoreStorageOptions : IStorageProviderSerializerOptions
     /// </summary>
     public int InitStage { get; set; } = ServiceLifecycleStage.ApplicationServices;
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     The serializer used in serialize state to EventStore stream.
+    /// </summary>
     public IGrainStorageSerializer GrainStorageSerializer { get; set; } = null!;
 
     /// <summary>

@@ -19,7 +19,6 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     private readonly string _serviceId;
 
     private EventStoreClient? _client;
-
     private bool _initialized;
 
     /// <summary>

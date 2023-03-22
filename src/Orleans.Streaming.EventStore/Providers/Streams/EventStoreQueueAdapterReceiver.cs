@@ -9,7 +9,7 @@ namespace Orleans.Providers.Streams.EventStore;
 /// <summary>
 ///     Receives batches of messages from a single partition of a message queue.
 /// </summary>
-internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver
+internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCache
 {
     private record PendingDelivery(StreamSequenceToken SequenceToken, ResolvedEvent Event);
 

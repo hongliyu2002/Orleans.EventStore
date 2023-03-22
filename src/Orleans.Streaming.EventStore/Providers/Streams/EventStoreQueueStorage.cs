@@ -5,6 +5,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
 using Orleans.Storage;
+using Orleans.Streaming.EventStoreStorage;
 
 namespace Orleans.Providers.Streams.EventStore;
 

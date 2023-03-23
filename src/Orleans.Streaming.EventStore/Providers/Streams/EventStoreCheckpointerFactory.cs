@@ -25,10 +25,14 @@ public class EventStoreCheckpointerFactory : IStreamQueueCheckpointerFactory
     /// <param name="loggerFactory"></param>
     public EventStoreCheckpointerFactory(string providerName, EventStoreStreamCheckpointerOptions options, IOptions<ClusterOptions> clusterOptions, ILoggerFactory loggerFactory)
     {
+        ArgumentException.ThrowIfNullOrEmpty(providerName, nameof(providerName));
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
+        ArgumentNullException.ThrowIfNull(clusterOptions, nameof(clusterOptions));
+        ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
         _providerName = providerName;
         _options = options;
-        _loggerFactory = loggerFactory;
         _clusterOptions = clusterOptions.Value;
+        _loggerFactory = loggerFactory;
     }
 
     /// <summary>

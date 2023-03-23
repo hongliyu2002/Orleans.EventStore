@@ -134,7 +134,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         ArgumentException.ThrowIfNullOrEmpty(streamName, nameof(streamName));
         if (_initialized == false || _streamClient == null)
         {
-            _logger.LogWarning(EventStoreErrorCodes.ClientIsNotInitialized, "EventStore client for stream {StreamName} is not initialized.", streamName);
+            _logger.LogWarning(EventStoreErrorCodes.CannotInitializeClient, "EventStore client for stream {StreamName} is not initialized.", streamName);
             throw new InvalidOperationException(FormattableString.Invariant($"EventStore client for stream {streamName} is not initialized."));
         }
         const string operation = "ReadState";
@@ -184,7 +184,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         ArgumentException.ThrowIfNullOrEmpty(streamName, nameof(streamName));
         if (_initialized == false || _streamClient == null)
         {
-            _logger.LogWarning(EventStoreErrorCodes.ClientIsNotInitialized, "EventStore client for stream {StreamName} is not initialized.", streamName);
+            _logger.LogWarning(EventStoreErrorCodes.CannotInitializeClient, "EventStore client for stream {StreamName} is not initialized.", streamName);
             throw new InvalidOperationException(FormattableString.Invariant($"EventStore client for stream {streamName} is not initialized."));
         }
         const string operation = "WriteState";
@@ -237,7 +237,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         ArgumentException.ThrowIfNullOrEmpty(streamName, nameof(streamName));
         if (_initialized == false || _streamClient == null)
         {
-            _logger.LogWarning(EventStoreErrorCodes.ClientIsNotInitialized, "EventStore client for stream {StreamName} is not initialized.", streamName);
+            _logger.LogWarning(EventStoreErrorCodes.CannotInitializeClient, "EventStore client for stream {StreamName} is not initialized.", streamName);
             throw new InvalidOperationException(FormattableString.Invariant($"EventStore client for stream {streamName} is not initialized."));
         }
         const string operation = "ClearState";

@@ -23,7 +23,7 @@ public class AveragingCachePressureMonitor : ICachePressureMonitor
     private double _cachePressureContributionCount;
 
     /// <summary>
-    ///     Constructor
+    ///     Initializes a new instance of the <see cref="AveragingCachePressureMonitor" /> class.
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="monitor"></param>
@@ -33,7 +33,7 @@ public class AveragingCachePressureMonitor : ICachePressureMonitor
     }
 
     /// <summary>
-    ///     Constructor
+    ///     Initializes a new instance of the <see cref="AveragingCachePressureMonitor" /> class.
     /// </summary>
     /// <param name="flowControlThreshold"></param>
     /// <param name="logger"></param>
@@ -48,14 +48,17 @@ public class AveragingCachePressureMonitor : ICachePressureMonitor
     }
 
     /// <summary>
-    ///     Cache monitor which is used to report cache related metrics
+    ///     Cache monitor which is used to report cache related metrics.
     /// </summary>
     public ICacheMonitor CacheMonitor
     {
         set => _monitor = value;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Record cache pressure contribution to the monitor.
+    /// </summary>
+    /// <param name="cachePressureContribution"></param>
     public void RecordCachePressureContribution(double cachePressureContribution)
     {
         // Weight unhealthy contributions thrice as much as healthy ones.
@@ -65,7 +68,11 @@ public class AveragingCachePressureMonitor : ICachePressureMonitor
         _cachePressureContributionCount += weight;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Determine if the monitor is under pressure.
+    /// </summary>
+    /// <param name="utcNow"></param>
+    /// <returns></returns>
     public bool IsUnderPressure(DateTime utcNow)
     {
         if (_nextCheckedTime < utcNow)

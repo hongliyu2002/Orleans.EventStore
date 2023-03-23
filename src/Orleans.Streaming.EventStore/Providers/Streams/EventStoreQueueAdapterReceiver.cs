@@ -1,8 +1,13 @@
-﻿using EventStore.Client;
+﻿using System.Diagnostics;
+using EventStore.Client;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Orleans.Configuration;
+using Orleans.Providers.Streams.Common;
+using Orleans.Runtime;
+using Orleans.Statistics;
+using Orleans.Streaming.EventStoreStorage;
 using Orleans.Streams;
+using StreamPosition = Orleans.Streams.StreamPosition;
 
 namespace Orleans.Providers.Streams.EventStore;
 
@@ -11,163 +16,310 @@ namespace Orleans.Providers.Streams.EventStore;
 /// </summary>
 internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCache
 {
-    private record PendingDelivery(StreamSequenceToken SequenceToken, ResolvedEvent Event);
+    public const int MaxMessagesPerRead = 1000;
 
-    private readonly string _queueName;
-    private EventStoreQueueStorage? _queueStorage;
-    private readonly IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> _dataAdapter;
+    private readonly EventStoreSubscriptionSettings _settings;
+    private readonly Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> _cacheFactory;
+    private readonly Func<string, Task<IStreamQueueCheckpointer<string>>> _checkpointerFactory;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<EventStoreQueueAdapterReceiver> _logger;
-    private readonly List<PendingDelivery> _pendingDeliveries = new(32);
+    private readonly IQueueAdapterReceiverMonitor _monitor;
+    private readonly LoadSheddingOptions _loadSheddingOptions;
+    private readonly IHostEnvironmentStatistics? _hostEnvironmentStatistics;
+    private readonly Func<EventStoreSubscriptionSettings, string, ILogger, IEventStoreReceiver> _eventStoreReceiverFactory;
 
-    private Task? _task;
+    private IEventStoreQueueCache? _cache;
+    private IEventStoreReceiver? _receiver;
+    private IStreamQueueCheckpointer<string>? _checkpointer;
+    private AggregatedQueueFlowController? _flowController;
 
-    public static IQueueAdapterReceiver Create(string queueName, EventStoreQueueOptions queueOptions, IOptions<ClusterOptions> clusterOptions, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILoggerFactory loggerFactory)
+    // Receiver life cycle
+    private int _receiverState = ReceiverShutdown;
+
+    private const int ReceiverShutdown = 0;
+    private const int ReceiverRunning = 1;
+
+    public EventStoreQueueAdapterReceiver(EventStoreSubscriptionSettings settings,
+                                          Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> cacheFactory,
+                                          Func<string, Task<IStreamQueueCheckpointer<string>>> checkpointerFactory,
+                                          ILoggerFactory loggerFactory,
+                                          IQueueAdapterReceiverMonitor monitor,
+                                          LoadSheddingOptions loadSheddingOptions,
+                                          IHostEnvironmentStatistics? hostEnvironmentStatistics,
+                                          Func<EventStoreSubscriptionSettings, string, ILogger, IEventStoreReceiver>? eventStoreReceiverFactory = null)
     {
-        ArgumentException.ThrowIfNullOrEmpty(queueName, nameof(queueName));
-        ArgumentNullException.ThrowIfNull(queueOptions, nameof(queueOptions));
-        ArgumentNullException.ThrowIfNull(clusterOptions, nameof(clusterOptions));
-        ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
+        ArgumentNullException.ThrowIfNull(settings, nameof(settings));
+        ArgumentNullException.ThrowIfNull(cacheFactory, nameof(cacheFactory));
+        ArgumentNullException.ThrowIfNull(checkpointerFactory, nameof(checkpointerFactory));
         ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
-        var streamStorage = new EventStoreQueueStorage(queueName, clusterOptions.Value.ServiceId, queueOptions, loggerFactory.CreateLogger<EventStoreQueueStorage>());
-        return new EventStoreQueueAdapterReceiver(queueName, streamStorage, dataAdapter, loggerFactory.CreateLogger<EventStoreQueueAdapterReceiver>());
+        ArgumentNullException.ThrowIfNull(monitor, nameof(monitor));
+        ArgumentNullException.ThrowIfNull(loadSheddingOptions, nameof(loadSheddingOptions));
+        _settings = settings;
+        _cacheFactory = cacheFactory;
+        _checkpointerFactory = checkpointerFactory;
+        _loggerFactory = loggerFactory;
+        _logger = loggerFactory.CreateLogger<EventStoreQueueAdapterReceiver>();
+        _monitor = monitor;
+        _loadSheddingOptions = loadSheddingOptions;
+        _hostEnvironmentStatistics = hostEnvironmentStatistics;
+        _eventStoreReceiverFactory = eventStoreReceiverFactory ?? CreateReceiver;
     }
 
-    private EventStoreQueueAdapterReceiver(string queueName, EventStoreQueueStorage queueStorage, IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer> dataAdapter, ILogger<EventStoreQueueAdapterReceiver> logger)
+    private static IEventStoreReceiver CreateReceiver(EventStoreSubscriptionSettings settings, string position, ILogger logger)
     {
-        _queueName = queueName;
-        _queueStorage = queueStorage;
-        _dataAdapter = dataAdapter;
-        _logger = logger;
+        return new EventStoreReceiverProxy(settings, position.ToPosition(), logger);
     }
 
-    #region Lifecycle
+    #region IQueueAdapterReceiver Implementation
 
-    /// <summary>
-    ///     Initializes this receiver.
-    /// </summary>
-    /// <returns>A <see cref="Task" />representing the operation.</returns>
+    /// <inheritdoc />
     public Task Initialize(TimeSpan timeout)
     {
-        if (_queueStorage != null)
-        {
-            return _queueStorage.Init();
-        }
-        return Task.CompletedTask;
+        _logger.LogInformation("Initializing EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}.", _settings.ConsumerGroup, _settings.StreamName);
+        // if receiver was already running, do nothing
+        return ReceiverRunning == Interlocked.Exchange(ref _receiverState, ReceiverRunning) ? Task.CompletedTask : Initialize();
     }
 
     /// <summary>
-    ///     Receiver is no longer used. Shutdown and clean up.
+    ///     Initialization of EventStore receiver is performed at adapter receiver initialization, but if it fails,
+    ///     it will be retried when messages are requested
     /// </summary>
-    /// <returns>A <see cref="Task" /> representing the operation.</returns>
-    public async Task Shutdown(TimeSpan timeout)
+    /// <returns></returns>
+    private async Task Initialize()
     {
+        var watch = Stopwatch.StartNew();
         try
         {
-            // await the last storage operation, so after we shutdown and stop this receiver we don't get async operation completions from pending storage operations.
-            if (_task != null)
+            _checkpointer = await _checkpointerFactory(_settings.StreamName);
+            if (_cache != null)
             {
-                await _task;
+                _cache.Dispose();
+                _cache = null;
             }
-            if (_queueStorage != null)
-            {
-                await _queueStorage.Close();
-            }
+            _cache = _cacheFactory(_settings.StreamName, _checkpointer, _loggerFactory);
+            _flowController = new AggregatedQueueFlowController(MaxMessagesPerRead) { _cache, LoadShedQueueFlowController.CreateAsPercentOfLoadSheddingLimit(_loadSheddingOptions, _hostEnvironmentStatistics) };
+            var position = await _checkpointer.Load();
+            _receiver = _eventStoreReceiverFactory(_settings, position, _logger);
+            await _receiver.InitAsync();
+            watch.Stop();
+            _monitor.TrackInitialization(true, watch.Elapsed, null);
         }
-        finally
+        catch (Exception ex)
         {
-            _queueStorage = null;
+            watch.Stop();
+            _monitor.TrackInitialization(false, watch.Elapsed, ex);
+            throw;
         }
+    }
+
+    /// <inheritdoc />
+    public async Task Shutdown(TimeSpan timeout)
+    {
+        var watch = Stopwatch.StartNew();
+        try
+        {
+            // if receiver was already shutdown, do nothing
+            if (ReceiverShutdown == Interlocked.Exchange(ref _receiverState, ReceiverShutdown))
+            {
+                return;
+            }
+            _logger.LogInformation("Stopping reading from EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}.", _settings.ConsumerGroup, _settings.StreamName);
+            // clear cache and receiver
+            var localCache = Interlocked.Exchange(ref _cache, null);
+            var localReceiver = Interlocked.Exchange(ref _receiver, null);
+            // start closing receiver
+            var closeTask = Task.CompletedTask;
+            if (localReceiver != null)
+            {
+                closeTask = localReceiver.CloseAsync();
+            }
+            // dispose of cache
+            localCache?.Dispose();
+            // finish return receiver closing task
+            await closeTask;
+            watch.Stop();
+            _monitor.TrackShutdown(true, watch.Elapsed, null);
+        }
+        catch (Exception ex)
+        {
+            watch.Stop();
+            _monitor.TrackShutdown(false, watch.Elapsed, ex);
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
+    {
+        if (_receiverState == ReceiverShutdown || maxCount <= 0)
+        {
+            return new List<IBatchContainer>();
+        }
+        // if receiver initialization failed, retry
+        if (_receiver == null)
+        {
+            _logger.LogWarning(EventStoreErrorCodes.CannotInitializeSubscriptionClient, "Retrying initialization of EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}.", _settings.ConsumerGroup, _settings.StreamName);
+            await Initialize();
+            if (_receiver == null)
+            {
+                // should not get here, should throw instead, but just incase.
+                return new List<IBatchContainer>();
+            }
+        }
+        var watch = Stopwatch.StartNew();
+        List<EventRecord> messages;
+        try
+        {
+            messages = _receiver.Receive(maxCount);
+            watch.Stop();
+            _monitor.TrackRead(true, watch.Elapsed, null);
+        }
+        catch (Exception ex)
+        {
+            watch.Stop();
+            _monitor.TrackRead(false, watch.Elapsed, ex);
+            _logger.LogWarning(EventStoreErrorCodes.CannotReadFromSubscription, "Failed to read from EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}. Exception: {Exception}", _settings.ConsumerGroup, _settings.StreamName, ex);
+            throw;
+        }
+        var batches = new List<IBatchContainer>();
+        if (messages == null || messages.Count == 0)
+        {
+            _monitor.TrackMessagesReceived(0, null, null);
+            return batches;
+        }
+        // monitor message age
+        var dequeueTimeUtc = DateTime.UtcNow;
+        var oldestMessageEnqueueTime = messages[0].Created;
+        var newestMessageEnqueueTime = messages[^1].Created;
+        _monitor.TrackMessagesReceived(messages.Count, oldestMessageEnqueueTime, newestMessageEnqueueTime);
+        if (_cache != null)
+        {
+            var messageStreamPositions = _cache.Add(messages, dequeueTimeUtc);
+            batches.AddRange(messageStreamPositions.Select(streamPosition => new StreamActivityNotificationBatch(streamPosition)));
+        }
+        if (_checkpointer is { CheckpointExists: false })
+        {
+            _checkpointer.Update(messages[0].Position.ToString(), DateTime.UtcNow);
+        }
+        return batches;
+    }
+
+    /// <inheritdoc />
+    public Task MessagesDeliveredAsync(IList<IBatchContainer> messages)
+    {
+        return Task.CompletedTask;
     }
 
     #endregion
 
-    #region IQueueAdapterReceiver Implementation
+    #region IQueueCache Implementation
 
-    /// <summary>
-    ///     Retrieves batches from a message queue.
-    /// </summary>
-    /// <param name="maxCount">
-    ///     The maximum number of message batches to retrieve.
-    /// </param>
-    /// <returns>The message batches.</returns>
-    public Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
+    /// <inheritdoc />
+    public int GetMaxAddCount()
     {
-        const int MaxNumberOfMessagesToPeek = 32;
-        try
+        return _flowController?.GetMaxAddCount() ?? 0;
+    }
+
+    /// <inheritdoc />
+    public void AddToCache(IList<IBatchContainer> messages)
+    {
+        // do nothing, we add data directly into cache.  No need for agent involvement
+    }
+
+    /// <inheritdoc />
+    public bool TryPurgeFromCache(out IList<IBatchContainer>? purgedItems)
+    {
+        purgedItems = null;
+        // if not under pressure, signal the cache to do a time based purge
+        // if under pressure, which means consuming speed is less than producing speed, then shouldn't purge, and don't read more message into the cache
+        if (!IsUnderPressure())
         {
-            // store direct ref, in case we are somehow asked to shutdown while we are receiving.
-            var queueStorage = _queueStorage;
-            if (queueStorage == null)
-            {
-                return Task.FromResult<IList<IBatchContainer>>(Array.Empty<IBatchContainer>());
-            }
-            var count = maxCount < 0 ? MaxNumberOfMessagesToPeek : Math.Min(maxCount, MaxNumberOfMessagesToPeek);
-            var resolvedEvents = queueStorage.DequeueMany(count);
-            var batchContainers = new List<IBatchContainer>(resolvedEvents.Count);
-            foreach (var resolvedEvent in resolvedEvents)
-            {
-                var batchContainer = _dataAdapter.FromQueueMessage(resolvedEvent.Event.Data, (long)resolvedEvent.Event.Position.CommitPosition);
-                batchContainers.Add(batchContainer);
-                _pendingDeliveries.Add(new PendingDelivery(batchContainer.SequenceToken, resolvedEvent));
-            }
-            return Task.FromResult<IList<IBatchContainer>>(batchContainers);
+            _cache?.SignalPurge();
         }
-        finally
+        return false;
+    }
+
+    /// <inheritdoc />
+    public IQueueCacheCursor GetCacheCursor(StreamId streamId, StreamSequenceToken token)
+    {
+        return new Cursor(_cache!, streamId, token);
+    }
+
+    /// <inheritdoc />
+    public bool IsUnderPressure()
+    {
+        return GetMaxAddCount() <= 0;
+    }
+
+    #endregion
+
+    #region Internal Class
+
+    [GenerateSerializer]
+    internal class StreamActivityNotificationBatch : IBatchContainer
+    {
+        public StreamActivityNotificationBatch(StreamPosition position)
         {
-            _task = null;
+            Position = position;
+        }
+
+        [Id(0)]
+        public StreamPosition Position { get; }
+
+        public StreamId StreamId => Position.StreamId;
+
+        public StreamSequenceToken SequenceToken => Position.SequenceToken;
+
+        public IEnumerable<Tuple<T, StreamSequenceToken>> GetEvents<T>()
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool ImportRequestContext()
+        {
+            throw new NotSupportedException();
         }
     }
 
-    /// <summary>
-    ///     Notifies the adapter receiver that the messages were delivered to all consumers,
-    ///     so the receiver can take an appropriate action (e.g., delete the messages from a message queue).
-    /// </summary>
-    /// <param name="deliveredContainers">
-    ///     The message batches.
-    /// </param>
-    /// <returns>A <see cref="Task" /> representing the operation.</returns>
-    public async Task MessagesDeliveredAsync(IList<IBatchContainer> deliveredContainers)
+    private class Cursor : IQueueCacheCursor
     {
-        try
+        private readonly IEventStoreQueueCache _cache;
+        private readonly object _cursor;
+        private IBatchContainer _current;
+
+        public Cursor(IEventStoreQueueCache cache, StreamId streamId, StreamSequenceToken token)
         {
-            // store direct ref, in case we are somehow asked to shutdown while we are receiving.
-            var queueStorage = _queueStorage;
-            if (queueStorage == null || deliveredContainers == null || deliveredContainers.Count == 0)
-            {
-                return;
-            }
-            // get sequence tokens of delivered messages
-            var deliveredTokens = deliveredContainers.Select(container => container.SequenceToken).ToList();
-            // find latest delivered message
-            var latestToken = deliveredTokens.Max();
-            // finalize all pending messages at or before the latest
-            var finalizedDeliveries = _pendingDeliveries.Where(pendingDelivery => !pendingDelivery.SequenceToken.Newer(latestToken)).ToList();
-            if (finalizedDeliveries.Count == 0)
-            {
-                return;
-            }
-            // remove all finalized deliveries from pending, regardless of if it was delivered or not.
-            _pendingDeliveries.RemoveRange(0, finalizedDeliveries.Count);
-            // get the queue messages for all finalized deliveries that were delivered.
-            var deliveredEvents = finalizedDeliveries.Where(finalized => deliveredTokens.Contains(finalized.SequenceToken)).Select(finalized => finalized.Event).ToList();
-            if (deliveredEvents.Count == 0)
-            {
-                return;
-            }
-            // Acknowlege all delivered queue messages from the queue.  Anything finalized but not delivered will show back up later
-            _task = queueStorage.AcknowledgeAsync(deliveredEvents.ToArray());
-            try
-            {
-                await _task;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Exception upon Acknowledge on queue {QueueName}. Ignoring.", _queueName);
-            }
+            _cache = cache;
+            _cursor = cache.GetCursor(streamId, token);
+            _current = null!;
         }
-        finally
+
+        public void Dispose()
         {
-            _task = null;
+        }
+
+        public IBatchContainer GetCurrent(out Exception? exception)
+        {
+            exception = null;
+            return _current;
+        }
+
+        public bool MoveNext()
+        {
+            if (!_cache.TryGetNextMessage(_cursor, out var next))
+            {
+                return false;
+            }
+            _current = next;
+            return true;
+        }
+
+        public void Refresh(StreamSequenceToken token)
+        {
+        }
+
+        public void RecordDeliveryFailure()
+        {
         }
     }
 

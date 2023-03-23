@@ -11,5 +11,5 @@ public interface IEventStoreQueueCacheFactory
     /// <summary>
     ///     Function used to create a IEventStoreQueueCache
     /// </summary>
-    IEventStoreQueueCache CreateCache(IStreamQueueCheckpointer<string> checkpointer, ILoggerFactory loggerFactory);
+    IEventStoreQueueCache CreateCache(string partition, IStreamQueueCheckpointer<string> checkpointer, ILoggerFactory loggerFactory);
 }

@@ -14,7 +14,7 @@ public class AggregatedCachePressureMonitor : List<ICachePressureMonitor>, ICach
     private bool _isUnderPressure;
 
     /// <summary>
-    ///     Constructor
+    ///     Initializes a new instance of the <see cref="AggregatedCachePressureMonitor" /> class.
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="monitor"></param>
@@ -26,7 +26,7 @@ public class AggregatedCachePressureMonitor : List<ICachePressureMonitor>, ICach
     }
 
     /// <summary>
-    ///     Cache monitor which is used to report cache related metrics
+    ///     Cache monitor which is used to report cache related metrics.
     /// </summary>
     public ICacheMonitor CacheMonitor
     {
@@ -34,7 +34,7 @@ public class AggregatedCachePressureMonitor : List<ICachePressureMonitor>, ICach
     }
 
     /// <summary>
-    ///     Record cache pressure to every monitor in this aggregated cache monitor group
+    ///     Record cache pressure to every monitor in this aggregated cache monitor group.
     /// </summary>
     /// <param name="cachePressureContribution"></param>
     public void RecordCachePressureContribution(double cachePressureContribution)
@@ -43,7 +43,7 @@ public class AggregatedCachePressureMonitor : List<ICachePressureMonitor>, ICach
     }
 
     /// <summary>
-    ///     If any monitor in this aggregated cache monitor group is under pressure, then return true
+    ///     If any monitor in this aggregated cache monitor group is under pressure, then return true.
     /// </summary>
     /// <param name="utcNow"></param>
     /// <returns></returns>
@@ -60,7 +60,7 @@ public class AggregatedCachePressureMonitor : List<ICachePressureMonitor>, ICach
     }
 
     /// <summary>
-    ///     Add one monitor to this aggregated cache monitor group
+    ///     Add one monitor to this aggregated cache monitor group.
     /// </summary>
     /// <param name="monitor"></param>
     public void AddCachePressureMonitor(ICachePressureMonitor monitor)

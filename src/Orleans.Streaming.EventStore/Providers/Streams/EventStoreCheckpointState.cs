@@ -32,10 +32,10 @@ public class EventStoreCheckpointState : IEventStoreState
     /// </summary>
     /// <param name="serviceId"></param>
     /// <param name="streamProviderName"></param>
-    /// <param name="partition"></param>
+    /// <param name="queue"></param>
     /// <returns></returns>
-    public static string GetStreamName(string serviceId, string streamProviderName, string partition)
+    public static string GetStreamName(string serviceId, string streamProviderName, string queue)
     {
-        return $"{serviceId}/checkpoints/streaming/{streamProviderName}/{partition}";
+        return $"{serviceId}/checkpoints/streaming/{streamProviderName}/{queue}";
     }
 }

@@ -12,21 +12,21 @@ using StreamPosition = Orleans.Streams.StreamPosition;
 namespace Orleans.Providers.Streams.EventStore;
 
 /// <summary>
-///     Receives batches of messages from a single partition of a message queue.
+///     Receives batches of messages from a single queue of a message queue.
 /// </summary>
 internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCache
 {
     public const int MaxMessagesPerRead = 1000;
 
-    private readonly EventStoreSubscriptionSettings _settings;
+    private readonly EventStoreReceiverSettings _settings;
     private readonly Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> _cacheFactory;
     private readonly Func<string, Task<IStreamQueueCheckpointer<string>>> _checkpointerFactory;
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<EventStoreQueueAdapterReceiver> _logger;
-    private readonly IQueueAdapterReceiverMonitor _monitor;
+    private readonly IQueueAdapterReceiverMonitor _receiverMonitor;
     private readonly LoadSheddingOptions _loadSheddingOptions;
     private readonly IHostEnvironmentStatistics? _hostEnvironmentStatistics;
-    private readonly Func<EventStoreSubscriptionSettings, string, ILogger, IEventStoreReceiver> _eventStoreReceiverFactory;
+    private readonly Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver> _eventStoreReceiverFactory;
 
     private IEventStoreQueueCache? _cache;
     private IEventStoreReceiver? _receiver;
@@ -39,35 +39,35 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
     private const int ReceiverShutdown = 0;
     private const int ReceiverRunning = 1;
 
-    public EventStoreQueueAdapterReceiver(EventStoreSubscriptionSettings settings,
+    public EventStoreQueueAdapterReceiver(EventStoreReceiverSettings settings,
                                           Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> cacheFactory,
                                           Func<string, Task<IStreamQueueCheckpointer<string>>> checkpointerFactory,
                                           ILoggerFactory loggerFactory,
-                                          IQueueAdapterReceiverMonitor monitor,
+                                          IQueueAdapterReceiverMonitor receiverMonitor,
                                           LoadSheddingOptions loadSheddingOptions,
                                           IHostEnvironmentStatistics? hostEnvironmentStatistics,
-                                          Func<EventStoreSubscriptionSettings, string, ILogger, IEventStoreReceiver>? eventStoreReceiverFactory = null)
+                                          Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver>? eventStoreReceiverFactory = null)
     {
         ArgumentNullException.ThrowIfNull(settings, nameof(settings));
         ArgumentNullException.ThrowIfNull(cacheFactory, nameof(cacheFactory));
         ArgumentNullException.ThrowIfNull(checkpointerFactory, nameof(checkpointerFactory));
         ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
-        ArgumentNullException.ThrowIfNull(monitor, nameof(monitor));
+        ArgumentNullException.ThrowIfNull(receiverMonitor, nameof(receiverMonitor));
         ArgumentNullException.ThrowIfNull(loadSheddingOptions, nameof(loadSheddingOptions));
         _settings = settings;
         _cacheFactory = cacheFactory;
         _checkpointerFactory = checkpointerFactory;
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<EventStoreQueueAdapterReceiver>();
-        _monitor = monitor;
+        _receiverMonitor = receiverMonitor;
         _loadSheddingOptions = loadSheddingOptions;
         _hostEnvironmentStatistics = hostEnvironmentStatistics;
         _eventStoreReceiverFactory = eventStoreReceiverFactory ?? CreateReceiver;
     }
 
-    private static IEventStoreReceiver CreateReceiver(EventStoreSubscriptionSettings settings, string position, ILogger logger)
+    private static IEventStoreReceiver CreateReceiver(EventStoreReceiverSettings settings, string position, ILogger logger)
     {
-        return new EventStoreReceiverProxy(settings, position.ToPosition(), logger);
+        return new EventStoreReceiver(settings, position.ToPosition(), logger);
     }
 
     #region IQueueAdapterReceiver Implementation
@@ -75,7 +75,7 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
     /// <inheritdoc />
     public Task Initialize(TimeSpan timeout)
     {
-        _logger.LogInformation("Initializing EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}.", _settings.ConsumerGroup, _settings.StreamName);
+        _logger.LogInformation("Initializing EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}.", _settings.ConsumerGroup, _settings.QueueName);
         // if receiver was already running, do nothing
         return ReceiverRunning == Interlocked.Exchange(ref _receiverState, ReceiverRunning) ? Task.CompletedTask : Initialize();
     }
@@ -90,24 +90,24 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
         var watch = Stopwatch.StartNew();
         try
         {
-            _checkpointer = await _checkpointerFactory(_settings.StreamName);
+            _checkpointer = await _checkpointerFactory(_settings.QueueName);
             if (_cache != null)
             {
                 _cache.Dispose();
                 _cache = null;
             }
-            _cache = _cacheFactory(_settings.StreamName, _checkpointer, _loggerFactory);
+            _cache = _cacheFactory(_settings.QueueName, _checkpointer, _loggerFactory);
             _flowController = new AggregatedQueueFlowController(MaxMessagesPerRead) { _cache, LoadShedQueueFlowController.CreateAsPercentOfLoadSheddingLimit(_loadSheddingOptions, _hostEnvironmentStatistics) };
             var position = await _checkpointer.Load();
             _receiver = _eventStoreReceiverFactory(_settings, position, _logger);
             await _receiver.InitAsync();
             watch.Stop();
-            _monitor.TrackInitialization(true, watch.Elapsed, null);
+            _receiverMonitor.TrackInitialization(true, watch.Elapsed, null);
         }
         catch (Exception ex)
         {
             watch.Stop();
-            _monitor.TrackInitialization(false, watch.Elapsed, ex);
+            _receiverMonitor.TrackInitialization(false, watch.Elapsed, ex);
             throw;
         }
     }
@@ -123,7 +123,7 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
             {
                 return;
             }
-            _logger.LogInformation("Stopping reading from EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}.", _settings.ConsumerGroup, _settings.StreamName);
+            _logger.LogInformation("Stopping reading from EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}.", _settings.ConsumerGroup, _settings.QueueName);
             // clear cache and receiver
             var localCache = Interlocked.Exchange(ref _cache, null);
             var localReceiver = Interlocked.Exchange(ref _receiver, null);
@@ -138,12 +138,12 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
             // finish return receiver closing task
             await closeTask;
             watch.Stop();
-            _monitor.TrackShutdown(true, watch.Elapsed, null);
+            _receiverMonitor.TrackShutdown(true, watch.Elapsed, null);
         }
         catch (Exception ex)
         {
             watch.Stop();
-            _monitor.TrackShutdown(false, watch.Elapsed, ex);
+            _receiverMonitor.TrackShutdown(false, watch.Elapsed, ex);
             throw;
         }
     }
@@ -158,7 +158,7 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
         // if receiver initialization failed, retry
         if (_receiver == null)
         {
-            _logger.LogWarning(EventStoreErrorCodes.CannotInitializeSubscriptionClient, "Retrying initialization of EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}.", _settings.ConsumerGroup, _settings.StreamName);
+            _logger.LogWarning(EventStoreErrorCodes.CannotInitializeSubscriptionClient, "Retrying initialization of EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}.", _settings.ConsumerGroup, _settings.QueueName);
             await Initialize();
             if (_receiver == null)
             {
@@ -172,26 +172,26 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
         {
             messages = _receiver.Receive(maxCount);
             watch.Stop();
-            _monitor.TrackRead(true, watch.Elapsed, null);
+            _receiverMonitor.TrackRead(true, watch.Elapsed, null);
         }
         catch (Exception ex)
         {
             watch.Stop();
-            _monitor.TrackRead(false, watch.Elapsed, ex);
-            _logger.LogWarning(EventStoreErrorCodes.CannotReadFromSubscription, "Failed to read from EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}. Exception: {Exception}", _settings.ConsumerGroup, _settings.StreamName, ex);
+            _receiverMonitor.TrackRead(false, watch.Elapsed, ex);
+            _logger.LogWarning(EventStoreErrorCodes.CannotReadFromSubscription, "Failed to read from EventStore persistent subscriptions from {ConsumerGroup}-{StreamName}. Exception: {Exception}", _settings.ConsumerGroup, _settings.QueueName, ex);
             throw;
         }
         var batches = new List<IBatchContainer>();
         if (messages == null || messages.Count == 0)
         {
-            _monitor.TrackMessagesReceived(0, null, null);
+            _receiverMonitor.TrackMessagesReceived(0, null, null);
             return batches;
         }
-        // monitor message age
+        // receiverMonitor message age
         var dequeueTimeUtc = DateTime.UtcNow;
         var oldestMessageEnqueueTime = messages[0].Created;
         var newestMessageEnqueueTime = messages[^1].Created;
-        _monitor.TrackMessagesReceived(messages.Count, oldestMessageEnqueueTime, newestMessageEnqueueTime);
+        _receiverMonitor.TrackMessagesReceived(messages.Count, oldestMessageEnqueueTime, newestMessageEnqueueTime);
         if (_cache != null)
         {
             var messageStreamPositions = _cache.Add(messages, dequeueTimeUtc);

@@ -17,10 +17,10 @@ public class EventStoreCacheMonitorDimensions : EventStoreReceiverMonitorDimensi
     ///     Initializes a new instance of the <see cref="EventStoreCacheMonitorDimensions" /> class.
     /// </summary>
     /// <param name="dimensions"></param>
-    /// <param name="ehStream"></param>
+    /// <param name="ehQueueName"></param>
     /// <param name="blockPoolId"></param>
-    public EventStoreCacheMonitorDimensions(EventStoreMonitorAggregationDimensions dimensions, string ehStream, string blockPoolId)
-        : base(dimensions, ehStream)
+    public EventStoreCacheMonitorDimensions(EventStoreMonitorAggregationDimensions dimensions, string ehQueueName, string blockPoolId)
+        : base(dimensions, ehQueueName)
     {
         BlockPoolId = blockPoolId;
     }

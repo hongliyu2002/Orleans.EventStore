@@ -59,11 +59,11 @@ public class EventStoreQueueCacheFactory : IEventStoreQueueCacheFactory
     ///     and AddCachePressureMonitors function.
     /// </summary>
     /// <returns></returns>
-    public IEventStoreQueueCache CreateCache(string partition, IStreamQueueCheckpointer<string> checkpointer, ILoggerFactory loggerFactory)
+    public IEventStoreQueueCache CreateCache(string queue, IStreamQueueCheckpointer<string> checkpointer, ILoggerFactory loggerFactory)
     {
         var blockPool = CreateBufferPool(_statisticOptions, loggerFactory, _sharedDimensions, out var blockPoolId);
-        var cache = CreateCache(partition, _dataAdater, _statisticOptions, _evictionOptions, checkpointer, loggerFactory, blockPool, blockPoolId, _timePurge, _sharedDimensions);
-        AddCachePressureMonitors(cache, _cacheOptions, loggerFactory.CreateLogger($"{typeof(EventStoreQueueCache).FullName}.{_sharedDimensions.EventStorePath}.{partition}"));
+        var cache = CreateCache(queue, _dataAdater, _statisticOptions, _evictionOptions, checkpointer, loggerFactory, blockPool, blockPoolId, _timePurge, _sharedDimensions);
+        AddCachePressureMonitors(cache, _cacheOptions, loggerFactory.CreateLogger($"{typeof(EventStoreQueueCache).FullName}.{_sharedDimensions.EventStoreName}.{queue}"));
         return cache;
     }
 
@@ -116,10 +116,10 @@ public class EventStoreQueueCacheFactory : IEventStoreQueueCacheFactory
     }
 
     /// <summary>
-    ///     Default function to be called to create an EventhubQueueCache in IEventStoreQueueCacheFactory.CreateCache method. User can
+    ///     Default function to be called to create an EventStoreQueueCache in IEventStoreQueueCacheFactory.CreateCache method. User can
     ///     override this method to add more customization.
     /// </summary>
-    protected virtual IEventStoreQueueCache CreateCache(string partition,
+    protected virtual IEventStoreQueueCache CreateCache(string queue,
                                                         IEventStoreDataAdapter dataAdatper,
                                                         StreamStatisticOptions statisticOptions,
                                                         StreamCacheEvictionOptions streamCacheEvictionOptions,
@@ -130,11 +130,11 @@ public class EventStoreQueueCacheFactory : IEventStoreQueueCacheFactory
                                                         TimePurgePredicate timePurge,
                                                         EventStoreMonitorAggregationDimensions sharedDimensions)
     {
-        var cacheMonitorDimensions = new EventStoreCacheMonitorDimensions(sharedDimensions, partition, blockPoolId);
+        var cacheMonitorDimensions = new EventStoreCacheMonitorDimensions(sharedDimensions, queue, blockPoolId);
         var cacheMonitor = CacheMonitorFactory(cacheMonitorDimensions, loggerFactory);
-        var logger = loggerFactory.CreateLogger($"{typeof(EventStoreQueueCache).FullName}.{sharedDimensions.EventStorePath}.{partition}");
+        var logger = loggerFactory.CreateLogger($"{typeof(EventStoreQueueCache).FullName}.{sharedDimensions.EventStoreName}.{queue}");
         var evictionStrategy = new ChronologicalEvictionStrategy(logger, timePurge, cacheMonitor, statisticOptions.StatisticMonitorWriteInterval);
-        return new EventStoreQueueCache(partition, EventStoreQueueAdapterReceiver.MaxMessagesPerRead, bufferPool, dataAdatper, evictionStrategy, checkpointer, logger, cacheMonitor, statisticOptions.StatisticMonitorWriteInterval, streamCacheEvictionOptions.MetadataMinTimeInCache);
+        return new EventStoreQueueCache(queue, EventStoreQueueAdapterReceiver.MaxMessagesPerRead, bufferPool, dataAdatper, evictionStrategy, checkpointer, logger, cacheMonitor, statisticOptions.StatisticMonitorWriteInterval, streamCacheEvictionOptions.MetadataMinTimeInCache);
     }
 
 }

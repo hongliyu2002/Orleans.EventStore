@@ -14,7 +14,7 @@ public class DefaultEventStoreBlockPoolMonitor : DefaultBlockPoolMonitor
     public DefaultEventStoreBlockPoolMonitor(EventStoreBlockPoolMonitorDimensions dimensions)
         : base(new KeyValuePair<string, object>[]
                {
-                   new("Path", dimensions.EventStorePath),
+                   new("Path", dimensions.EventStoreName),
                    new("ObjectPoolId", dimensions.BlockPoolId)
                })
     {

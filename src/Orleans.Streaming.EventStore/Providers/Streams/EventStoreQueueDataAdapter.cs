@@ -21,6 +21,7 @@ public class EventStoreQueueDataAdapter : IEventStoreDataAdapter
     /// <param name="serializer"></param>
     public EventStoreQueueDataAdapter(Serializer serializer)
     {
+        ArgumentNullException.ThrowIfNull(serializer, nameof(serializer));
         _serializer = serializer;
     }
 
@@ -31,6 +32,7 @@ public class EventStoreQueueDataAdapter : IEventStoreDataAdapter
     /// <returns></returns>
     public virtual IBatchContainer GetBatchContainer(ref CachedMessage cachedMessage)
     {
+        ArgumentNullException.ThrowIfNull(cachedMessage, nameof(cachedMessage));
         var evenStoreMessage = new EventStoreMessage(cachedMessage);
         return GetBatchContainer(evenStoreMessage);
     }
@@ -42,6 +44,7 @@ public class EventStoreQueueDataAdapter : IEventStoreDataAdapter
     /// <returns></returns>
     protected virtual IBatchContainer GetBatchContainer(EventStoreMessage eventStoreMessage)
     {
+        ArgumentNullException.ThrowIfNull(eventStoreMessage, nameof(eventStoreMessage));
         return new EventStoreBatchContainer(eventStoreMessage, _serializer);
     }
 
@@ -52,7 +55,10 @@ public class EventStoreQueueDataAdapter : IEventStoreDataAdapter
     /// <returns></returns>
     public virtual StreamSequenceToken GetSequenceToken(ref CachedMessage cachedMessage)
     {
-        return new EventStoreSequenceToken("", cachedMessage.SequenceNumber, 0);
+        ArgumentNullException.ThrowIfNull(cachedMessage, nameof(cachedMessage));
+        var readOffset = 0;
+        var position = SegmentBuilder.ReadNextString(cachedMessage.Segment, ref readOffset);
+        return new EventStoreSequenceToken(position, cachedMessage.SequenceNumber, cachedMessage.EventIndex);
     }
 
     /// <summary>
@@ -76,6 +82,9 @@ public class EventStoreQueueDataAdapter : IEventStoreDataAdapter
     /// <returns>The message batch.</returns>
     public virtual CachedMessage FromQueueMessage(StreamPosition position, EventRecord queueMessage, DateTime dequeueTime, Func<int, ArraySegment<byte>> getSegment)
     {
+        ArgumentNullException.ThrowIfNull(position, nameof(position));
+        ArgumentNullException.ThrowIfNull(queueMessage, nameof(queueMessage));
+        ArgumentNullException.ThrowIfNull(getSegment, nameof(getSegment));
         return new CachedMessage
                {
                    StreamId = position.StreamId,
@@ -94,8 +103,9 @@ public class EventStoreQueueDataAdapter : IEventStoreDataAdapter
     /// <returns></returns>
     public virtual StreamPosition GetStreamPosition(EventRecord queueMessage)
     {
+        ArgumentNullException.ThrowIfNull(queueMessage, nameof(queueMessage));
         var streamId = GetStreamId(queueMessage);
-        var sequenceToken = new EventStoreSequenceToken(queueMessage.Position.CommitPosition.ToString(), queueMessage.EventNumber.ToInt64(), 0);
+        var sequenceToken = new EventStoreSequenceToken(queueMessage.Position.ToString(), queueMessage.EventNumber.ToInt64(), 0);
         return new StreamPosition(streamId, sequenceToken);
     }
 
@@ -105,6 +115,7 @@ public class EventStoreQueueDataAdapter : IEventStoreDataAdapter
     /// </summary>
     public virtual string GetPosition(CachedMessage cachedMessage)
     {
+        ArgumentNullException.ThrowIfNull(cachedMessage, nameof(cachedMessage));
         var readOffset = 0;
         return SegmentBuilder.ReadNextString(cachedMessage.Segment, ref readOffset);
     }
@@ -116,6 +127,7 @@ public class EventStoreQueueDataAdapter : IEventStoreDataAdapter
     /// <returns>The stream identity.</returns>
     public virtual StreamId GetStreamId(EventRecord queueMessage)
     {
+        ArgumentNullException.ThrowIfNull(queueMessage, nameof(queueMessage));
         return StreamId.Parse(queueMessage.Metadata.Span);
     }
 
@@ -127,7 +139,7 @@ public class EventStoreQueueDataAdapter : IEventStoreDataAdapter
     /// <returns></returns>
     protected virtual ArraySegment<byte> EncodeMessageIntoSegment(EventRecord queueMessage, Func<int, ArraySegment<byte>> getSegment)
     {
-        var position = queueMessage.Position.CommitPosition.ToString();
+        var position = queueMessage.Position.ToString();
         var eventId = queueMessage.EventId.ToString();
         var eventType = queueMessage.EventType;
         var data = queueMessage.Data.Span;

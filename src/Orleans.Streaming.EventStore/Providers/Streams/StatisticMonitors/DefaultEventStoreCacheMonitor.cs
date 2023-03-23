@@ -14,8 +14,8 @@ public class DefaultEventStoreCacheMonitor : DefaultCacheMonitor
     public DefaultEventStoreCacheMonitor(EventStoreCacheMonitorDimensions dimensions)
         : base(new KeyValuePair<string, object>[]
                {
-                   new("Path", dimensions.EventStorePath),
-                   new("Stream", dimensions.EventStoreStream)
+                   new("Path", dimensions.EventStoreName),
+                   new("Stream", dimensions.EventStoreQueueName)
                })
     {
     }

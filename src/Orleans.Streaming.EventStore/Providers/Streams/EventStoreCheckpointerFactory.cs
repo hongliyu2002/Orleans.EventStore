@@ -36,13 +36,13 @@ public class EventStoreCheckpointerFactory : IStreamQueueCheckpointerFactory
     }
 
     /// <summary>
-    ///     Creates a stream checkpointer for the specified partition.
+    ///     Creates a stream checkpointer for the specified queue.
     /// </summary>
-    /// <param name="partition">The partition.</param>
+    /// <param name="queue">The queue name.</param>
     /// <returns>The stream checkpointer.</returns>
-    public Task<IStreamQueueCheckpointer<string>> Create(string partition)
+    public Task<IStreamQueueCheckpointer<string>> Create(string queue)
     {
-        return Task.FromResult<IStreamQueueCheckpointer<string>>(EventStoreCheckpointer.Create(_clusterOptions.ServiceId, _providerName, partition, _options, _loggerFactory));
+        return Task.FromResult<IStreamQueueCheckpointer<string>>(EventStoreCheckpointer.Create(_clusterOptions.ServiceId, _providerName, queue, _options, _loggerFactory));
     }
 
     /// <summary>

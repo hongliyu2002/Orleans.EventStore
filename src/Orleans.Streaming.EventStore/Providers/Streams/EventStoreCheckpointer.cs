@@ -7,7 +7,7 @@ using Orleans.Streams;
 namespace Orleans.Providers.Streams.EventStore;
 
 /// <summary>
-///     This class stores EventStore partition checkpointer information (a position) in another EventStore stream.
+///     This class stores EventStore queue checkpointer information (a position) in another EventStore stream.
 /// </summary>
 public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
 {
@@ -25,29 +25,29 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
     /// </summary>
     /// <param name="serviceId"></param>
     /// <param name="streamProviderName"></param>
-    /// <param name="partition"></param>
+    /// <param name="queue"></param>
     /// <param name="options"></param>
     /// <param name="loggerFactory"></param>
     /// <returns></returns>
-    public static EventStoreCheckpointer Create(string serviceId, string streamProviderName, string partition, EventStoreStreamCheckpointerOptions options, ILoggerFactory loggerFactory)
+    public static EventStoreCheckpointer Create(string serviceId, string streamProviderName, string queue, EventStoreStreamCheckpointerOptions options, ILoggerFactory loggerFactory)
     {
-        var checkpointer = new EventStoreCheckpointer(serviceId, streamProviderName, partition, options, loggerFactory);
+        var checkpointer = new EventStoreCheckpointer(serviceId, streamProviderName, queue, options, loggerFactory);
         checkpointer.Initialize();
         return checkpointer;
     }
 
-    private EventStoreCheckpointer(string serviceId, string streamProviderName, string partition, EventStoreStreamCheckpointerOptions options, ILoggerFactory loggerFactory)
+    private EventStoreCheckpointer(string serviceId, string streamProviderName, string queue, EventStoreStreamCheckpointerOptions options, ILoggerFactory loggerFactory)
     {
         ArgumentException.ThrowIfNullOrEmpty(serviceId, nameof(serviceId));
         ArgumentException.ThrowIfNullOrEmpty(streamProviderName, nameof(streamProviderName));
-        ArgumentException.ThrowIfNullOrEmpty(partition, nameof(partition));
+        ArgumentException.ThrowIfNullOrEmpty(queue, nameof(queue));
         ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
         // _logger = loggerFactory.CreateLogger<EventStoreCheckpointer>();
-        // _logger.LogInformation("Creating EventStore checkpointer for partition {Partition} of stream provider {StreamProviderName} with serviceId {ServiceId}.", partition, streamProviderName, serviceId);
+        // _logger.LogInformation("Creating EventStore checkpointer for queue {Partition} of stream provider {StreamProviderName} with serviceId {ServiceId}.", queue, streamProviderName, serviceId);
         _persistInterval = options.PersistInterval;
         _stateManager = new EventStoreStateManager(options, loggerFactory.CreateLogger<EventStoreStateManager>());
         _checkPointState = new EventStoreCheckpointState();
-        _streamName = EventStoreCheckpointState.GetStreamName(serviceId, streamProviderName, partition);
+        _streamName = EventStoreCheckpointState.GetStreamName(serviceId, streamProviderName, queue);
     }
 
     private void Initialize()

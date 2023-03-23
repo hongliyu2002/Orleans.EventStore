@@ -18,11 +18,12 @@ public class EventStoreCheckpointerFactory : IStreamQueueCheckpointerFactory
     private readonly ClusterOptions _clusterOptions;
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="EventStoreCheckpointerFactory" /> class with the specified parameters.
     /// </summary>
-    /// <param name="providerName"></param>
-    /// <param name="options"></param>
-    /// <param name="clusterOptions"></param>
-    /// <param name="loggerFactory"></param>
+    /// <param name="providerName">The name of the stream provider.</param>
+    /// <param name="options">The options for the stream checkpointer.</param>
+    /// <param name="clusterOptions">The cluster options.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
     public EventStoreCheckpointerFactory(string providerName, EventStoreStreamCheckpointerOptions options, IOptions<ClusterOptions> clusterOptions, ILoggerFactory loggerFactory)
     {
         ArgumentException.ThrowIfNullOrEmpty(providerName, nameof(providerName));
@@ -46,10 +47,11 @@ public class EventStoreCheckpointerFactory : IStreamQueueCheckpointerFactory
     }
 
     /// <summary>
+    ///     Creates an instance of the <see cref="EventStoreCheckpointerFactory" /> using the provided IServiceProvider and providerName.
     /// </summary>
-    /// <param name="serviceProvider"></param>
-    /// <param name="providerName"></param>
-    /// <returns></returns>
+    /// <param name="serviceProvider">The IServiceProvider used for dependency injection.</param>
+    /// <param name="providerName">The name used to retrieve options and services from the IServiceProvider.</param>
+    /// <returns>An instance of the <see cref="EventStoreCheckpointerFactory" />.</returns>
     public static EventStoreCheckpointerFactory CreateFactory(IServiceProvider serviceProvider, string providerName)
     {
         var options = serviceProvider.GetOptionsByName<EventStoreStreamCheckpointerOptions>(providerName);

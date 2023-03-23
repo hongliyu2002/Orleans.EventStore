@@ -12,7 +12,7 @@ public class EventStoreCheckpointState : IEventStoreState
     /// </summary>
     public EventStoreCheckpointState()
     {
-        Position = global::EventStore.Client.Position.Start.ToString();
+        Position = string.Empty;
         ETag = string.Empty;
     }
 

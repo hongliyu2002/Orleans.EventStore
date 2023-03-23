@@ -105,7 +105,7 @@ public class EventStoreQueueDataAdapterV2 : IEventStoreDataAdapter
     {
         ArgumentNullException.ThrowIfNull(queueMessage, nameof(queueMessage));
         var streamId = GetStreamId(queueMessage);
-        var sequenceToken = new EventStoreSequenceTokenV2(queueMessage.Position.ToString(), queueMessage.EventNumber.ToInt64(), 0);
+        var sequenceToken = new EventStoreSequenceTokenV2(queueMessage.EventNumber.ToString(), queueMessage.EventNumber.ToInt64(), 0);
         return new StreamPosition(streamId, sequenceToken);
     }
 
@@ -139,7 +139,7 @@ public class EventStoreQueueDataAdapterV2 : IEventStoreDataAdapter
     /// <returns></returns>
     protected virtual ArraySegment<byte> EncodeMessageIntoSegment(EventRecord queueMessage, Func<int, ArraySegment<byte>> getSegment)
     {
-        var position = queueMessage.Position.ToString();
+        var position = queueMessage.EventNumber.ToString();
         var eventId = queueMessage.EventId.ToString();
         var eventType = queueMessage.EventType;
         var data = queueMessage.Data.Span;

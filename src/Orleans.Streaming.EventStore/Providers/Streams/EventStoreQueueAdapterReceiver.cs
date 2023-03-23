@@ -39,14 +39,7 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
     private const int ReceiverShutdown = 0;
     private const int ReceiverRunning = 1;
 
-    public EventStoreQueueAdapterReceiver(EventStoreReceiverSettings settings,
-                                          Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> cacheFactory,
-                                          Func<string, Task<IStreamQueueCheckpointer<string>>> checkpointerFactory,
-                                          ILoggerFactory loggerFactory,
-                                          IQueueAdapterReceiverMonitor receiverMonitor,
-                                          LoadSheddingOptions loadSheddingOptions,
-                                          IHostEnvironmentStatistics? hostEnvironmentStatistics,
-                                          Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver>? eventStoreReceiverFactory = null)
+    public EventStoreQueueAdapterReceiver(EventStoreReceiverSettings settings, Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> cacheFactory, Func<string, Task<IStreamQueueCheckpointer<string>>> checkpointerFactory, ILoggerFactory loggerFactory, IQueueAdapterReceiverMonitor receiverMonitor, LoadSheddingOptions loadSheddingOptions, IHostEnvironmentStatistics? hostEnvironmentStatistics, Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver>? eventStoreReceiverFactory = null)
     {
         ArgumentNullException.ThrowIfNull(settings, nameof(settings));
         ArgumentNullException.ThrowIfNull(cacheFactory, nameof(cacheFactory));
@@ -67,7 +60,7 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
 
     private static IEventStoreReceiver CreateReceiver(EventStoreReceiverSettings settings, string position, ILogger logger)
     {
-        return new EventStoreReceiver(settings, position.ToPosition(), logger);
+        return new EventStorePersistentSubscriptionReceiver(settings, position, logger);
     }
 
     #region IQueueAdapterReceiver Implementation
@@ -97,7 +90,11 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
                 _cache = null;
             }
             _cache = _cacheFactory(_settings.QueueName, _checkpointer, _loggerFactory);
-            _flowController = new AggregatedQueueFlowController(MaxMessagesPerRead) { _cache, LoadShedQueueFlowController.CreateAsPercentOfLoadSheddingLimit(_loadSheddingOptions, _hostEnvironmentStatistics) };
+            _flowController = new AggregatedQueueFlowController(MaxMessagesPerRead)
+                              {
+                                  _cache,
+                                  LoadShedQueueFlowController.CreateAsPercentOfLoadSheddingLimit(_loadSheddingOptions, _hostEnvironmentStatistics)
+                              };
             var position = await _checkpointer.Load();
             _receiver = _eventStoreReceiverFactory(_settings, position, _logger);
             await _receiver.InitAsync();
@@ -170,7 +167,7 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
         List<EventRecord> messages;
         try
         {
-            messages = _receiver.Receive(maxCount);
+            messages = await _receiver.ReceiveAsync(maxCount);
             watch.Stop();
             _receiverMonitor.TrackRead(true, watch.Elapsed, null);
         }
@@ -199,7 +196,7 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
         }
         if (_checkpointer is { CheckpointExists: false })
         {
-            _checkpointer.Update(messages[0].Position.ToString(), DateTime.UtcNow);
+            _checkpointer.Update(messages[0].EventNumber.ToString(), DateTime.UtcNow);
         }
         return batches;
     }

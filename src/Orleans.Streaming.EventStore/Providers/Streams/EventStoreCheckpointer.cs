@@ -21,14 +21,14 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
     private DateTime? _throttleSavesUntilUtc;
 
     /// <summary>
-    ///     Factory function that creates and initializes the checkpointer.
+    ///     A factory method that creates a new instance of <see cref="EventStoreCheckpointer" /> with the specified parameters.
     /// </summary>
-    /// <param name="serviceId"></param>
-    /// <param name="streamProviderName"></param>
-    /// <param name="queue"></param>
-    /// <param name="options"></param>
-    /// <param name="loggerFactory"></param>
-    /// <returns></returns>
+    /// <param name="serviceId">The ID of the service that the checkpointer will be created for.</param>
+    /// <param name="streamProviderName">The name of the stream provider that the checkpointer will be created for.</param>
+    /// <param name="queue">The name of the queue that the checkpointer will be created for.</param>
+    /// <param name="options">The options used to configure the checkpointer.</param>
+    /// <param name="loggerFactory">The logger factory used to create loggers.</param>
+    /// <returns>A new instance of <see cref="EventStoreCheckpointer" />.</returns>
     public static EventStoreCheckpointer Create(string serviceId, string streamProviderName, string queue, EventStoreStreamCheckpointerOptions options, ILoggerFactory loggerFactory)
     {
         var checkpointer = new EventStoreCheckpointer(serviceId, streamProviderName, queue, options, loggerFactory);
@@ -36,6 +36,14 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
         return checkpointer;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EventStoreCheckpointer" /> class.
+    /// </summary>
+    /// <param name="serviceId">The ID of the service that the checkpointer will be created for.</param>
+    /// <param name="streamProviderName">The name of the stream provider that the checkpointer will be created for.</param>
+    /// <param name="queue">The name of the queue that the checkpointer will be created for.</param>
+    /// <param name="options">The options used to configure the checkpointer.</param>
+    /// <param name="loggerFactory">The logger factory used to create loggers.</param>
     private EventStoreCheckpointer(string serviceId, string streamProviderName, string queue, EventStoreStreamCheckpointerOptions options, ILoggerFactory loggerFactory)
     {
         ArgumentException.ThrowIfNullOrEmpty(serviceId, nameof(serviceId));
@@ -59,17 +67,7 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
     ///     Gets a value indicating whether a checkpoint exists.
     /// </summary>
     /// <value><see langword="true" /> if checkpoint exists; otherwise, <see langword="false" />.</value>
-    public bool CheckpointExists
-    {
-        get
-        {
-            if (_checkPointState is not { Position: { } })
-            {
-                return false;
-            }
-            return _checkPointState.Position != Position.Start.ToString();
-        }
-    }
+    public bool CheckpointExists => _checkPointState is { Position: { } } && !string.IsNullOrEmpty(_checkPointState.Position);
 
     /// <summary>
     ///     Loads the checkpoint.

@@ -91,7 +91,7 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
         StreamFailureHandlerFactory = _ => Task.FromResult<IStreamFailureHandler>(new NoOpStreamDeliveryFailureHandler());
         QueueMapperFactory = queues => new HashRingBasedPartitionedStreamQueueMapper(queues, name);
         ReceiverMonitorFactory = (dimensions, _) => new DefaultEventStoreReceiverMonitor(dimensions);
-        ReceiverFactory = (settings, position, logger) => new EventStoreReceiver(settings, position.ToPosition(), logger);
+        ReceiverFactory = (settings, position, logger) => new EventStorePersistentSubscriptionReceiver(settings, position, logger);
     }
 
     /// <summary>

@@ -10,7 +10,7 @@ namespace Orleans.Providers.Streams.EventStore;
 /// <summary>
 ///     Subscribe from EventStore persistent subscriptions and receive data from internal queue.
 /// </summary>
-public class EventStoreReceiver : IEventStoreReceiver
+public class EventStorePersistentSubscriptionReceiver : IEventStoreReceiver
 {
     private readonly EventStoreReceiverSettings _settings;
     private readonly ILogger _logger;
@@ -27,30 +27,41 @@ public class EventStoreReceiver : IEventStoreReceiver
     /// <param name="settings"></param>
     /// <param name="position"></param>
     /// <param name="logger"></param>
-    public EventStoreReceiver(EventStoreReceiverSettings settings, IPosition position, ILogger logger)
+    public EventStorePersistentSubscriptionReceiver(EventStoreReceiverSettings settings, string position, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(settings, nameof(settings));
+        ArgumentNullException.ThrowIfNull(settings.Options, nameof(settings.Options));
         ArgumentNullException.ThrowIfNull(settings.Options.ClientSettings, nameof(settings.Options.ClientSettings));
+        ArgumentNullException.ThrowIfNull(settings.ReceiverOptions, nameof(settings.ReceiverOptions));
         ArgumentNullException.ThrowIfNull(settings.ReceiverOptions.SubscriptionSettings, nameof(settings.ReceiverOptions.SubscriptionSettings));
         ArgumentException.ThrowIfNullOrEmpty(settings.ConsumerGroup, nameof(settings.ConsumerGroup));
         ArgumentException.ThrowIfNullOrEmpty(settings.QueueName, nameof(settings.QueueName));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _settings = settings;
-        var originSettings = _settings.ReceiverOptions.SubscriptionSettings;
-        _settings.ReceiverOptions.SubscriptionSettings = new PersistentSubscriptionSettings(originSettings.ResolveLinkTos,
-                                                                                            position,
-                                                                                            originSettings.ExtraStatistics,
-                                                                                            originSettings.MessageTimeout,
-                                                                                            originSettings.MaxRetryCount,
-                                                                                            originSettings.LiveBufferSize,
-                                                                                            originSettings.ReadBatchSize,
-                                                                                            originSettings.HistoryBufferSize,
-                                                                                            originSettings.CheckPointAfter,
-                                                                                            originSettings.CheckPointLowerBound,
-                                                                                            originSettings.CheckPointUpperBound,
-                                                                                            originSettings.MaxSubscriberCount,
-                                                                                            originSettings.ConsumerStrategyName);
+        var origin = _settings.ReceiverOptions.SubscriptionSettings;
+        _settings.ReceiverOptions.SubscriptionSettings = new PersistentSubscriptionSettings(origin.ResolveLinkTos, GetEventPosition(), origin.ExtraStatistics, origin.MessageTimeout, origin.MaxRetryCount, origin.LiveBufferSize, origin.ReadBatchSize, origin.HistoryBufferSize, origin.CheckPointAfter, origin.CheckPointLowerBound, origin.CheckPointUpperBound, origin.MaxSubscriberCount, origin.ConsumerStrategyName);
         _logger = logger;
+        StreamPosition GetEventPosition()
+        {
+            // If we have a position, read from position
+            if (position.TryToStreamPosition(out var streamPosition))
+            {
+                logger.LogInformation("Starting to read from EventStore queue {0}-{1} at position {2}", settings.Options.Name, settings.QueueName, position);
+            }
+            // else, if configured to start from now, start reading from most recent 
+            else if (settings.ReceiverOptions.StartFromNow)
+            {
+                logger.LogInformation("Starting to read latest messages from EventStore queue {0}-{1}.", settings.Options.Name, settings.QueueName);
+                streamPosition = StreamPosition.End;
+            }
+            // else, start reading from begining of the queue
+            else
+            {
+                logger.LogInformation("Starting to read messages from begining of EventStore queue {0}-{1}.", settings.Options.Name, settings.QueueName);
+                streamPosition = StreamPosition.Start;
+            }
+            return streamPosition;
+        }
     }
 
     /// <summary>
@@ -63,7 +74,7 @@ public class EventStoreReceiver : IEventStoreReceiver
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("EventStoreReceiver for stream {QueueName} is initializing.", _settings.QueueName);
+                _logger.LogDebug("EventStorePersistentSubscriptionReceiver for stream {QueueName} is initializing.", _settings.QueueName);
             }
             _subscriptionClient = new EventStorePersistentSubscriptionsClient(_settings.Options.ClientSettings);
             try
@@ -74,6 +85,7 @@ public class EventStoreReceiver : IEventStoreReceiver
             {
                 await _subscriptionClient.DeleteAsync(_settings.QueueName, _settings.ConsumerGroup, null, _settings.Options.Credentials).ConfigureAwait(false);
                 await _subscriptionClient.CreateAsync(_settings.QueueName, _settings.ConsumerGroup, _settings.ReceiverOptions.SubscriptionSettings, null, _settings.Options.Credentials).ConfigureAwait(false);
+                // await _subscriptionClient.UpdateAsync(_settings.QueueName, _settings.ConsumerGroup, _settings.ReceiverOptions.SubscriptionSettings, null, _settings.Options.Credentials).ConfigureAwait(false);
             }
             _subscription = await _subscriptionClient.SubscribeToStreamAsync(_settings.QueueName, _settings.ConsumerGroup, OnEventAppeared, OnSubscriptionDropped, _settings.Options.Credentials, _settings.ReceiverOptions.PrefetchCount).ConfigureAwait(false);
             _initialized = true;
@@ -125,13 +137,13 @@ public class EventStoreReceiver : IEventStoreReceiver
     /// </summary>
     /// <param name="maxCount">Max amount of message which should be delivered in this request</param>
     /// <returns></returns>
-    public List<EventRecord> Receive(int maxCount)
+    public async Task<List<EventRecord>> ReceiveAsync(int maxCount)
     {
         if (_logger.IsEnabled(LogLevel.Trace))
         {
             _logger.LogTrace("Receiving events from internal queue: {QueueName}", _settings.QueueName);
         }
-        if (_initialized == false)
+        if (_initialized == false || _subscription == null)
         {
             return new List<EventRecord>();
         }
@@ -147,71 +159,16 @@ public class EventStoreReceiver : IEventStoreReceiver
                 eventRecords.Add(eventRecord);
                 _hashSet.TryRemove(eventRecord, out _);
             }
+            if (eventRecords.Count > 0)
+            {
+                await _subscription.Ack(eventRecords.Select(record => record.EventId));
+            }
             return eventRecords;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to receive events from internal queue for stream {QueueName}.", _settings.QueueName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to receive events from internal queue for stream {_settings.QueueName}. {ex.GetType()}: {ex.Message}"));
-        }
-    }
-
-    /// <summary>
-    ///     Acknowledge that a message has completed processing (this will tell the server it has been processed).
-    /// </summary>
-    /// <remarks>There is no need to ack a message if you have Auto Ack enabled.</remarks>
-    /// <param name="eventIds">
-    ///     The <see cref="T:EventStore.Client.Uuid" /> of the <see cref="T:EventStore.Client.ResolvedEvent" />s to acknowledge.
-    ///     There should not be more than 2000 to ack at a time.
-    /// </param>
-    public async Task AckAsync(params Uuid[] eventIds)
-    {
-        if (_logger.IsEnabled(LogLevel.Trace))
-        {
-            _logger.LogTrace("Acknowledging events to stream: {QueueName}", _settings.QueueName);
-        }
-        if (_initialized == false || _subscription == null)
-        {
-            return;
-        }
-        try
-        {
-            await _subscription.Ack(eventIds);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to acknowledge events for stream {QueueName}.", _settings.QueueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to acknowledge events for stream {_settings.QueueName}. {ex.GetType()}: {ex.Message}"));
-        }
-    }
-
-    /// <summary>
-    ///     Acknowledge that a message has failed processing (this will tell the server it has not been processed).
-    /// </summary>
-    /// <param name="action">The <see cref="T:EventStore.Client.PersistentSubscriptionNakEventAction" /> to take.</param>
-    /// <param name="reason">A reason given.</param>
-    /// <param name="eventIds">
-    ///     The <see cref="T:EventStore.Client.Uuid" /> of the <see cref="T:EventStore.Client.ResolvedEvent" />s to nak.
-    ///     There should not be more than 2000 to nak at a time.
-    /// </param>
-    public async Task NackAsync(PersistentSubscriptionNakEventAction action, string reason, params Uuid[] eventIds)
-    {
-        if (_logger.IsEnabled(LogLevel.Trace))
-        {
-            _logger.LogTrace("Nacknowledging events to stream: {QueueName}", _settings.QueueName);
-        }
-        if (_initialized == false || _subscription == null)
-        {
-            return;
-        }
-        try
-        {
-            await _subscription.Nack(action, reason, eventIds);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to nacknowledge events for stream {QueueName}.", _settings.QueueName);
-            throw new EventStoreStorageException(FormattableString.Invariant($"Failed to unacknowledge events for stream {_settings.QueueName}. {ex.GetType()}: {ex.Message}"));
         }
     }
 

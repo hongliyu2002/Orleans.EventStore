@@ -1,5 +1,4 @@
 ﻿using EventStore.Client;
-using Orleans.Runtime;
 using Orleans.Storage;
 
 namespace Orleans.Configuration;
@@ -24,47 +23,6 @@ public class EventStoreOperationOptions
     /// </summary>
     [Redact]
     public UserCredentials? Credentials { get; set; }
-
-    /// <summary>
-    ///     The serializer used in serialize state to EventStore stream.
-    /// </summary>
-    public IGrainStorageSerializer GrainStorageSerializer { get; set; } = null!;
-
-    #region Create Client
-
-    /// <summary>
-    ///     The delegate used to create a <see cref="EventStoreClient" /> instance.
-    /// </summary>
-    internal Func<EventStoreClient> CreateClient { get; private set; } = null!;
-
-    /// <summary>
-    ///     Configures the <see cref="EventStoreClient" /> using a connection string.
-    /// </summary>
-    public void ConfigureEventStoreClient(string connectionString)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(connectionString, nameof(connectionString));
-        CreateClient = () => new EventStoreClient(EventStoreClientSettings.Create(connectionString));
-    }
-
-    /// <summary>
-    ///     Configures the <see cref="EventStoreClient" /> using the provided callback.
-    /// </summary>
-    public void ConfigureEventStoreClient(Func<EventStoreClient> createClient)
-    {
-        ArgumentNullException.ThrowIfNull(createClient, nameof(createClient));
-        CreateClient = createClient;
-    }
-
-    internal void Validate(string? name)
-    {
-        if (CreateClient is null)
-        {
-            throw new OrleansConfigurationException($"No credentials specified. Use the {GetType().Name}.{nameof(ConfigureEventStoreClient)} method to configure the Event Store client.");
-        }
-    }
-
-    #endregion
-
 }
 
 /// <summary>
@@ -94,6 +52,5 @@ public class EventStoreOperationOptionsValidator<TOptions> : IConfigurationValid
     /// <inheritdoc />
     public void ValidateConfiguration()
     {
-        Options.Validate(Name);
     }
 }

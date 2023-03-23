@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
 using Orleans.Configuration.Overrides;
+using Orleans.Serialization;
 using Orleans.Streams;
 
 namespace Orleans.Providers.Streams.EventStore;
@@ -14,37 +15,9 @@ public class EventStoreCheckpointerFactory : IStreamQueueCheckpointerFactory
 {
     private readonly string _providerName;
     private readonly EventStoreStreamCheckpointerOptions _options;
+    private readonly Serializer _serializer;
     private readonly ILoggerFactory _loggerFactory;
     private readonly ClusterOptions _clusterOptions;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventStoreCheckpointerFactory" /> class with the specified parameters.
-    /// </summary>
-    /// <param name="providerName">The name of the stream provider.</param>
-    /// <param name="options">The options for the stream checkpointer.</param>
-    /// <param name="clusterOptions">The cluster options.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    public EventStoreCheckpointerFactory(string providerName, EventStoreStreamCheckpointerOptions options, IOptions<ClusterOptions> clusterOptions, ILoggerFactory loggerFactory)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(providerName, nameof(providerName));
-        ArgumentNullException.ThrowIfNull(options, nameof(options));
-        ArgumentNullException.ThrowIfNull(clusterOptions, nameof(clusterOptions));
-        ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
-        _providerName = providerName;
-        _options = options;
-        _clusterOptions = clusterOptions.Value;
-        _loggerFactory = loggerFactory;
-    }
-
-    /// <summary>
-    ///     Creates a stream checkpointer for the specified queue.
-    /// </summary>
-    /// <param name="queue">The queue name.</param>
-    /// <returns>The stream checkpointer.</returns>
-    public Task<IStreamQueueCheckpointer<string>> Create(string queue)
-    {
-        return Task.FromResult<IStreamQueueCheckpointer<string>>(EventStoreCheckpointer.Create(_clusterOptions.ServiceId, _providerName, queue, _options, _loggerFactory));
-    }
 
     /// <summary>
     ///     Creates an instance of the <see cref="EventStoreCheckpointerFactory" /> using the provided IServiceProvider and providerName.
@@ -58,4 +31,37 @@ public class EventStoreCheckpointerFactory : IStreamQueueCheckpointerFactory
         var clusterOptions = serviceProvider.GetProviderClusterOptions(providerName);
         return ActivatorUtilities.CreateInstance<EventStoreCheckpointerFactory>(serviceProvider, providerName, options, clusterOptions);
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EventStoreCheckpointerFactory" /> class with the specified parameters.
+    /// </summary>
+    /// <param name="providerName">The name of the stream provider.</param>
+    /// <param name="options">The options for the stream checkpointer.</param>
+    /// <param name="clusterOptions">The cluster options.</param>
+    /// <param name="serializer">The serializer used for state manager.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    private EventStoreCheckpointerFactory(string providerName, EventStoreStreamCheckpointerOptions options, IOptions<ClusterOptions> clusterOptions, Serializer serializer, ILoggerFactory loggerFactory)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(providerName, nameof(providerName));
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
+        ArgumentNullException.ThrowIfNull(clusterOptions, nameof(clusterOptions));
+        ArgumentNullException.ThrowIfNull(serializer, nameof(serializer));
+        ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
+        _providerName = providerName;
+        _options = options;
+        _clusterOptions = clusterOptions.Value;
+        _serializer = serializer;
+        _loggerFactory = loggerFactory;
+    }
+
+    /// <summary>
+    ///     Creates a stream checkpointer for the specified queue.
+    /// </summary>
+    /// <param name="queue">The queue name.</param>
+    /// <returns>The stream checkpointer.</returns>
+    public Task<IStreamQueueCheckpointer<string>> Create(string queue)
+    {
+        return Task.FromResult<IStreamQueueCheckpointer<string>>(EventStoreCheckpointer.Create(_clusterOptions.ServiceId, _providerName, queue, _options, _serializer, _loggerFactory));
+    }
+
 }

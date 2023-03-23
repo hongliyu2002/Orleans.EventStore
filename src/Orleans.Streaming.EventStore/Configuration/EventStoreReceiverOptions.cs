@@ -9,12 +9,12 @@ public class EventStoreReceiverOptions
     /// <summary>
     ///     The EventStore persistent subscription settings.
     /// </summary>
-    public PersistentSubscriptionSettings SubscriptionSettings { get; set; } = null!;
+    public PersistentSubscriptionSettings SubscriptionSettings { get; set; } = new();
 
     /// <summary>
     ///     Optional parameter that configures the receiver prefetch count.
     /// </summary>
-    public int PrefetchCount { get; set; } = 50;
+    public int PrefetchCount { get; set; } = 10;
 
     /// <summary>
     ///     In cases where no checkpoint is found,

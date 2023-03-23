@@ -16,6 +16,7 @@ public class ChannelGrainTests
     {
         var clusterBuilder = new TestClusterBuilder().AddClientBuilderConfigurator<ClientBuilderConfigurator>().AddSiloBuilderConfigurator<SiloConfigurator>();
         clusterBuilder.Options.ServiceId = "TestService";
+        clusterBuilder.Options.InitialSilosCount = 1;
         _cluster = clusterBuilder.Build();
         await _cluster.DeployAsync();
     }

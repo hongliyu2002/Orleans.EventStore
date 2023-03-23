@@ -1,6 +1,7 @@
 ﻿using EventStore.Client;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
+using Orleans.Serialization;
 using Orleans.Storage;
 
 namespace Orleans.Streaming.EventStoreStorage;
@@ -12,26 +13,28 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
 {
     private readonly EventStoreOperationOptions _options;
     private readonly EventStorePolicyOptions _policyOptions;
-    private readonly IGrainStorageSerializer _serializer;
+    private readonly Serializer _serializer;
     private readonly ILogger _logger;
 
-    private EventStoreClient? _streamClient;
+    private EventStoreClient? _client;
     private bool _initialized;
 
     /// <summary>
     ///     Creates a new <see cref="EventStoreStateManager" /> instance.
     /// </summary>
     /// <param name="options">Storage configuration.</param>
+    /// <param name="serializer"></param>
     /// <param name="logger">Logger to use.</param>
-    public EventStoreStateManager(EventStoreOperationOptions options, ILogger<EventStoreStateManager> logger)
+    public EventStoreStateManager(EventStoreOperationOptions options, Serializer serializer, ILogger<EventStoreStateManager> logger)
     {
         ArgumentNullException.ThrowIfNull(options, nameof(options));
         ArgumentNullException.ThrowIfNull(options.PolicyOptions, nameof(options.PolicyOptions));
-        ArgumentNullException.ThrowIfNull(options.GrainStorageSerializer, nameof(options.GrainStorageSerializer));
+        ArgumentNullException.ThrowIfNull(serializer, nameof(serializer));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _options = options;
+        _serializer = serializer;
         _policyOptions = options.PolicyOptions;
-        _serializer = options.GrainStorageSerializer;
+        _serializer = serializer;
         _logger = logger;
     }
 
@@ -46,7 +49,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         var startTime = DateTime.UtcNow;
         try
         {
-            _streamClient = _options.CreateClient();
+            _client = new EventStoreClient(_options.ClientSettings);
             _initialized = true;
         }
         catch (Exception ex)
@@ -65,7 +68,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
     /// </summary>
     public async Task Close()
     {
-        if (_initialized == false || _streamClient == null)
+        if (_initialized == false || _client == null)
         {
             return;
         }
@@ -73,7 +76,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         var startTime = DateTime.UtcNow;
         try
         {
-            await _streamClient.DisposeAsync();
+            await _client.DisposeAsync();
         }
         catch (Exception ex)
         {
@@ -82,7 +85,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         }
         finally
         {
-            _streamClient = null;
+            _client = null;
             _initialized = false;
             CheckAlertSlowAccess(startTime, operation);
         }
@@ -91,7 +94,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
     /// <inheritdoc />
     public void Dispose()
     {
-        if (_initialized == false || _streamClient == null)
+        if (_initialized == false || _client == null)
         {
             return;
         }
@@ -99,7 +102,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         var startTime = DateTime.UtcNow;
         try
         {
-            _streamClient.Dispose();
+            _client.Dispose();
         }
         catch (Exception ex)
         {
@@ -108,7 +111,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         }
         finally
         {
-            _streamClient = null;
+            _client = null;
             _initialized = false;
             CheckAlertSlowAccess(startTime, operation);
         }
@@ -132,7 +135,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         where T : class, IEventStoreState, new()
     {
         ArgumentException.ThrowIfNullOrEmpty(streamName, nameof(streamName));
-        if (_initialized == false || _streamClient == null)
+        if (_initialized == false || _client == null)
         {
             _logger.LogWarning(EventStoreErrorCodes.CannotInitializeClient, "EventStore client for stream {StreamName} is not initialized.", streamName);
             throw new InvalidOperationException(FormattableString.Invariant($"EventStore client for stream {streamName} is not initialized."));
@@ -145,7 +148,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         }
         try
         {
-            var readResult = _streamClient.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1, false, null, _options.Credentials);
+            var readResult = _client.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1, false, null, _options.Credentials);
             var readState = await readResult.ReadState.ConfigureAwait(false);
             if (readState == ReadState.Ok)
             {
@@ -182,7 +185,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         where T : class, IEventStoreState, new()
     {
         ArgumentException.ThrowIfNullOrEmpty(streamName, nameof(streamName));
-        if (_initialized == false || _streamClient == null)
+        if (_initialized == false || _client == null)
         {
             _logger.LogWarning(EventStoreErrorCodes.CannotInitializeClient, "EventStore client for stream {StreamName} is not initialized.", streamName);
             throw new InvalidOperationException(FormattableString.Invariant($"EventStore client for stream {streamName} is not initialized."));
@@ -200,11 +203,11 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
             IWriteResult writeResult;
             if (ignoreETag)
             {
-                writeResult = await _streamClient.AppendToStreamAsync(streamName, StreamState.Any, new[] { serializedState }, null, null, _options.Credentials).ConfigureAwait(false);
+                writeResult = await _client.AppendToStreamAsync(streamName, StreamState.Any, new[] { serializedState }, null, null, _options.Credentials).ConfigureAwait(false);
             }
             else
             {
-                writeResult = await _streamClient.AppendToStreamAsync(streamName, eTagExists ? new StreamRevision(eTag) : StreamRevision.None, new[] { serializedState }, null, null, _options.Credentials).ConfigureAwait(false);
+                writeResult = await _client.AppendToStreamAsync(streamName, eTagExists ? new StreamRevision(eTag) : StreamRevision.None, new[] { serializedState }, null, null, _options.Credentials).ConfigureAwait(false);
             }
             state.ETag = writeResult.NextExpectedStreamRevision.ToUInt64().ToString();
             return state;
@@ -235,7 +238,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         where T : class, IEventStoreState, new()
     {
         ArgumentException.ThrowIfNullOrEmpty(streamName, nameof(streamName));
-        if (_initialized == false || _streamClient == null)
+        if (_initialized == false || _client == null)
         {
             _logger.LogWarning(EventStoreErrorCodes.CannotInitializeClient, "EventStore client for stream {StreamName} is not initialized.", streamName);
             throw new InvalidOperationException(FormattableString.Invariant($"EventStore client for stream {streamName} is not initialized."));
@@ -251,10 +254,10 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
             var eTagExists = ulong.TryParse(state.ETag, out var eTag);
             if (!ignoreETag && eTagExists)
             {
-                await _streamClient.DeleteAsync(streamName, new StreamRevision(eTag), null, _options.Credentials).ConfigureAwait(false);
+                await _client.DeleteAsync(streamName, new StreamRevision(eTag), null, _options.Credentials).ConfigureAwait(false);
                 return;
             }
-            await _streamClient.DeleteAsync(streamName, StreamState.Any, null, _options.Credentials).ConfigureAwait(false);
+            await _client.DeleteAsync(streamName, StreamState.Any, null, _options.Credentials).ConfigureAwait(false);
         }
         catch (WrongExpectedVersionException)
         {
@@ -298,27 +301,28 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
     #region Serialize & Deserialize
 
     /// <summary>
+    ///     Serializes the provided event store state object into an event data instance.
     /// </summary>
-    /// <param name="state"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="T">The type of the event store state object being serialized.</typeparam>
+    /// <param name="state">The event store state object being serialized.</param>
+    /// <returns>An event data instance representing the serialized state object.</returns>
     private EventData SerializeState<T>(T state)
         where T : class, IEventStoreState, new()
     {
-        var contentType = _serializer is JsonGrainStorageSerializer ? "application/json" : "application/octet-stream";
         if (state is null)
         {
-            return new EventData(Uuid.NewUuid(), typeof(T).Name, new ReadOnlyMemory<byte>(), null, contentType);
+            return new EventData(Uuid.NewUuid(), typeof(T).Name, new ReadOnlyMemory<byte>(), null, "application/octet-stream");
         }
-        var stateBuffer = _serializer.Serialize(state);
-        return new EventData(Uuid.NewUuid(), state.GetType().Name, stateBuffer.ToMemory(), null, contentType);
+        var stateBuffer = _serializer.SerializeToArray(state);
+        return new EventData(Uuid.NewUuid(), state.GetType().Name, new ReadOnlyMemory<byte>(stateBuffer), null, "application/octet-stream");
     }
 
     /// <summary>
+    ///     Deserializes the provided event data into an event store state object.
     /// </summary>
-    /// <param name="evt"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="T">The type of the event store state object being deserialized.</typeparam>
+    /// <param name="evt">The resolved event containing the serialized state data.</param>
+    /// <returns>A tuple containing the deserialized state object and its ETag.</returns>
     private (T State, string ETag) DeserializeState<T>(ResolvedEvent evt)
         where T : class, IEventStoreState, new()
     {

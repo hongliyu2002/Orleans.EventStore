@@ -2,7 +2,7 @@
 
 public static class Constants
 {
-    public const string PubSubStoreName = "PubSubStore";
-    public const string StreamProviderName = "EventStoreStream";
-    public const string ChatNamespace = "Test.Chat";
+    public const string PubSubStoreName = "PubSubStore-V2";
+    public const string StreamProviderName = "EventStoreStream-V2";
+    public const string ChatNamespace = "Test.Chat-V2";
 }

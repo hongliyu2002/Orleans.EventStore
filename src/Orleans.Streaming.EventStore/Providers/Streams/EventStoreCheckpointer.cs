@@ -1,6 +1,6 @@
-﻿using EventStore.Client;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
+using Orleans.Serialization;
 using Orleans.Streaming.EventStoreStorage;
 using Orleans.Streams;
 
@@ -27,11 +27,12 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
     /// <param name="streamProviderName">The name of the stream provider that the checkpointer will be created for.</param>
     /// <param name="queue">The name of the queue that the checkpointer will be created for.</param>
     /// <param name="options">The options used to configure the checkpointer.</param>
+    /// <param name="serializer">The serializer used for state manager.</param>
     /// <param name="loggerFactory">The logger factory used to create loggers.</param>
     /// <returns>A new instance of <see cref="EventStoreCheckpointer" />.</returns>
-    public static EventStoreCheckpointer Create(string serviceId, string streamProviderName, string queue, EventStoreStreamCheckpointerOptions options, ILoggerFactory loggerFactory)
+    public static EventStoreCheckpointer Create(string serviceId, string streamProviderName, string queue, EventStoreStreamCheckpointerOptions options, Serializer serializer, ILoggerFactory loggerFactory)
     {
-        var checkpointer = new EventStoreCheckpointer(serviceId, streamProviderName, queue, options, loggerFactory);
+        var checkpointer = new EventStoreCheckpointer(serviceId, streamProviderName, queue, options, serializer, loggerFactory);
         checkpointer.Initialize();
         return checkpointer;
     }
@@ -43,17 +44,20 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
     /// <param name="streamProviderName">The name of the stream provider that the checkpointer will be created for.</param>
     /// <param name="queue">The name of the queue that the checkpointer will be created for.</param>
     /// <param name="options">The options used to configure the checkpointer.</param>
+    /// <param name="serializer">The serializer used for state manager.</param>
     /// <param name="loggerFactory">The logger factory used to create loggers.</param>
-    private EventStoreCheckpointer(string serviceId, string streamProviderName, string queue, EventStoreStreamCheckpointerOptions options, ILoggerFactory loggerFactory)
+    private EventStoreCheckpointer(string serviceId, string streamProviderName, string queue, EventStoreStreamCheckpointerOptions options, Serializer serializer, ILoggerFactory loggerFactory)
     {
         ArgumentException.ThrowIfNullOrEmpty(serviceId, nameof(serviceId));
         ArgumentException.ThrowIfNullOrEmpty(streamProviderName, nameof(streamProviderName));
         ArgumentException.ThrowIfNullOrEmpty(queue, nameof(queue));
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
+        ArgumentNullException.ThrowIfNull(serializer, nameof(serializer));
         ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
         // _logger = loggerFactory.CreateLogger<EventStoreCheckpointer>();
         // _logger.LogInformation("Creating EventStore checkpointer for queue {Partition} of stream provider {StreamProviderName} with serviceId {ServiceId}.", queue, streamProviderName, serviceId);
         _persistInterval = options.PersistInterval;
-        _stateManager = new EventStoreStateManager(options, loggerFactory.CreateLogger<EventStoreStateManager>());
+        _stateManager = new EventStoreStateManager(options, serializer, loggerFactory.CreateLogger<EventStoreStateManager>());
         _checkPointState = new EventStoreCheckpointState();
         _streamName = EventStoreCheckpointState.GetStreamName(serviceId, streamProviderName, queue);
     }

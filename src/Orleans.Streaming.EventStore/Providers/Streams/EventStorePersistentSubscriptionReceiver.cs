@@ -137,7 +137,7 @@ public class EventStorePersistentSubscriptionReceiver : IEventStoreReceiver
     /// </summary>
     /// <param name="maxCount">Max amount of message which should be delivered in this request</param>
     /// <returns></returns>
-    public async Task<List<EventRecord>> ReceiveAsync(int maxCount)
+    public List<EventRecord> Receive(int maxCount)
     {
         if (_logger.IsEnabled(LogLevel.Trace))
         {
@@ -161,7 +161,7 @@ public class EventStorePersistentSubscriptionReceiver : IEventStoreReceiver
             }
             if (eventRecords.Count > 0)
             {
-                await _subscription.Ack(eventRecords.Select(record => record.EventId));
+                _subscription.Ack(eventRecords.Select(record => record.EventId)).Ignore();
             }
             return eventRecords;
         }

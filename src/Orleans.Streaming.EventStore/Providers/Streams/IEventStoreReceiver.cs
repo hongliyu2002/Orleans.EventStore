@@ -23,5 +23,5 @@ public interface IEventStoreReceiver
     /// </summary>
     /// <param name="maxCount">Max amount of message which should be delivered</param>
     /// <returns></returns>
-    Task<List<EventRecord>> ReceiveAsync(int maxCount);
+    List<EventRecord> Receive(int maxCount);
 }

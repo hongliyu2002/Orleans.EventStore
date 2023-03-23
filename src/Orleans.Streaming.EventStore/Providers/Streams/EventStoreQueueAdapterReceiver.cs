@@ -167,7 +167,7 @@ internal class EventStoreQueueAdapterReceiver : IQueueAdapterReceiver, IQueueCac
         List<EventRecord> messages;
         try
         {
-            messages = await _receiver.ReceiveAsync(maxCount);
+            messages = _receiver.Receive(maxCount);
             watch.Stop();
             _receiverMonitor.TrackRead(true, watch.Elapsed, null);
         }

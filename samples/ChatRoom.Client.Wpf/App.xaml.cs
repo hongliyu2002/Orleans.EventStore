@@ -19,7 +19,8 @@ public partial class App
     /// <inheritdoc />
     public App()
     {
-        _host = CreateHostBuilder().Build();
+        _host = CreateHostBuilder()
+           .Build();
     }
 
     /// <inheritdoc />
@@ -66,21 +67,18 @@ public partial class App
                                          //                           });
                                          // Configure streaming
                                          client.AddStreaming();
-                                         client.AddEventStoreQueueStreams(Constants.StreamProviderName,
-                                                                          configurator =>
-                                                                          {
-                                                                              configurator.ConfigureEventStoreQueue(optionsBuilder =>
-                                                                                                                    {
-                                                                                                                        optionsBuilder.Configure(options =>
-                                                                                                                                                 {
-                                                                                                                                                     options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
-                                                                                                                                                     options.SubscriptionSettings = new PersistentSubscriptionSettings(checkPointAfter: TimeSpan.FromSeconds(30));
-                                                                                                                                                     options.TotalQueueCount = 1;
-                                                                                                                                                     options.QueueBufferSize = 10;
-                                                                                                                                                 });
-                                                                                                                    });
-                                                                              configurator.ConfigureStreamPubSub();
-                                                                          });
+                                         client.AddEventStoreStreams(Constants.StreamProviderName,
+                                                                     configurator =>
+                                                                     {
+                                                                         configurator.ConfigureEventStore(optionsBuilder =>
+                                                                                                          {
+                                                                                                              optionsBuilder.Configure(options =>
+                                                                                                                                       {
+                                                                                                                                           options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
+                                                                                                                                       });
+                                                                                                          });
+                                                                         configurator.ConfigureStreamPubSub();
+                                                                     });
                                          client.AddBroadcastChannel(Constants.BroadcastChannelName,
                                                                     options =>
                                                                     {

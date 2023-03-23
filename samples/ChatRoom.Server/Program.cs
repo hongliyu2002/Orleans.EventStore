@@ -11,7 +11,10 @@ public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        Log.Logger = new LoggerConfiguration().MinimumLevel.Override("Microsoft", LogEventLevel.Information).Enrich.FromLogContext().WriteTo.Console().CreateBootstrapLogger();
+        Log.Logger = new LoggerConfiguration().MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                                              .Enrich.FromLogContext()
+                                              .WriteTo.Console()
+                                              .CreateBootstrapLogger();
         var appName = "Chat Room";
         try
         {
@@ -78,32 +81,27 @@ public static class Program
                                                              });
                                    // Configure streaming
                                    silo.AddStreaming();
-                                   silo.AddEventStoreQueueStreams(Constants.StreamProviderName,
-                                                                  configurator =>
-                                                                  {
-                                                                      configurator.ConfigureEventStoreQueue(optionsBuilder =>
-                                                                                                            {
-                                                                                                                optionsBuilder.Configure(options =>
-                                                                                                                                         {
-                                                                                                                                             options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
-                                                                                                                                             options.SubscriptionSettings =
-                                                                                                                                                 new PersistentSubscriptionSettings(checkPointAfter: TimeSpan.FromSeconds(10), checkPointLowerBound: 1);
-                                                                                                                                             options.TotalQueueCount = 4;
-                                                                                                                                             options.QueueBufferSize = 10;
-                                                                                                                                         });
-                                                                                                            });
-                                                                      configurator.ConfigurePullingAgent(optionsBuilder =>
-                                                                                                         {
-                                                                                                             optionsBuilder.Configure(options =>
-                                                                                                                                      {
-                                                                                                                                          options.BatchContainerBatchSize = 10;
-                                                                                                                                          options.GetQueueMsgsTimerPeriod = TimeSpan.FromMilliseconds(200);
-                                                                                                                                      });
-                                                                                                         });
-                                                                      configurator.ConfigureCacheSize(1024);
-                                                                      configurator.ConfigureStreamPubSub();
-                                                                      configurator.UseConsistentRingQueueBalancer();
-                                                                  });
+                                   silo.AddEventStoreStreams(Constants.StreamProviderName,
+                                                             configurator =>
+                                                             {
+                                                                 configurator.ConfigureEventStore(optionsBuilder =>
+                                                                                                  {
+                                                                                                      optionsBuilder.Configure(options =>
+                                                                                                                               {
+                                                                                                                                   options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
+                                                                                                                               });
+                                                                                                  });
+                                                                 configurator.ConfigurePullingAgent(optionsBuilder =>
+                                                                                                    {
+                                                                                                        optionsBuilder.Configure(options =>
+                                                                                                                                 {
+                                                                                                                                     options.BatchContainerBatchSize = 10;
+                                                                                                                                     options.GetQueueMsgsTimerPeriod = TimeSpan.FromMilliseconds(200);
+                                                                                                                                 });
+                                                                                                    });
+                                                                 configurator.ConfigureStreamPubSub();
+                                                                 configurator.UseConsistentRingQueueBalancer();
+                                                             });
                                    silo.AddBroadcastChannel(Constants.BroadcastChannelName,
                                                             options =>
                                                             {
@@ -114,7 +112,8 @@ public static class Program
                                })
                    .UseSerilog((context, serviceProvider, logConfig) =>
                                {
-                                   logConfig.ReadFrom.Configuration(context.Configuration).ReadFrom.Services(serviceProvider);
+                                   logConfig.ReadFrom.Configuration(context.Configuration)
+                                            .ReadFrom.Services(serviceProvider);
                                })
                    .UseConsoleLifetime();
     }

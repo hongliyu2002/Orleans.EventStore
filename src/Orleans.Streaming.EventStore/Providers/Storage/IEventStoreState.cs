@@ -11,6 +11,11 @@
 public interface IEventStoreState
 {
     /// <summary>
+    ///     The Id value for the state.
+    /// </summary>
+    Guid Id { get; set; }
+
+    /// <summary>
     ///     The ETag value for the state.
     /// </summary>
     string ETag { get; set; }

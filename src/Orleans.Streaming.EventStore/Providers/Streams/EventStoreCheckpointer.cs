@@ -7,7 +7,7 @@ using Orleans.Streams;
 namespace Orleans.Providers.Streams.EventStore;
 
 /// <summary>
-///     This class stores EventStore queue checkpointer information (a position) in another EventStore stream.
+///     This class stores EventStore queue checkpointer information (a stream position) in another EventStore stream.
 /// </summary>
 public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
 {
@@ -59,7 +59,7 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
         _persistInterval = options.PersistInterval;
         _stateManager = new EventStoreStateManager(options, serializer, loggerFactory.CreateLogger<EventStoreStateManager>());
         _checkPointState = new EventStoreCheckpointState();
-        _streamName = EventStoreCheckpointState.GetStreamName(serviceId, streamProviderName, queue);
+        _streamName = EventStoreCheckpointState.GetStreamName(serviceId, streamProviderName, queue, _checkPointState.Id);
     }
 
     private void Initialize()
@@ -106,7 +106,7 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
         }
         _checkPointState.Position = position;
         _throttleSavesUntilUtc = utcNow + _persistInterval;
-        _inProgressSaveTask = _stateManager.WriteStateAsync(_streamName, _checkPointState);
+        _inProgressSaveTask = _stateManager.WriteStateAsync(_streamName, _checkPointState, true);
         _inProgressSaveTask.Ignore();
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Orleans.Configuration;
 using Orleans.Providers.Streams.Common;
 using Orleans.Providers.Streams.EventStore.StatisticMonitors;
@@ -11,67 +10,68 @@ using Orleans.Streams;
 namespace Orleans.Providers.Streams.EventStore;
 
 /// <summary>
-///     Adapter factory. This should create an adapter from the stream provider configuration
+///     Adapter factory. This should create an adapter from the stream provider configuration.
 /// </summary>
 public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
 {
     private readonly string _name;
     private readonly EventStoreOptions _options;
-    private readonly EventStoreStreamCachePressureOptions _cacheOptions;
+    private readonly EventStoreReceiverOptions _receiverOptions;
     private readonly StreamCacheEvictionOptions _cacheEvictionOptions;
     private readonly StreamStatisticOptions _statisticOptions;
     private readonly IEventStoreDataAdapter _dataAdapter;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IStreamQueueCheckpointerFactory _checkpointerFactory;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly IHostEnvironmentStatistics _hostEnvironmentStatistics;
+    private readonly IHostEnvironmentStatistics? _hostEnvironmentStatistics;
 
     private HashRingBasedPartitionedStreamQueueMapper? _streamQueueMapper;
-
-    private string[] _queues;
+    private EventStoreQueueAdapter? _queueAdapter;
 
     /// <summary>
+    ///     Creates an instance of the <see cref="EventStoreQueueAdapterFactory" /> using the provided IServiceProvider and name.
     /// </summary>
-    /// <param name="serviceProvider"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
+    /// <param name="serviceProvider">The IServiceProvider used for dependency injection.</param>
+    /// <param name="name">The name used to retrieve options and services from the IServiceProvider.</param>
+    /// <returns>An instance of the <see cref="EventStoreQueueAdapterFactory" />.</returns>
     public static EventStoreQueueAdapterFactory Create(IServiceProvider serviceProvider, string name)
     {
-        var storageOptions = serviceProvider.GetOptionsByName<EventStoreOptions>(name);
-        var clusterOptions = serviceProvider.GetRequiredService<IOptions<ClusterOptions>>();
-        var cacheOptions = serviceProvider.GetOptionsByName<SimpleQueueCacheOptions>(name);
-        var dataAdapter = serviceProvider.GetServiceByName<IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer>>(name) ?? serviceProvider.GetRequiredService<IQueueDataAdapter<ReadOnlyMemory<byte>, IBatchContainer>>();
-        var queueAdapterFactory = ActivatorUtilities.CreateInstance<EventStoreQueueAdapterFactory>(serviceProvider, name, storageOptions, clusterOptions, cacheOptions, dataAdapter);
-        queueAdapterFactory.Init();
-        return queueAdapterFactory;
+        var options = serviceProvider.GetOptionsByName<EventStoreOptions>(name);
+        var receiverOptions = serviceProvider.GetOptionsByName<EventStoreReceiverOptions>(name);
+        var cachePressureOptions = serviceProvider.GetOptionsByName<EventStoreStreamCachePressureOptions>(name);
+        var cacheEvictionOptions = serviceProvider.GetOptionsByName<StreamCacheEvictionOptions>(name);
+        var statisticOptions = serviceProvider.GetOptionsByName<StreamStatisticOptions>(name);
+        var dataAdapter = serviceProvider.GetServiceByName<IEventStoreDataAdapter>(name) ?? serviceProvider.GetService<IEventStoreDataAdapter>() ?? ActivatorUtilities.CreateInstance<EventStoreQueueDataAdapterV2>(serviceProvider);
+        return ActivatorUtilities.CreateInstance<EventStoreQueueAdapterFactory>(serviceProvider, name, options, receiverOptions, cachePressureOptions, cacheEvictionOptions, statisticOptions, dataAdapter);
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EventStoreQueueAdapterFactory" /> class.
+    ///     Creates a new instance of <see cref="EventStoreQueueAdapterFactory" />.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="options"></param>
-    /// <param name="receiverOptions"></param>
-    /// <param name="cacheOptions"></param>
-    /// <param name="statisticOptions"></param>
-    /// <param name="dataAdapter"></param>
-    /// <param name="serviceProvider"></param>
-    /// <param name="loggerFactory"></param>
-    /// <param name="cacheEvictionOptions"></param>
-    /// <param name="hostEnvironmentStatistics"></param>
+    /// <param name="name">Name of the adapter. Primarily for logging purposes.</param>
+    /// <param name="options">The options for connecting to the event store.</param>
+    /// <param name="receiverOptions">The options for receiving events from the event store.</param>
+    /// <param name="cachePressureOptions">The options for configuring the stream cache pressure.</param>
+    /// <param name="cacheEvictionOptions">The options for configuring stream cache eviction.</param>
+    /// <param name="statisticOptions">The options for configuring statistics collection.</param>
+    /// <param name="dataAdapter">The adapter for converting between EventStore's data and Orleans' data.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="hostEnvironmentStatistics">The host environment statistics.</param>
     public EventStoreQueueAdapterFactory(string name,
                                          EventStoreOptions options,
                                          EventStoreReceiverOptions receiverOptions,
-                                         EventStoreStreamCachePressureOptions cacheOptions,
+                                         EventStoreStreamCachePressureOptions cachePressureOptions,
                                          StreamCacheEvictionOptions cacheEvictionOptions,
                                          StreamStatisticOptions statisticOptions,
                                          IEventStoreDataAdapter dataAdapter,
                                          IServiceProvider serviceProvider,
                                          ILoggerFactory loggerFactory,
-                                         IHostEnvironmentStatistics hostEnvironmentStatistics)
+                                         IHostEnvironmentStatistics? hostEnvironmentStatistics)
     {
         ArgumentNullException.ThrowIfNull(options, nameof(options));
         ArgumentNullException.ThrowIfNull(receiverOptions, nameof(receiverOptions));
-        ArgumentNullException.ThrowIfNull(cacheOptions, nameof(cacheOptions));
+        ArgumentNullException.ThrowIfNull(cachePressureOptions, nameof(cachePressureOptions));
         ArgumentNullException.ThrowIfNull(cacheEvictionOptions, nameof(cacheEvictionOptions));
         ArgumentNullException.ThrowIfNull(statisticOptions, nameof(statisticOptions));
         ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
@@ -79,80 +79,122 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
         ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
         _name = name;
         _options = options;
-        _cacheOptions = cacheOptions;
+        _receiverOptions = receiverOptions;
         _cacheEvictionOptions = cacheEvictionOptions;
         _statisticOptions = statisticOptions;
         _dataAdapter = dataAdapter;
         _serviceProvider = serviceProvider;
+        _checkpointerFactory = serviceProvider.GetRequiredServiceByName<IStreamQueueCheckpointerFactory>(name);
         _loggerFactory = loggerFactory;
         _hostEnvironmentStatistics = hostEnvironmentStatistics;
+        CacheFactory = CreateCacheFactory(cachePressureOptions).CreateCache;
+        StreamFailureHandlerFactory = _ => Task.FromResult<IStreamFailureHandler>(new NoOpStreamDeliveryFailureHandler());
+        QueueMapperFactory = queues => new HashRingBasedPartitionedStreamQueueMapper(queues, name);
+        ReceiverMonitorFactory = (dimensions, _) => new DefaultEventStoreReceiverMonitor(dimensions);
+        ReceiverFactory = (settings, position, logger) => new EventStoreReceiver(settings, position.ToPosition(), logger);
     }
 
     /// <summary>
     ///     Creates a message cache for an EventStore queue.
     /// </summary>
-    protected Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache>? CacheFactory { get; set; }
-
-    /// <summary>
-    ///     Creates a queue checkpointer.
-    /// </summary>
-    private IStreamQueueCheckpointerFactory _checkpointerFactory;
+    protected Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> CacheFactory { get; set; }
 
     /// <summary>
     ///     Creates a failure handler for a queue.
     /// </summary>
-    protected Func<string, Task<IStreamFailureHandler>>? StreamFailureHandlerFactory { get; set; }
+    protected Func<string, Task<IStreamFailureHandler>> StreamFailureHandlerFactory { get; set; }
 
     /// <summary>
     ///     Create a queue mapper to map EventStore streams to queues.
     /// </summary>
-    protected Func<string[], HashRingBasedPartitionedStreamQueueMapper>? QueueMapperFactory { get; set; }
+    protected Func<string[], HashRingBasedPartitionedStreamQueueMapper> QueueMapperFactory { get; set; }
 
     /// <summary>
     ///     Create a receiver monitor to report performance metrics.
     ///     Factory function should return an IEventStoreReceiverMonitor.
     /// </summary>
-    protected Func<EventStoreReceiverMonitorDimensions, ILoggerFactory, IQueueAdapterReceiverMonitor>? ReceiverMonitorFactory { get; set; }
+    protected Func<EventStoreReceiverMonitorDimensions, ILoggerFactory, IQueueAdapterReceiverMonitor> ReceiverMonitorFactory { get; set; }
 
     /// <summary>
+    ///     Factory to create a IEventStoreReceiver.
+    ///     for testing purpose, used in EventStoreGeneratorStreamProvider
     /// </summary>
-    public virtual void Init()
+    protected Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver> ReceiverFactory { get; set; }
+
+    /// <summary>
+    ///     Create a IEventStoreQueueCacheFactory. It will create a EventStoreQueueCacheFactory by default.
+    ///     User can override this function to return their own implementation of IEventStoreQueueCacheFactory,
+    ///     and other customization of IEventStoreQueueCacheFactory if they may.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual IEventStoreQueueCacheFactory CreateCacheFactory(EventStoreStreamCachePressureOptions cachePressureOptions)
     {
-        CacheFactory ??= CreateCacheFactory(_cacheOptions).CreateCache;
-        StreamFailureHandlerFactory ??= queue => Task.FromResult<IStreamFailureHandler>(new NoOpStreamDeliveryFailureHandler());
-        QueueMapperFactory ??= queues => new HashRingBasedPartitionedStreamQueueMapper(queues, _name);
-        ReceiverMonitorFactory ??= (dimensions, logger) => new DefaultEventStoreReceiverMonitor(dimensions);
+        var sharedDimensions = new EventStoreMonitorAggregationDimensions(_options.Name);
+        return new EventStoreQueueCacheFactory(cachePressureOptions, _cacheEvictionOptions, _statisticOptions, _dataAdapter, sharedDimensions);
+    }
+
+    /// <summary>
+    ///     Get queue names (aka stream names) from EventStore.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual string[] GetQueueNames()
+    {
+        return _options.Queues.ToArray();
     }
 
     #region IQueueAdapterFactory Implementation
 
-    /// <inheritdoc />
-    public async Task<IQueueAdapter> CreateAdapter()
+    /// <summary>
+    ///     Creates a queue adapter.
+    /// </summary>
+    /// <returns>The queue adapter</returns>
+    public Task<IQueueAdapter> CreateAdapter()
     {
-        return null;
+        return Task.FromResult<IQueueAdapter>(GetOrCreateAdapter());
     }
 
-    /// <inheritdoc />
+    private EventStoreQueueAdapter GetOrCreateAdapter()
+    {
+        var streamQueueMapper = GetOrCreateStreamQueueMapper();
+        _queueAdapter ??= new EventStoreQueueAdapter(_name, _options, _receiverOptions, streamQueueMapper, CacheFactory, _checkpointerFactory.Create, ReceiverMonitorFactory, ReceiverFactory, _dataAdapter, _serviceProvider, _loggerFactory, _hostEnvironmentStatistics);
+        return _queueAdapter;
+    }
+
+    /// <summary>
+    ///     Creates queue message cache adapter.
+    /// </summary>
+    /// <returns>The queue adapter cache.</returns>
     public IQueueAdapterCache GetQueueAdapterCache()
     {
-        return null;
+        return GetOrCreateAdapter();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Creates a queue mapper.
+    /// </summary>
+    /// <returns>The queue mapper.</returns>
     public IStreamQueueMapper GetStreamQueueMapper()
+    {
+        return GetOrCreateStreamQueueMapper();
+    }
+
+    private HashRingBasedPartitionedStreamQueueMapper GetOrCreateStreamQueueMapper()
     {
         if (_streamQueueMapper == null)
         {
-            _queues = GetQueueNames();
-            _streamQueueMapper = QueueMapperFactory?.Invoke(_queues) ?? new HashRingBasedPartitionedStreamQueueMapper(_queues, _name);
+            _streamQueueMapper = QueueMapperFactory.Invoke(GetQueueNames());
         }
         return _streamQueueMapper;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Acquire delivery failure handler for a queue
+    /// </summary>
+    /// <param name="queueId">The queue identifier.</param>
+    /// <returns>The stream failure handler.</returns>
     public Task<IStreamFailureHandler> GetDeliveryFailureHandler(QueueId queueId)
     {
-        if (_streamQueueMapper != null && StreamFailureHandlerFactory != null)
+        if (_streamQueueMapper != null)
         {
             var queue = _streamQueueMapper.QueueToPartition(queueId);
             return StreamFailureHandlerFactory.Invoke(queue);
@@ -162,24 +204,4 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
 
     #endregion
 
-    /// <summary>
-    ///     Get queue Ids from EventStore
-    /// </summary>
-    /// <returns></returns>
-    protected virtual string[] GetQueueNames()
-    {
-        return Array.Empty<string>();
-    }
-
-    /// <summary>
-    ///     Create a IEventStoreQueueCacheFactory. It will create a EventStoreQueueCacheFactory by default.
-    ///     User can override this function to return their own implementation of IEventStoreQueueCacheFactory,
-    ///     and other customization of IEventStoreQueueCacheFactory if they may.
-    /// </summary>
-    /// <returns></returns>
-    protected virtual IEventStoreQueueCacheFactory CreateCacheFactory(EventStoreStreamCachePressureOptions eventStoreCacheOptions)
-    {
-        var sharedDimensions = new EventStoreMonitorAggregationDimensions(_options.Name);
-        return new EventStoreQueueCacheFactory(eventStoreCacheOptions, _cacheEvictionOptions, _statisticOptions, _dataAdapter, sharedDimensions);
-    }
 }

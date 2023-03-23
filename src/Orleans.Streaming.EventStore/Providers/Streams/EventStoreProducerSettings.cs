@@ -13,7 +13,7 @@ public class EventStoreProducerSettings
     public EventStoreOptions Options { get; set; } = null!;
 
     /// <summary>
-    ///     The name of a EventStore stream.
+    ///     The queue name (aks stream name) from EventStore.
     /// </summary>
     public string QueueName { get; set; } = null!;
 }

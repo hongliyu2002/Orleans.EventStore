@@ -26,11 +26,26 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
     private readonly IServiceProvider _serviceProvider;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IHostEnvironmentStatistics? _hostEnvironmentStatistics;
-    private readonly Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver>? _eventStoreReceiverFactory;
+    private readonly Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver>? _receiverFactory;
 
     private readonly ConcurrentDictionary<QueueId, EventStoreProducer> _producers = new();
     private readonly ConcurrentDictionary<QueueId, EventStoreQueueAdapterReceiver> _receivers = new();
 
+    /// <summary>
+    ///     Initializes a new instance of the EventStoreQueueAdapter class.
+    /// </summary>
+    /// <param name="name">The name of the adapter.</param>
+    /// <param name="options">The EventStore options.</param>
+    /// <param name="receiverOptions">The EventStore receiver options.</param>
+    /// <param name="streamQueueMapper">The stream queue mapper.</param>
+    /// <param name="cacheFactory">The cache factory.</param>
+    /// <param name="checkpointerFactory">The checkpointer factory.</param>
+    /// <param name="receiverMonitorFactory">The receiver monitor factory.</param>
+    /// <param name="receiverFactory">The EventStore receiver factory.</param>
+    /// <param name="dataAdapter">The EventStore data adapter.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="hostEnvironmentStatistics">The host environment statistics.</param>
     public EventStoreQueueAdapter(string name,
                                   EventStoreOptions options,
                                   EventStoreReceiverOptions receiverOptions,
@@ -38,17 +53,22 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
                                   Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> cacheFactory,
                                   Func<string, Task<IStreamQueueCheckpointer<string>>> checkpointerFactory,
                                   Func<EventStoreReceiverMonitorDimensions, ILoggerFactory, IQueueAdapterReceiverMonitor> receiverMonitorFactory,
+                                  Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver> receiverFactory,
                                   IEventStoreDataAdapter dataAdapter,
                                   IServiceProvider serviceProvider,
                                   ILoggerFactory loggerFactory,
-                                  IHostEnvironmentStatistics? hostEnvironmentStatistics,
-                                  Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver>? eventStoreReceiverFactory = null)
+                                  IHostEnvironmentStatistics? hostEnvironmentStatistics)
     {
-        // ArgumentNullException.ThrowIfNull(options, nameof(options));
-        // ArgumentNullException.ThrowIfNull(receiverOptions, nameof(receiverOptions));
-        // ArgumentNullException.ThrowIfNull(streamQueueMapper, nameof(streamQueueMapper));
-        // ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
-        // ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
+        ArgumentNullException.ThrowIfNull(receiverOptions, nameof(receiverOptions));
+        ArgumentNullException.ThrowIfNull(streamQueueMapper, nameof(streamQueueMapper));
+        ArgumentNullException.ThrowIfNull(cacheFactory, nameof(cacheFactory));
+        ArgumentNullException.ThrowIfNull(checkpointerFactory, nameof(checkpointerFactory));
+        ArgumentNullException.ThrowIfNull(receiverMonitorFactory, nameof(receiverMonitorFactory));
+        ArgumentNullException.ThrowIfNull(receiverFactory, nameof(receiverFactory));
+        ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
+        ArgumentNullException.ThrowIfNull(serviceProvider, nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
         Name = name;
         _options = options;
         _receiverOptions = receiverOptions;
@@ -56,11 +76,11 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
         _cacheFactory = cacheFactory;
         _checkpointerFactory = checkpointerFactory;
         _receiverMonitorFactory = receiverMonitorFactory;
+        _receiverFactory = receiverFactory;
         _dataAdapter = dataAdapter;
         _serviceProvider = serviceProvider;
         _loggerFactory = loggerFactory;
         _hostEnvironmentStatistics = hostEnvironmentStatistics;
-        _eventStoreReceiverFactory = eventStoreReceiverFactory;
     }
 
     #region IQueueAdapter Implementation
@@ -139,14 +159,7 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
                                             QueueName = receiverSettings.QueueName,
                                             Name = receiverSettings.Options.Name
                                         };
-        return new EventStoreQueueAdapterReceiver(receiverSettings,
-                                                  _cacheFactory,
-                                                  _checkpointerFactory,
-                                                  _loggerFactory,
-                                                  _receiverMonitorFactory(receiverMonitorDimensions, _loggerFactory),
-                                                  _serviceProvider.GetRequiredService<IOptions<LoadSheddingOptions>>().Value,
-                                                  _hostEnvironmentStatistics,
-                                                  _eventStoreReceiverFactory);
+        return new EventStoreQueueAdapterReceiver(receiverSettings, _cacheFactory, _checkpointerFactory, _loggerFactory, _receiverMonitorFactory(receiverMonitorDimensions, _loggerFactory), _serviceProvider.GetRequiredService<IOptions<LoadSheddingOptions>>().Value, _hostEnvironmentStatistics, _receiverFactory);
     }
 
     #endregion

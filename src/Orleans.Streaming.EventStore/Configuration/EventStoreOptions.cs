@@ -3,7 +3,7 @@
 namespace Orleans.Configuration;
 
 /// <summary>
-///     EventStore settings
+///     EventStore settings.
 /// </summary>
 public class EventStoreOptions
 {
@@ -21,4 +21,9 @@ public class EventStoreOptions
     ///     EventStore name for this connection, used in cache monitor.
     /// </summary>
     public string Name { get; set; } = null!;
+
+    /// <summary>
+    ///     The queue names (aka stream names) of EventStore.
+    /// </summary>
+    public List<string> Queues { get; set; } = new();
 }

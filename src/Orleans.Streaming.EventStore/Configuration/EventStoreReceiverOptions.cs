@@ -14,7 +14,7 @@ public class EventStoreReceiverOptions
     /// <summary>
     ///     Optional parameter that configures the receiver prefetch count.
     /// </summary>
-    public int PrefetchCount { get; set; } = 32;
+    public int PrefetchCount { get; set; } = 50;
 
     /// <summary>
     ///     In cases where no checkpoint is found,

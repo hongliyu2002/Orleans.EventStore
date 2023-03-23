@@ -11,7 +11,7 @@ namespace Orleans.Providers.Streams.EventStore;
 /// </summary>
 public class EventStoreQueueCacheFactory : IEventStoreQueueCacheFactory
 {
-    private readonly EventStoreStreamCachePressureOptions _cacheOptions;
+    private readonly EventStoreStreamCachePressureOptions _pressureOptions;
     private readonly StreamCacheEvictionOptions _evictionOptions;
     private readonly StreamStatisticOptions _statisticOptions;
     private readonly IEventStoreDataAdapter _dataAdater;
@@ -24,7 +24,7 @@ public class EventStoreQueueCacheFactory : IEventStoreQueueCacheFactory
     /// <summary>
     ///     Initializes a new instance of the <see cref="EventStoreQueueCacheFactory" /> class.
     /// </summary>
-    public EventStoreQueueCacheFactory(EventStoreStreamCachePressureOptions cacheOptions,
+    public EventStoreQueueCacheFactory(EventStoreStreamCachePressureOptions pressureOptions,
                                        StreamCacheEvictionOptions evictionOptions,
                                        StreamStatisticOptions statisticOptions,
                                        IEventStoreDataAdapter dataAdater,
@@ -32,7 +32,12 @@ public class EventStoreQueueCacheFactory : IEventStoreQueueCacheFactory
                                        Func<EventStoreCacheMonitorDimensions, ILoggerFactory, ICacheMonitor>? cacheMonitorFactory = null,
                                        Func<EventStoreBlockPoolMonitorDimensions, ILoggerFactory, IBlockPoolMonitor>? blockPoolMonitorFactory = null)
     {
-        _cacheOptions = cacheOptions;
+        ArgumentNullException.ThrowIfNull(pressureOptions, nameof(pressureOptions));
+        ArgumentNullException.ThrowIfNull(evictionOptions, nameof(evictionOptions));
+        ArgumentNullException.ThrowIfNull(statisticOptions, nameof(statisticOptions));
+        ArgumentNullException.ThrowIfNull(dataAdater, nameof(dataAdater));
+        ArgumentNullException.ThrowIfNull(sharedDimensions, nameof(sharedDimensions));
+        _pressureOptions = pressureOptions;
         _evictionOptions = evictionOptions;
         _statisticOptions = statisticOptions;
         _dataAdater = dataAdater;
@@ -63,7 +68,7 @@ public class EventStoreQueueCacheFactory : IEventStoreQueueCacheFactory
     {
         var blockPool = CreateBufferPool(_statisticOptions, loggerFactory, _sharedDimensions, out var blockPoolId);
         var cache = CreateCache(queue, _dataAdater, _statisticOptions, _evictionOptions, checkpointer, loggerFactory, blockPool, blockPoolId, _timePurge, _sharedDimensions);
-        AddCachePressureMonitors(cache, _cacheOptions, loggerFactory.CreateLogger($"{typeof(EventStoreQueueCache).FullName}.{_sharedDimensions.Name}.{queue}"));
+        AddCachePressureMonitors(cache, _pressureOptions, loggerFactory.CreateLogger($"{typeof(EventStoreQueueCache).FullName}.{_sharedDimensions.Name}.{queue}"));
         return cache;
     }
 
@@ -122,7 +127,7 @@ public class EventStoreQueueCacheFactory : IEventStoreQueueCacheFactory
     protected virtual IEventStoreQueueCache CreateCache(string queue,
                                                         IEventStoreDataAdapter dataAdatper,
                                                         StreamStatisticOptions statisticOptions,
-                                                        StreamCacheEvictionOptions streamCacheEvictionOptions,
+                                                        StreamCacheEvictionOptions cacheEvictionOptions,
                                                         IStreamQueueCheckpointer<string> checkpointer,
                                                         ILoggerFactory loggerFactory,
                                                         IObjectPool<FixedSizeBuffer> bufferPool,
@@ -134,7 +139,7 @@ public class EventStoreQueueCacheFactory : IEventStoreQueueCacheFactory
         var cacheMonitor = CacheMonitorFactory(cacheMonitorDimensions, loggerFactory);
         var logger = loggerFactory.CreateLogger($"{typeof(EventStoreQueueCache).FullName}.{sharedDimensions.Name}.{queue}");
         var evictionStrategy = new ChronologicalEvictionStrategy(logger, timePurge, cacheMonitor, statisticOptions.StatisticMonitorWriteInterval);
-        return new EventStoreQueueCache(queue, EventStoreQueueAdapterReceiver.MaxMessagesPerRead, bufferPool, dataAdatper, evictionStrategy, checkpointer, logger, cacheMonitor, statisticOptions.StatisticMonitorWriteInterval, streamCacheEvictionOptions.MetadataMinTimeInCache);
+        return new EventStoreQueueCache(queue, EventStoreQueueAdapterReceiver.MaxMessagesPerRead, bufferPool, dataAdatper, evictionStrategy, checkpointer, logger, cacheMonitor, statisticOptions.StatisticMonitorWriteInterval, cacheEvictionOptions.MetadataMinTimeInCache);
     }
 
 }

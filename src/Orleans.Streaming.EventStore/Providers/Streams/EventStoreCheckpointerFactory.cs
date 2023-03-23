@@ -40,7 +40,7 @@ public class EventStoreCheckpointerFactory : IStreamQueueCheckpointerFactory
     /// <param name="clusterOptions">The cluster options.</param>
     /// <param name="serializer">The serializer used for state manager.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    private EventStoreCheckpointerFactory(string providerName, EventStoreStreamCheckpointerOptions options, IOptions<ClusterOptions> clusterOptions, Serializer serializer, ILoggerFactory loggerFactory)
+    public EventStoreCheckpointerFactory(string providerName, EventStoreStreamCheckpointerOptions options, IOptions<ClusterOptions> clusterOptions, Serializer serializer, ILoggerFactory loggerFactory)
     {
         ArgumentException.ThrowIfNullOrEmpty(providerName, nameof(providerName));
         ArgumentNullException.ThrowIfNull(options, nameof(options));

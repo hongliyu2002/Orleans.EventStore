@@ -8,17 +8,17 @@ namespace Orleans.Configuration;
 public class StreamCheckpointerConfigurationValidator : IConfigurationValidator
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly string name;
+    private readonly string _name;
 
     /// <summary>
     ///     Validates the configuration of a stream checkpointer by checking that a corresponding <see cref="IStreamQueueCheckpointerFactory" /> is configured with the specified stream provider name.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
-    /// <param name="_name">The name of the stream provider to validate.</param>
-    public StreamCheckpointerConfigurationValidator(IServiceProvider serviceProvider, string _name)
+    /// <param name="name">The name of the stream provider to validate.</param>
+    public StreamCheckpointerConfigurationValidator(IServiceProvider serviceProvider, string name)
     {
         _serviceProvider = serviceProvider;
-        name = _name;
+        _name = name;
     }
 
     /// <summary>
@@ -27,10 +27,10 @@ public class StreamCheckpointerConfigurationValidator : IConfigurationValidator
     /// <exception cref="OrleansConfigurationException">Thrown if no IStreamQueueCheckpointer is configured with the PersistentStreamProvider.</exception>
     public void ValidateConfiguration()
     {
-        var checkpointerFactory = _serviceProvider.GetServiceByName<IStreamQueueCheckpointerFactory>(name);
+        var checkpointerFactory = _serviceProvider.GetServiceByName<IStreamQueueCheckpointerFactory>(_name);
         if (checkpointerFactory == null)
         {
-            throw new OrleansConfigurationException($"No IStreamQueueCheckpointer is configured with PersistentStreamProvider {name}. Please configure one.");
+            throw new OrleansConfigurationException($"No IStreamQueueCheckpointer is configured with PersistentStreamProvider {_name}. Please configure one.");
         }
     }
 }

@@ -52,14 +52,14 @@ public class EventStoreQueueCache : IEventStoreQueueCache
         _defaultMaxAddCount = defaultMaxAddCount;
         _bufferPool = bufferPool;
         _dataAdapter = dataAdapter;
+        _checkpointer = checkpointer;
+        _cache = new PooledQueueCache(dataAdapter, logger, cacheMonitor, cacheMonitorWriteInterval, purgeMetadataInterval);
+        _cacheMonitor = cacheMonitor;
         _evictionStrategy = evictionStrategy;
         _evictionStrategy.OnPurged = OnPurged;
         _evictionStrategy.PurgeObservable = _cache;
-        _checkpointer = checkpointer;
-        _logger = logger;
-        _cache = new PooledQueueCache(dataAdapter, logger, cacheMonitor, cacheMonitorWriteInterval, purgeMetadataInterval);
-        _cacheMonitor = cacheMonitor;
         _cachePressureMonitor = new AggregatedCachePressureMonitor(logger, cacheMonitor);
+        _logger = logger;
     }
 
     /// <summary>

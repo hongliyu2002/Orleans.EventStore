@@ -21,7 +21,6 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
     private readonly StreamStatisticOptions _statisticOptions;
     private readonly IEventStoreDataAdapter _dataAdapter;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IStreamQueueCheckpointerFactory _checkpointerFactory;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IHostEnvironmentStatistics? _hostEnvironmentStatistics;
 
@@ -58,16 +57,7 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="hostEnvironmentStatistics">The host environment statistics.</param>
-    public EventStoreQueueAdapterFactory(string name,
-                                         EventStoreOptions options,
-                                         EventStoreReceiverOptions receiverOptions,
-                                         EventStoreStreamCachePressureOptions cachePressureOptions,
-                                         StreamCacheEvictionOptions cacheEvictionOptions,
-                                         StreamStatisticOptions statisticOptions,
-                                         IEventStoreDataAdapter dataAdapter,
-                                         IServiceProvider serviceProvider,
-                                         ILoggerFactory loggerFactory,
-                                         IHostEnvironmentStatistics? hostEnvironmentStatistics)
+    public EventStoreQueueAdapterFactory(string name, EventStoreOptions options, EventStoreReceiverOptions receiverOptions, EventStoreStreamCachePressureOptions cachePressureOptions, StreamCacheEvictionOptions cacheEvictionOptions, StreamStatisticOptions statisticOptions, IEventStoreDataAdapter dataAdapter, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, IHostEnvironmentStatistics? hostEnvironmentStatistics)
     {
         ArgumentNullException.ThrowIfNull(options, nameof(options));
         ArgumentNullException.ThrowIfNull(receiverOptions, nameof(receiverOptions));
@@ -84,7 +74,6 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
         _statisticOptions = statisticOptions;
         _dataAdapter = dataAdapter;
         _serviceProvider = serviceProvider;
-        _checkpointerFactory = serviceProvider.GetRequiredServiceByName<IStreamQueueCheckpointerFactory>(name);
         _loggerFactory = loggerFactory;
         _hostEnvironmentStatistics = hostEnvironmentStatistics;
         CacheFactory = CreateCacheFactory(cachePressureOptions).CreateCache;
@@ -155,8 +144,12 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
 
     private EventStoreQueueAdapter GetOrCreateAdapter()
     {
-        var streamQueueMapper = GetOrCreateStreamQueueMapper();
-        _queueAdapter ??= new EventStoreQueueAdapter(_name, _options, _receiverOptions, streamQueueMapper, CacheFactory, _checkpointerFactory.Create, ReceiverMonitorFactory, ReceiverFactory, _dataAdapter, _serviceProvider, _loggerFactory, _hostEnvironmentStatistics);
+        if (_queueAdapter == null)
+        {
+            var streamQueueMapper = GetOrCreateStreamQueueMapper();
+            var checkpointerFactory = _serviceProvider.GetRequiredServiceByName<IStreamQueueCheckpointerFactory>(_name);
+            _queueAdapter = new EventStoreQueueAdapter(_name, _options, _receiverOptions, streamQueueMapper, CacheFactory, checkpointerFactory.Create, ReceiverMonitorFactory, ReceiverFactory, _dataAdapter, _serviceProvider, _loggerFactory, _hostEnvironmentStatistics);
+        }
         return _queueAdapter;
     }
 

@@ -45,7 +45,7 @@ public class EventStoreQueueDataAdapterV2 : IEventStoreDataAdapter
     protected virtual IBatchContainer GetBatchContainer(EventStoreMessage eventStoreMessage)
     {
         ArgumentNullException.ThrowIfNull(eventStoreMessage, nameof(eventStoreMessage));
-        return new EventStoreBatchContainer(eventStoreMessage, _serializer);
+        return new EventStoreBatchContainerV2(eventStoreMessage, _serializer);
     }
 
     /// <summary>

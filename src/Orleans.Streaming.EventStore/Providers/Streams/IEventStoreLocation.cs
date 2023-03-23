@@ -6,7 +6,7 @@
 public interface IEventStoreLocation
 {
     /// <summary>
-    ///     Committed position of the message within an EventStore.
+    ///     Stream position of the event within an EventStore.
     /// </summary>
     string Position { get; }
 

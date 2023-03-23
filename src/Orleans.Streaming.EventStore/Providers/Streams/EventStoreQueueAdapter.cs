@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
+using Orleans.Configuration.Overrides;
 using Orleans.Providers.Streams.Common;
 using Orleans.Providers.Streams.EventStore.StatisticMonitors;
 using Orleans.Runtime;
@@ -59,6 +60,7 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
                                   ILoggerFactory loggerFactory,
                                   IHostEnvironmentStatistics? hostEnvironmentStatistics)
     {
+        ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
         ArgumentNullException.ThrowIfNull(options, nameof(options));
         ArgumentNullException.ThrowIfNull(receiverOptions, nameof(receiverOptions));
         ArgumentNullException.ThrowIfNull(streamQueueMapper, nameof(streamQueueMapper));
@@ -146,12 +148,12 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
 
     private EventStoreQueueAdapterReceiver MakeReceiver(QueueId queueId)
     {
+        var clusterOptions = _serviceProvider.GetProviderClusterOptions(Name);
         var receiverSettings = new EventStoreReceiverSettings
                                {
                                    Options = _options,
                                    ReceiverOptions = _receiverOptions,
-                                   // TODO
-                                   ConsumerGroup = "",
+                                   ConsumerGroup = $"{clusterOptions.Value.ServiceId}-{Name}",
                                    QueueName = _streamQueueMapper.QueueToPartition(queueId)
                                };
         var receiverMonitorDimensions = new EventStoreReceiverMonitorDimensions

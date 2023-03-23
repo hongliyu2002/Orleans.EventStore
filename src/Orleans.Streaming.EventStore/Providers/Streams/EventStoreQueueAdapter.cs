@@ -136,8 +136,8 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
                                };
         var receiverMonitorDimensions = new EventStoreReceiverMonitorDimensions
                                         {
-                                            EventStoreQueueName = receiverSettings.QueueName,
-                                            EventStoreName = receiverSettings.Options.EventStoreName
+                                            QueueName = receiverSettings.QueueName,
+                                            Name = receiverSettings.Options.Name
                                         };
         return new EventStoreQueueAdapterReceiver(receiverSettings,
                                                   _cacheFactory,

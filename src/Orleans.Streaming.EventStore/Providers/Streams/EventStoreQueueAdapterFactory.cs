@@ -179,7 +179,7 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
     /// <returns></returns>
     protected virtual IEventStoreQueueCacheFactory CreateCacheFactory(EventStoreStreamCachePressureOptions eventStoreCacheOptions)
     {
-        var sharedDimensions = new EventStoreMonitorAggregationDimensions(_options.EventStoreName);
+        var sharedDimensions = new EventStoreMonitorAggregationDimensions(_options.Name);
         return new EventStoreQueueCacheFactory(eventStoreCacheOptions, _cacheEvictionOptions, _statisticOptions, _dataAdapter, sharedDimensions);
     }
 }

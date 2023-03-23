@@ -11,16 +11,16 @@ public class EventStoreMonitorAggregationDimensions
     /// </summary>
     public EventStoreMonitorAggregationDimensions()
     {
-        EventStoreName = string.Empty;
+        Name = string.Empty;
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="EventStoreMonitorAggregationDimensions" /> class.
     /// </summary>
-    /// <param name="eventStoreName"></param>
-    public EventStoreMonitorAggregationDimensions(string eventStoreName)
+    /// <param name="name"></param>
+    public EventStoreMonitorAggregationDimensions(string name)
     {
-        EventStoreName = eventStoreName;
+        Name = name;
     }
 
     /// <summary>
@@ -29,11 +29,11 @@ public class EventStoreMonitorAggregationDimensions
     /// <param name="dimensions"></param>
     public EventStoreMonitorAggregationDimensions(EventStoreMonitorAggregationDimensions dimensions)
     {
-        EventStoreName = dimensions.EventStoreName;
+        Name = dimensions.Name;
     }
 
     /// <summary>
-    ///     EventStore path
+    ///     EventStore name.
     /// </summary>
-    public string EventStoreName { get; set; }
+    public string Name { get; set; }
 }

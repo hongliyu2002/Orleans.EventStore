@@ -20,5 +20,5 @@ public class EventStoreOptions
     /// <summary>
     ///     EventStore name for this connection, used in cache monitor.
     /// </summary>
-    public string EventStoreName { get; set; } = null!;
+    public string Name { get; set; } = null!;
 }

@@ -10,22 +10,22 @@ public class EventStoreReceiverMonitorDimensions : EventStoreMonitorAggregationD
     /// </summary>
     public EventStoreReceiverMonitorDimensions()
     {
-        EventStoreQueueName = string.Empty;
+        QueueName = string.Empty;
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="EventStoreReceiverMonitorDimensions" /> class.
     /// </summary>
     /// <param name="dimensions"></param>
-    /// <param name="eventStoreQueueName"></param>
-    public EventStoreReceiverMonitorDimensions(EventStoreMonitorAggregationDimensions dimensions, string eventStoreQueueName)
+    /// <param name="queue"></param>
+    public EventStoreReceiverMonitorDimensions(EventStoreMonitorAggregationDimensions dimensions, string queue)
         : base(dimensions)
     {
-        EventStoreQueueName = eventStoreQueueName;
+        QueueName = queue;
     }
 
     /// <summary>
-    ///     EventStore stream
+    ///     EventStore stream name (Aka queue name)
     /// </summary>
-    public string EventStoreQueueName { get; set; }
+    public string QueueName { get; set; }
 }

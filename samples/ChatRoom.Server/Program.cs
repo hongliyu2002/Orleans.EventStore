@@ -4,6 +4,7 @@ using EventStore.Client;
 using Orleans.Configuration;
 using Serilog;
 using Serilog.Events;
+using StackExchange.Redis;
 
 namespace ChatRoom.Server;
 
@@ -36,7 +37,8 @@ public static class Program
 
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
-        var redisConnectionString = "123.60.184.85:6379";
+        // var redisConnectionString0 = "123.60.184.85:6379,defaultDatabase=0";
+        var redisConnectionString1 = "123.60.184.85:6379,defaultDatabase=1";
         var eventStoreConnectionString = "esdb://123.60.184.85:2113?tls=false";
         return Host.CreateDefaultBuilder(args)
                    .UseOrleans(silo =>
@@ -58,7 +60,6 @@ public static class Program
                                    //                             options.Database = 0;
                                    //                         });
                                    silo.UseLocalhostClustering();
-
                                    // Configure reminder service.
                                    silo.AddReminders();
                                    // silo.UseRedisReminderService(options =>
@@ -72,9 +73,7 @@ public static class Program
                                    silo.AddRedisGrainStorage(Constants.PubSubStoreName,
                                                              options =>
                                                              {
-                                                                 options.ConnectionString = redisConnectionString;
-                                                                 options.DatabaseNumber = 1;
-                                                                 options.DeleteOnClear = true;
+                                                                 options.ConfigurationOptions = ConfigurationOptions.Parse(redisConnectionString1);
                                                              });
                                    // Configure streaming
                                    silo.AddStreaming();
@@ -100,7 +99,7 @@ public static class Program
                                                                                                 {
                                                                                                     optionsBuilder.Configure(options =>
                                                                                                                              {
-                                                                                                                                 options.SubscriptionSettings = new PersistentSubscriptionSettings(checkPointAfter: TimeSpan.FromMinutes(1), checkPointLowerBound:1);
+                                                                                                                                 options.SubscriptionSettings = new PersistentSubscriptionSettings(checkPointAfter: TimeSpan.FromMinutes(1), checkPointLowerBound: 1);
                                                                                                                                  options.PrefetchCount = 50;
                                                                                                                              });
                                                                                                 });

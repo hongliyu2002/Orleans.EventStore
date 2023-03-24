@@ -79,12 +79,12 @@ public class EventStorePersistentSubscriptionReceiver : IEventStoreReceiver
             _subscriptionClient = new EventStorePersistentSubscriptionsClient(_settings.Options.ClientSettings);
             try
             {
-                await _subscriptionClient.CreateAsync(_settings.QueueName, _settings.ConsumerGroup, _settings.ReceiverOptions.SubscriptionSettings, null, _settings.Options.Credentials).ConfigureAwait(false);
+                await _subscriptionClient.CreateToStreamAsync(_settings.QueueName, _settings.ConsumerGroup, _settings.ReceiverOptions.SubscriptionSettings, null, _settings.Options.Credentials).ConfigureAwait(false);
             }
             catch (RpcException ex) when (ex.StatusCode is StatusCode.AlreadyExists)
             {
-                await _subscriptionClient.DeleteAsync(_settings.QueueName, _settings.ConsumerGroup, null, _settings.Options.Credentials).ConfigureAwait(false);
-                await _subscriptionClient.CreateAsync(_settings.QueueName, _settings.ConsumerGroup, _settings.ReceiverOptions.SubscriptionSettings, null, _settings.Options.Credentials).ConfigureAwait(false);
+                await _subscriptionClient.DeleteToStreamAsync(_settings.QueueName, _settings.ConsumerGroup, null, _settings.Options.Credentials).ConfigureAwait(false);
+                await _subscriptionClient.CreateToStreamAsync(_settings.QueueName, _settings.ConsumerGroup, _settings.ReceiverOptions.SubscriptionSettings, null, _settings.Options.Credentials).ConfigureAwait(false);
                 // await _subscriptionClient.UpdateAsync(_settings.QueueName, _settings.ConsumerGroup, _settings.ReceiverOptions.SubscriptionSettings, null, _settings.Options.Credentials).ConfigureAwait(false);
             }
             _subscription = await _subscriptionClient.SubscribeToStreamAsync(_settings.QueueName, _settings.ConsumerGroup, OnEventAppeared, OnSubscriptionDropped, _settings.Options.Credentials, _settings.ReceiverOptions.PrefetchCount).ConfigureAwait(false);

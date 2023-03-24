@@ -31,7 +31,7 @@ public class PersistentSubscriptionsClientTests
     {
         try
         {
-            await _client!.CreateAsync($"Snack-{_id}", "test-group", new PersistentSubscriptionSettings());
+            await _client!.CreateToStreamAsync($"Snack-{_id}", "test-group", new PersistentSubscriptionSettings());
         }
         catch (RpcException ex) when (ex.StatusCode is StatusCode.AlreadyExists)
         {

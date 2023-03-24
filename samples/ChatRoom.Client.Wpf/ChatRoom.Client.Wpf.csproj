@@ -10,11 +10,11 @@
     <ItemGroup>
         <PackageReference Include="Fluxera.Utilities" Version="7.1.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-        <PackageReference Include="Microsoft.Orleans.BroadcastChannel" Version="7.1.0" />
-        <PackageReference Include="Microsoft.Orleans.Client" Version="7.1.0" />
-        <PackageReference Include="Microsoft.Orleans.Streaming" Version="7.1.0" />
-        <PackageReference Include="Microsoft.Orleans.Transactions" Version="7.1.0" />
-        <PackageReference Include="Orleans.Clustering.Redis" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Orleans.BroadcastChannel" Version="7.1.1" />
+        <PackageReference Include="Microsoft.Orleans.Client" Version="7.1.1" />
+        <PackageReference Include="Microsoft.Orleans.Streaming" Version="7.1.1" />
+        <PackageReference Include="Microsoft.Orleans.Transactions" Version="7.1.1" />
+        <PackageReference Include="Microsoft.Orleans.Clustering.Redis" Version="7.1.1-beta1" />
     </ItemGroup>
 
     <ItemGroup>

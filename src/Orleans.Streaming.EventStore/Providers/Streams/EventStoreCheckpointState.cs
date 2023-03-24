@@ -14,27 +14,20 @@ public class EventStoreCheckpointState : IEventStoreState
     /// </summary>
     public EventStoreCheckpointState()
     {
-        Id = Guid.NewGuid();
         Position = string.Empty;
         ETag = string.Empty;
     }
 
     /// <summary>
-    ///     The Id value for the state.
-    /// </summary>
-    [Id(0)]
-    public Guid Id { get; set; }
-
-    /// <summary>
     ///     Referring to a potential logical record position in the EventStore transaction file.
     /// </summary>
-    [Id(1)]
+    [Id(0)]
     public string Position { get; set; }
 
     /// <summary>
     ///     The ETag value for the state.
     /// </summary>
-    [Id(2)]
+    [Id(1)]
     public string ETag { get; set; }
 
     /// <summary>
@@ -43,10 +36,9 @@ public class EventStoreCheckpointState : IEventStoreState
     /// <param name="serviceId">The service identifier.</param>
     /// <param name="streamProviderName">Name of the stream provider.</param>
     /// <param name="queue">The queue.</param>
-    /// <param name="id">The identifier.</param>
     /// <returns>The checkpoint stream name.</returns>
-    public static string GetStreamName(string serviceId, string streamProviderName, string queue, Guid id)
+    public static string GetStreamName(string serviceId, string streamProviderName, string queue)
     {
-        return $"{serviceId}/checkpoints/{streamProviderName}/{queue}/{id:N}";
+        return $"{queue}/checkpoints/{serviceId}/{streamProviderName}";
     }
 }

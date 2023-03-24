@@ -59,7 +59,7 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
         _persistInterval = options.PersistInterval;
         _stateManager = new EventStoreStateManager(options, serializer, loggerFactory.CreateLogger<EventStoreStateManager>());
         _checkPointState = new EventStoreCheckpointState();
-        _streamName = EventStoreCheckpointState.GetStreamName(serviceId, streamProviderName, queue, _checkPointState.Id);
+        _streamName = EventStoreCheckpointState.GetStreamName(serviceId, streamProviderName, queue);
     }
 
     private void Initialize()

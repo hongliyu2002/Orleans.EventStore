@@ -96,10 +96,6 @@ public static class Program
                                                                                                                                                     };
                                                                                                                                });
                                                                                                   });
-                                                                 // configurator.ConfigureDataAdapter((sp, name) =>
-                                                                 //                                   {
-                                                                 //                                       
-                                                                 //                                   });
                                                                  configurator.ConfigureReceiver(optionsBuilder =>
                                                                                                 {
                                                                                                     optionsBuilder.Configure(options =>
@@ -108,12 +104,14 @@ public static class Program
                                                                                                                                  options.PrefetchCount = 50;
                                                                                                                              });
                                                                                                 });
-                                                                 // configurator.ConfigureCachePressuring(optionsBuilder =>
-                                                                 //                                       {
-                                                                 //                                           optionsBuilder.Configure(options =>
-                                                                 //                                                                    {
-                                                                 //                                                                    });
-                                                                 //                                       });
+                                                                 configurator.ConfigureCachePressuring(optionsBuilder =>
+                                                                                                       {
+                                                                                                           optionsBuilder.Configure(options =>
+                                                                                                                                    {
+                                                                                                                                        options.SlowConsumingMonitorFlowControlThreshold = 0.5;
+                                                                                                                                        options.SlowConsumingMonitorPressureWindowSize = TimeSpan.FromMinutes(30);
+                                                                                                                                    });
+                                                                                                       });
                                                                  configurator.UseEventStoreCheckpointer(optionsBuilder =>
                                                                                                         {
                                                                                                             optionsBuilder.Configure(options =>
@@ -122,14 +120,6 @@ public static class Program
                                                                                                                                          options.PersistInterval = TimeSpan.FromSeconds(30);
                                                                                                                                      });
                                                                                                         });
-                                                                 // configurator.ConfigurePullingAgent(optionsBuilder =>
-                                                                 //                                    {
-                                                                 //                                        optionsBuilder.Configure(options =>
-                                                                 //                                                                 {
-                                                                 //                                                                     options.BatchContainerBatchSize = 10;
-                                                                 //                                                                     options.GetQueueMsgsTimerPeriod = TimeSpan.FromMilliseconds(200);
-                                                                 //                                                                 });
-                                                                 //                                    });
                                                                  configurator.ConfigureStreamPubSub();
                                                                  configurator.UseConsistentRingQueueBalancer();
                                                              });

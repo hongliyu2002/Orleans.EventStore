@@ -12,6 +12,19 @@ silo.AddEventStoreBasedLogConsistencyProvider(Constants.LogConsistencyStoreName,
 .AddMemoryGrainStorage(Constants.LogSnapshotStoreName);
 ```
 
+## Persistence
+
+### Silo Configuration
+```csharp
+var eventStoreConnectionString = "esdb://123.60.184.85:2113?tls=false";
+silo.AddEventStoreGrainStorage(Constants.StateStoreName, 
+        options =>
+        {
+            options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
+        })
+```
+*Using EventStore DB as a Grain Storage Provider has an interesting feature: all data of the grain state changes are kept in EventStore, just like some time-series databases. By subscribing to the stream of this state, the data can be dynamically updated to the state database, such as SQL Server, making it easy to implement certain CQRS functionality.*
+
 ## Streaming
 *Now supports rewindable feature!*
 ```csharp

@@ -1,5 +1,3 @@
-<img src="https://raw.githubusercontent.com/hongliyu2002/Orleans.FluentResult/master/resources/icons/logo_128.png" alt="Fluent Result"/>
-
 # EventStore Provider for Microsoft Orleans EventSourcing
 
 ### Silo Configuration
@@ -55,6 +53,13 @@ public sealed record SnackRemovedEvent(Guid Id, Guid TraceId, DateTimeOffset Ope
 [GenerateSerializer]
 public sealed class Snack
 {
+    public Snack(Guid id, string name, string? pictureUrl = null)
+    {
+        Id = Guard.Against.Empty(id, nameof(id));
+        Name = Guard.Against.NullOrEmpty(name, nameof(name));
+        PictureUrl = pictureUrl;
+    }
+    
     [Id(0)]
     public Guid Id { get; set; }
 

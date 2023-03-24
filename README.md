@@ -1,5 +1,3 @@
-<img src="https://raw.githubusercontent.com/hongliyu2002/Orleans.FluentResult/master/resources/icons/logo_128.png" alt="Fluent Result"/>
-
 # EventStore Providers for Microsoft Orleans
 
 ## Event Sourcing
@@ -93,7 +91,7 @@ silo.AddEventStoreStreams(Constants.StreamProviderName, configurator =>
 });
 ```
 
-### Cluster Client Configuration
+### Cluster Client Configuration:
 ```csharp
 client.AddStreaming();
 client.AddEventStoreStreams(Constants.StreamProviderName, configurator =>

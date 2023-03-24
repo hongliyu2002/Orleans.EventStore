@@ -14,6 +14,7 @@
         <PackageReference Include="Fluxera.Guards" Version="7.1.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
         <PackageReference Include="Microsoft.Orleans.Serialization.Abstractions" Version="7.1.1" />
+        <PackageReference Include="Microsoft.Orleans.Serialization.Protobuf" Version="7.1.1" />
         <PackageReference Include="Microsoft.Orleans.Server" Version="7.1.1" />
         <PackageReference Include="Microsoft.Orleans.TestingHost" Version="7.1.1" />
         <PackageReference Include="NUnit" Version="3.13.3" />

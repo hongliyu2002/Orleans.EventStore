@@ -76,7 +76,7 @@ public class EventStoreStateManager : IDisposable, IAsyncDisposable
         var startTime = DateTime.UtcNow;
         try
         {
-            await _client.DisposeAsync();
+            await _client.DisposeAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {

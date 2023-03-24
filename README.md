@@ -1,6 +1,41 @@
 <img src="https://raw.githubusercontent.com/hongliyu2002/Orleans.FluentResult/master/resources/icons/logo_128.png" alt="Fluent Result"/>
 
-# EventStore Provider for Microsoft Orleans Streaming
+# EventStore Providers for Microsoft Orleans
+
+## Event Sourcing
+### Silo Configuration
+```csharp
+var eventStoreConnectionString = "esdb://123.60.184.85:2113?tls=false";
+silo.AddEventStoreBasedLogConsistencyProvider(Constants.LogConsistencyStoreName, 
+        options =>
+        {
+            options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
+        })
+.AddMemoryGrainStorage(Constants.LogSnapshotStoreName);
+```
+
+## Streaming
+*Now supports rewindable feature!*
+```csharp
+private async Task JoinChannel(string? username, string? channel, long version)
+{
+    try
+    {
+        _currentUsername = username.IsNullOrWhiteSpace() ? "(anonymous)" : username;
+        _currentChannel = channel.IsNullOrWhiteSpace() ? "(channel unknown)" : channel;
+        _channelGrain = _clusterClient.GetGrain<IChannelGrain>(_currentChannel);
+        _streamId = await _channelGrain.Join(_currentUsername!);
+        _stream = _streamProvider.GetStream<ChatMessage>(_streamId);
+        // Providing a specific SequenceToken allows subscribing from a specific point in time.
+        _subscription = await _stream.SubscribeAsync(new StreamObserver(MessagesListBox), new EventSequenceTokenV2(version));
+        _joined = true;
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show(this, ex.Message, "Error occurred, Please try again...");
+    }
+}
+```
 
 ### Silo configuration:
 ```csharp

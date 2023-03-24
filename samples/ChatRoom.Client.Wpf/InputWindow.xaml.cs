@@ -10,6 +10,8 @@ public partial class InputWindow : Window
     public string? Username { get; set; }
 
     public string? Channel { get; set; }
+    
+    public long Version { get; set; }
 
     public InputWindow()
     {
@@ -20,6 +22,10 @@ public partial class InputWindow : Window
     {
         Username = UsernameTextBox.Text;
         Channel = ChannelTextBox.Text;
+        if (long.TryParse(VersionTextBox.Text, out var version))
+        {
+            Version = version;
+        }
         DialogResult = true;
     }
 }

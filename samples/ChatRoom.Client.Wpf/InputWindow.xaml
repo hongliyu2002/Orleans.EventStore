@@ -15,6 +15,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Text="User Name:"
@@ -29,10 +31,19 @@
                    Margin="10" />
         <TextBox x:Name="ChannelTextBox"
                  Grid.Row="3"
+                 Text="Orleans"
                  Margin="10,0,10,10" />
 
+        <TextBlock Text="Start From Version:"
+                   Grid.Row="4"
+                   Margin="10" />
+        <TextBox x:Name="VersionTextBox"
+                 Grid.Row="5"
+                 Text="0"
+                 Margin="10,0,10,10" />
+        
         <Button Content="OK"
-                Grid.Row="4"
+                Grid.Row="6"
                 Margin="10"
                 Width="75"
                 Click="OkButton_Click" />

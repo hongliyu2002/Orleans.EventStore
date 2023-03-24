@@ -7,6 +7,7 @@ using ChatRoom.Abstractions;
 using ChatRoom.Abstractions.States;
 using Fluxera.Utilities.Extensions;
 using Orleans;
+using Orleans.Providers.Streams.Common;
 using Orleans.Runtime;
 using Orleans.Streams;
 
@@ -87,7 +88,7 @@ public partial class MainWindow
             var result = inputWindow.ShowDialog();
             if (result is true)
             {
-                await JoinChannel(inputWindow.Username, inputWindow.Channel);
+                await JoinChannel(inputWindow.Username, inputWindow.Channel, inputWindow.Version);
             }
         }
         RefreshControls();
@@ -116,12 +117,14 @@ public partial class MainWindow
         }
         else
         {
+            SendMessageButton.IsEnabled = false;
             await SendMessage(text);
             MessageText.Text = string.Empty;
+            SendMessageButton.IsEnabled = true;
         }
     }
 
-    private async Task JoinChannel(string? username, string? channel)
+    private async Task JoinChannel(string? username, string? channel, long version)
     {
         try
         {
@@ -135,7 +138,7 @@ public partial class MainWindow
             // {
             //     await Task.WhenAll(subscriptions.Select(subscription => subscription.ResumeAsync(new StreamObserver(MessagesListBox))));
             // }
-            _subscription = await _stream.SubscribeAsync(new StreamObserver(MessagesListBox));
+            _subscription = await _stream.SubscribeAsync(new StreamObserver(MessagesListBox), new EventSequenceTokenV2(version));
             _joined = true;
         }
         catch (Exception ex)

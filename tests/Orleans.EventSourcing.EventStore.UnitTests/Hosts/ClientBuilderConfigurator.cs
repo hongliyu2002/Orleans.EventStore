@@ -6,7 +6,7 @@ namespace Orleans.EventSourcing.EventStore.UnitTests.Hosts;
 public class ClientBuilderConfigurator : IClientBuilderConfigurator
 {
     /// <inheritdoc />
-    public void Configure(IConfiguration configuration, IClientBuilder clientBuilder)
+    public void Configure(IConfiguration configuration, IClientBuilder client)
     {
     }
 }

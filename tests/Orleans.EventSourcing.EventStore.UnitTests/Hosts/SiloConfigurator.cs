@@ -6,14 +6,14 @@ namespace Orleans.EventSourcing.EventStore.UnitTests.Hosts;
 public class SiloConfigurator : ISiloConfigurator
 {
     /// <inheritdoc />
-    public void Configure(ISiloBuilder siloBuilder)
+    public void Configure(ISiloBuilder silo)
     {
-        siloBuilder.AddEventStoreBasedLogConsistencyProvider(Constants.LogConsistencyStoreName,
-                                                             options =>
-                                                             {
-                                                                 var connectionString = "esdb://123.60.184.85:2113?tls=false";
-                                                                 options.ClientSettings = EventStoreClientSettings.Create(connectionString);
-                                                             })
-                   .AddMemoryGrainStorage(Constants.LogSnapshotStoreName);
+        var eventStoreConnectionString = "esdb://123.60.184.85:2113?tls=false";
+        silo.AddEventStoreBasedLogConsistencyProvider(Constants.LogConsistencyStoreName,
+                                                      options =>
+                                                      {
+                                                          options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
+                                                      })
+            .AddMemoryGrainStorage(Constants.LogSnapshotStoreName);
     }
 }

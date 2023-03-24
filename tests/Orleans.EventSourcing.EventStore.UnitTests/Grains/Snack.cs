@@ -6,18 +6,6 @@ namespace Orleans.EventSourcing.EventStore.UnitTests.Grains;
 [GenerateSerializer]
 public sealed class Snack
 {
-    public Snack()
-    {
-    }
-
-    public Snack(Guid id, string name, string? pictureUrl = null)
-        : this()
-    {
-        Id = Guard.Against.Empty(id, nameof(id));
-        Name = Guard.Against.NullOrEmpty(name, nameof(name));
-        PictureUrl = pictureUrl;
-    }
-
     [Id(0)]
     public Guid Id { get; set; }
 

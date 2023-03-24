@@ -7,7 +7,7 @@ namespace Orleans.Hosting;
 public static class EventStoreSiloBuilderExtensions
 {
     /// <summary>
-    ///     Configure silo to use event hub persistent streams.
+    ///     Configure silo to use EventStore persistent streams.
     /// </summary>
     public static ISiloBuilder AddEventStoreStreams(this ISiloBuilder builder, string name, Action<ISiloEventStoreStreamConfigurator> configure)
     {
@@ -17,7 +17,7 @@ public static class EventStoreSiloBuilderExtensions
     }
 
     /// <summary>
-    ///     Configure silo to use event hub persistent streams with default check pointer and other settings
+    ///     Configure silo to use EventStore persistent streams with default check pointer and other settings
     /// </summary>
     public static ISiloBuilder AddEventStoreStreams(this ISiloBuilder builder, string name, Action<EventStoreOptions> configureEventStore, Action<EventStoreStreamCheckpointerOptions> configureDefaultCheckpointer)
     {

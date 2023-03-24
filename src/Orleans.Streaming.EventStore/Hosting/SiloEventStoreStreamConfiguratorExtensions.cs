@@ -44,7 +44,7 @@ public static class SiloEventStoreStreamConfiguratorExtensions
     }
 
     /// <summary>
-    ///     Configures EventStore as backend storage of the checkpointer state.
+    ///     Configures EventStore as backend storage of checkpointer state.
     /// </summary>
     /// <param name="configurator">The stream configurator.</param>
     /// <param name="configureOptions">An action to configure the options for the checkpointer.</param>

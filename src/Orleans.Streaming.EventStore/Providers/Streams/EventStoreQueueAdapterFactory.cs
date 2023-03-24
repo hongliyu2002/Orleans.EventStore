@@ -147,8 +147,7 @@ public class EventStoreQueueAdapterFactory : IQueueAdapterFactory
         if (_queueAdapter == null)
         {
             var streamQueueMapper = GetOrCreateStreamQueueMapper();
-            var checkpointerFactory = _serviceProvider.GetRequiredServiceByName<IStreamQueueCheckpointerFactory>(_name);
-            _queueAdapter = new EventStoreQueueAdapter(_name, _options, _receiverOptions, streamQueueMapper, CacheFactory, checkpointerFactory.Create, ReceiverMonitorFactory, ReceiverFactory, _dataAdapter, _serviceProvider, _loggerFactory, _hostEnvironmentStatistics);
+            _queueAdapter = new EventStoreQueueAdapter(_name, _options, _receiverOptions, streamQueueMapper, CacheFactory, ReceiverMonitorFactory, ReceiverFactory, _dataAdapter, _serviceProvider, _loggerFactory, _hostEnvironmentStatistics);
         }
         return _queueAdapter;
     }

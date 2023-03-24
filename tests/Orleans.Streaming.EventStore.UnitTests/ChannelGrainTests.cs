@@ -1,5 +1,7 @@
-﻿using FluentAssertions;
+﻿using System.Text;
+using FluentAssertions;
 using NUnit.Framework;
+using Orleans.Runtime;
 using Orleans.Streaming.EventStore.UnitTests.Grains;
 using Orleans.Streaming.EventStore.UnitTests.Hosts;
 using Orleans.TestingHost;
@@ -161,5 +163,16 @@ public class ChannelGrainTests
         var history = await channelGrain.ReadHistory(10);
         history.Length.Should().BeGreaterOrEqualTo(5);
         history.Should().Contain(x => x.Author == nickname && x.Text.StartsWith($"{messageText}"));
+    }
+
+    [Test]
+    public async Task Test_StreamId()
+    {
+        var id = StreamId.Create("ChatRoom", Guid.NewGuid().ToString("D"));
+        var idString = id.ToString();
+        await TestContext.Progress.WriteLineAsync(idString);
+        var idBuffer = new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(idString));
+        var newId = StreamId.Parse(idBuffer.Span);
+        newId.Should().Be(id);
     }
 }

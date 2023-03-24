@@ -96,11 +96,30 @@ public static class Program
                                                                                                                                                     };
                                                                                                                                });
                                                                                                   });
+                                                                 // configurator.ConfigureDataAdapter((sp, name) =>
+                                                                 //                                   {
+                                                                 //                                       
+                                                                 //                                   });
+                                                                 configurator.ConfigureReceiver(optionsBuilder =>
+                                                                                                {
+                                                                                                    optionsBuilder.Configure(options =>
+                                                                                                                             {
+                                                                                                                                 options.SubscriptionSettings = new PersistentSubscriptionSettings(checkPointAfter: TimeSpan.FromMinutes(1), checkPointLowerBound:1);
+                                                                                                                                 options.PrefetchCount = 50;
+                                                                                                                             });
+                                                                                                });
+                                                                 // configurator.ConfigureCachePressuring(optionsBuilder =>
+                                                                 //                                       {
+                                                                 //                                           optionsBuilder.Configure(options =>
+                                                                 //                                                                    {
+                                                                 //                                                                    });
+                                                                 //                                       });
                                                                  configurator.UseEventStoreCheckpointer(optionsBuilder =>
                                                                                                         {
                                                                                                             optionsBuilder.Configure(options =>
                                                                                                                                      {
                                                                                                                                          options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
+                                                                                                                                         options.PersistInterval = TimeSpan.FromSeconds(30);
                                                                                                                                      });
                                                                                                         });
                                                                  // configurator.ConfigurePullingAgent(optionsBuilder =>

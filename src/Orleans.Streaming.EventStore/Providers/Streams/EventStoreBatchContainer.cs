@@ -1,4 +1,5 @@
-﻿using EventStore.Client;
+﻿using System.Text;
+using EventStore.Client;
 using Newtonsoft.Json;
 using Orleans.Runtime;
 using Orleans.Serialization;
@@ -110,7 +111,7 @@ public class EventStoreBatchContainer : IBatchContainer
         ArgumentNullException.ThrowIfNull(events);
         var payload = new MessageBody(events.Cast<object>().ToList(), requestContext);
         var payloadBuffer = serializer.SerializeToArray(payload);
-        var eventData = new EventData(Uuid.NewUuid(), typeof(T).Name, new ReadOnlyMemory<byte>(payloadBuffer), streamId.FullKey, "application/octet-stream");
+        var eventData = new EventData(Uuid.NewUuid(), typeof(T).Name, new ReadOnlyMemory<byte>(payloadBuffer), new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(streamId.ToString())), "application/octet-stream");
         return eventData;
     }
 

@@ -7,7 +7,7 @@ namespace Orleans.Hosting;
 public static class EventStoreClientBuilderExtensions
 {
     /// <summary>
-    ///     Configure cluster client to use event hub persistent streams.
+    ///     Configure cluster client to use EventStore persistent streams.
     /// </summary>
     public static IClientBuilder AddEventStoreStreams(this IClientBuilder builder, string name, Action<IClusterClientEventStoreStreamConfigurator> configure)
     {
@@ -17,7 +17,7 @@ public static class EventStoreClientBuilderExtensions
     }
 
     /// <summary>
-    ///     Configure cluster client to use event hub persistent streams with default settings.
+    ///     Configure cluster client to use EventStore persistent streams with default settings.
     /// </summary>
     public static IClientBuilder AddEventStoreStreams(this IClientBuilder builder, string name, Action<EventStoreOptions> configureEventStore)
     {

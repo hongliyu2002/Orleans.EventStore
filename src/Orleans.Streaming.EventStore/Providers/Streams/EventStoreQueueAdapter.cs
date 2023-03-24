@@ -21,13 +21,14 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
     private readonly EventStoreReceiverOptions _receiverOptions;
     private readonly HashRingBasedPartitionedStreamQueueMapper _streamQueueMapper;
     private readonly Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> _cacheFactory;
-    private readonly Func<string, Task<IStreamQueueCheckpointer<string>>> _checkpointerFactory;
     private readonly Func<EventStoreReceiverMonitorDimensions, ILoggerFactory, IQueueAdapterReceiverMonitor> _receiverMonitorFactory;
     private readonly IEventStoreDataAdapter _dataAdapter;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IHostEnvironmentStatistics? _hostEnvironmentStatistics;
     private readonly Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver>? _receiverFactory;
+
+    private IStreamQueueCheckpointerFactory? _checkpointerFactory;
 
     private readonly ConcurrentDictionary<QueueId, EventStoreProducer> _producers = new();
     private readonly ConcurrentDictionary<QueueId, EventStoreQueueAdapterReceiver> _receivers = new();
@@ -40,21 +41,19 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
     /// <param name="receiverOptions">The EventStore receiver options.</param>
     /// <param name="streamQueueMapper">The stream queue mapper.</param>
     /// <param name="cacheFactory">The cache factory.</param>
-    /// <param name="checkpointerFactory">The checkpointer factory.</param>
     /// <param name="receiverMonitorFactory">The receiver monitor factory.</param>
     /// <param name="receiverFactory">The EventStore receiver factory.</param>
     /// <param name="dataAdapter">The EventStore data adapter.</param>
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="hostEnvironmentStatistics">The host environment statistics.</param>
-    public EventStoreQueueAdapter(string name, EventStoreOptions options, EventStoreReceiverOptions receiverOptions, HashRingBasedPartitionedStreamQueueMapper streamQueueMapper, Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> cacheFactory, Func<string, Task<IStreamQueueCheckpointer<string>>> checkpointerFactory, Func<EventStoreReceiverMonitorDimensions, ILoggerFactory, IQueueAdapterReceiverMonitor> receiverMonitorFactory, Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver> receiverFactory, IEventStoreDataAdapter dataAdapter, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, IHostEnvironmentStatistics? hostEnvironmentStatistics)
+    public EventStoreQueueAdapter(string name, EventStoreOptions options, EventStoreReceiverOptions receiverOptions, HashRingBasedPartitionedStreamQueueMapper streamQueueMapper, Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> cacheFactory, Func<EventStoreReceiverMonitorDimensions, ILoggerFactory, IQueueAdapterReceiverMonitor> receiverMonitorFactory, Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver> receiverFactory, IEventStoreDataAdapter dataAdapter, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, IHostEnvironmentStatistics? hostEnvironmentStatistics)
     {
         ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
         ArgumentNullException.ThrowIfNull(options, nameof(options));
         ArgumentNullException.ThrowIfNull(receiverOptions, nameof(receiverOptions));
         ArgumentNullException.ThrowIfNull(streamQueueMapper, nameof(streamQueueMapper));
         ArgumentNullException.ThrowIfNull(cacheFactory, nameof(cacheFactory));
-        ArgumentNullException.ThrowIfNull(checkpointerFactory, nameof(checkpointerFactory));
         ArgumentNullException.ThrowIfNull(receiverMonitorFactory, nameof(receiverMonitorFactory));
         ArgumentNullException.ThrowIfNull(receiverFactory, nameof(receiverFactory));
         ArgumentNullException.ThrowIfNull(dataAdapter, nameof(dataAdapter));
@@ -65,7 +64,6 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
         _receiverOptions = receiverOptions;
         _streamQueueMapper = streamQueueMapper;
         _cacheFactory = cacheFactory;
-        _checkpointerFactory = checkpointerFactory;
         _receiverMonitorFactory = receiverMonitorFactory;
         _receiverFactory = receiverFactory;
         _dataAdapter = dataAdapter;
@@ -152,7 +150,12 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
                                             QueueName = receiverSettings.QueueName,
                                             Name = receiverSettings.Options.Name
                                         };
-        return new EventStoreQueueAdapterReceiver(receiverSettings, _cacheFactory, _checkpointerFactory, _loggerFactory, _receiverMonitorFactory(receiverMonitorDimensions, _loggerFactory), _serviceProvider.GetRequiredService<IOptions<LoadSheddingOptions>>().Value, _hostEnvironmentStatistics, _receiverFactory);
+        // Should only need checkpointer on silo side, so move its init logic when it is used.
+        if (_checkpointerFactory == null)
+        {
+            _checkpointerFactory = _serviceProvider.GetRequiredServiceByName<IStreamQueueCheckpointerFactory>(Name);
+        }
+        return new EventStoreQueueAdapterReceiver(receiverSettings, _cacheFactory, _checkpointerFactory.Create, _loggerFactory, _receiverMonitorFactory(receiverMonitorDimensions, _loggerFactory), _serviceProvider.GetRequiredService<IOptions<LoadSheddingOptions>>().Value, _hostEnvironmentStatistics, _receiverFactory);
     }
 
     #endregion

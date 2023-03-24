@@ -19,7 +19,7 @@
         <PackageProjectUrl>https://github.com/hongliyu2002/Orleans.EventStore</PackageProjectUrl>
         <PackageIcon>logo_128.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>Add UserCredentials options to connect to EventStore</PackageReleaseNotes>
+        <PackageReleaseNotes>Add provider name to persistence state stream name. and upgraded to Orleans 7.1.1</PackageReleaseNotes>
         <!--SourceLink-->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

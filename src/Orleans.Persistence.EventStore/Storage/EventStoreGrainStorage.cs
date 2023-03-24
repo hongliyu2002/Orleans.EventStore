@@ -13,7 +13,7 @@ namespace Orleans.Storage;
 public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
 {
     private readonly string _name;
-    private readonly EventStoreStorageOptions _storageOptions;
+    private readonly EventStoreStorageOptions _options;
     private readonly IGrainStorageSerializer _storageSerializer;
     private readonly ILogger<EventStoreGrainStorage> _logger;
     private readonly string _serviceId;
@@ -24,15 +24,16 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     /// <summary>
     ///     Creates a new instance of the <see cref="EventStoreGrainStorage" /> type.
     /// </summary>
-    public EventStoreGrainStorage(string name, EventStoreStorageOptions storageOptions, IOptions<ClusterOptions> clusterOptions, ILogger<EventStoreGrainStorage> logger)
+    public EventStoreGrainStorage(string name, EventStoreStorageOptions options, IOptions<ClusterOptions> clusterOptions, ILogger<EventStoreGrainStorage> logger)
     {
         ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
-        ArgumentNullException.ThrowIfNull(storageOptions, nameof(storageOptions));
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
+        ArgumentNullException.ThrowIfNull(options.GrainStorageSerializer, nameof(options.GrainStorageSerializer));
         ArgumentNullException.ThrowIfNull(clusterOptions, nameof(clusterOptions));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _name = name;
-        _storageOptions = storageOptions;
-        _storageSerializer = storageOptions.GrainStorageSerializer;
+        _options = options;
+        _storageSerializer = options.GrainStorageSerializer;
         _serviceId = clusterOptions.Value.ServiceId;
         _logger = logger;
     }
@@ -43,7 +44,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     /// <returns></returns>
     private string GetStreamName(GrainId grainId)
     {
-        return $"{_serviceId}/state/{grainId}";
+        return $"{_serviceId}/{_name}/state/{grainId}";
     }
 
     #region Lifecycle Participant
@@ -52,7 +53,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     public void Participate(ISiloLifecycle lifecycle)
     {
         var name = OptionFormattingUtilities.Name<EventStoreGrainStorage>(_name);
-        lifecycle.Subscribe(name, _storageOptions.InitStage, Init, Close);
+        lifecycle.Subscribe(name, _options.InitStage, Init, Close);
     }
 
     private Task Init(CancellationToken cancellationToken)
@@ -64,7 +65,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
             {
                 _logger.LogDebug("EventStoreGrainStorage {Name} is initializing: ServiceId={ServiceId}", _name, _serviceId);
             }
-            _client = new EventStoreClient(_storageOptions.ClientSettings);
+            _client = new EventStoreClient(_options.ClientSettings);
             _initialized = true;
             if (_logger.IsEnabled(LogLevel.Debug))
             {
@@ -117,7 +118,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         var streamName = GetStreamName(grainId);
         try
         {
-            var readResult = _client.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1, false, null, _storageOptions.Credentials);
+            var readResult = _client.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1, false, null, _options.Credentials);
             var readState = await readResult.ReadState.ConfigureAwait(false);
             if (readState == ReadState.Ok)
             {
@@ -152,7 +153,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         {
             var eTagExists = ulong.TryParse(grainState.ETag, out var eTag);
             var serializedState = SerializeState(grainState.State);
-            var writeResult = await _client.AppendToStreamAsync(streamName, eTagExists ? new StreamRevision(eTag) : StreamRevision.None, new[] { serializedState }, null, null, _storageOptions.Credentials).ConfigureAwait(false);
+            var writeResult = await _client.AppendToStreamAsync(streamName, eTagExists ? new StreamRevision(eTag) : StreamRevision.None, new[] { serializedState }, null, null, _options.Credentials).ConfigureAwait(false);
             grainState.ETag = writeResult.NextExpectedStreamRevision.ToUInt64().ToString();
             grainState.RecordExists = true;
         }
@@ -179,11 +180,11 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         try
         {
             var eTagExists = ulong.TryParse(grainState.ETag, out var eTag);
-            if (_storageOptions.DeleteStateOnClear)
+            if (_options.DeleteStateOnClear)
             {
                 if (eTagExists)
                 {
-                    await _client.DeleteAsync(streamName, new StreamRevision(eTag), null, _storageOptions.Credentials).ConfigureAwait(false);
+                    await _client.DeleteAsync(streamName, new StreamRevision(eTag), null, _options.Credentials).ConfigureAwait(false);
                     grainState.ETag = eTag.ToString();
                 }
             }
@@ -192,7 +193,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
                 if (eTagExists)
                 {
                     var serializedState = SerializeState(default(T));
-                    var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision(eTag), new[] { serializedState }, null, null, _storageOptions.Credentials).ConfigureAwait(false);
+                    var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision(eTag), new[] { serializedState }, null, null, _options.Credentials).ConfigureAwait(false);
                     grainState.ETag = writeResult.NextExpectedStreamRevision.ToUInt64().ToString();
                 }
             }

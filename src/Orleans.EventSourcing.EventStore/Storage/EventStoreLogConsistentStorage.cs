@@ -45,7 +45,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
     /// <returns></returns>
     private string GetStreamName(GrainId grainId)
     {
-        return $"{_serviceId}/log/{grainId}";
+        return $"{_serviceId}/{_name}/log/{grainId}";
     }
 
     #region Lifecycle Participant

@@ -11,7 +11,7 @@ public interface IEventStoreProducer
     /// <summary>
     ///     Start to create client and subscribe from EventStore persistent subscriptions.
     /// </summary>
-    Task InitAsync();
+    void Init();
 
     /// <summary>
     ///     Clean up.

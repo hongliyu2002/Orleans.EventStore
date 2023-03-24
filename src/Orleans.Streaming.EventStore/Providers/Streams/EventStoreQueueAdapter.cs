@@ -47,18 +47,7 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="hostEnvironmentStatistics">The host environment statistics.</param>
-    public EventStoreQueueAdapter(string name,
-                                  EventStoreOptions options,
-                                  EventStoreReceiverOptions receiverOptions,
-                                  HashRingBasedPartitionedStreamQueueMapper streamQueueMapper,
-                                  Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> cacheFactory,
-                                  Func<string, Task<IStreamQueueCheckpointer<string>>> checkpointerFactory,
-                                  Func<EventStoreReceiverMonitorDimensions, ILoggerFactory, IQueueAdapterReceiverMonitor> receiverMonitorFactory,
-                                  Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver> receiverFactory,
-                                  IEventStoreDataAdapter dataAdapter,
-                                  IServiceProvider serviceProvider,
-                                  ILoggerFactory loggerFactory,
-                                  IHostEnvironmentStatistics? hostEnvironmentStatistics)
+    public EventStoreQueueAdapter(string name, EventStoreOptions options, EventStoreReceiverOptions receiverOptions, HashRingBasedPartitionedStreamQueueMapper streamQueueMapper, Func<string, IStreamQueueCheckpointer<string>, ILoggerFactory, IEventStoreQueueCache> cacheFactory, Func<string, Task<IStreamQueueCheckpointer<string>>> checkpointerFactory, Func<EventStoreReceiverMonitorDimensions, ILoggerFactory, IQueueAdapterReceiverMonitor> receiverMonitorFactory, Func<EventStoreReceiverSettings, string, ILogger, IEventStoreReceiver> receiverFactory, IEventStoreDataAdapter dataAdapter, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, IHostEnvironmentStatistics? hostEnvironmentStatistics)
     {
         ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
         ArgumentNullException.ThrowIfNull(options, nameof(options));
@@ -128,7 +117,9 @@ public class EventStoreQueueAdapter : IQueueAdapter, IQueueAdapterCache
                                    Options = _options,
                                    QueueName = _streamQueueMapper.QueueToPartition(queueId)
                                };
-        return new EventStoreProducer(producerSettings, _loggerFactory.CreateLogger<EventStoreProducer>());
+        var producer = new EventStoreProducer(producerSettings, _loggerFactory.CreateLogger<EventStoreProducer>());
+        producer.Init();
+        return producer;
     }
 
     /// <summary>

@@ -11,10 +11,7 @@ public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        Log.Logger = new LoggerConfiguration().MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                                              .Enrich.FromLogContext()
-                                              .WriteTo.Console()
-                                              .CreateBootstrapLogger();
+        Log.Logger = new LoggerConfiguration().MinimumLevel.Override("Microsoft", LogEventLevel.Information).Enrich.FromLogContext().WriteTo.Console().CreateBootstrapLogger();
         var appName = "Chat Room";
         try
         {
@@ -89,16 +86,31 @@ public static class Program
                                                                                                       optionsBuilder.Configure(options =>
                                                                                                                                {
                                                                                                                                    options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
+                                                                                                                                   options.Name = "ChatRoomV2";
+                                                                                                                                   options.Queues = new List<string>
+                                                                                                                                                    {
+                                                                                                                                                        "ChatRoomV2-11111",
+                                                                                                                                                        "ChatRoomV2-22222",
+                                                                                                                                                        "ChatRoomV2-33333",
+                                                                                                                                                        "ChatRoomV2-44444"
+                                                                                                                                                    };
                                                                                                                                });
                                                                                                   });
-                                                                 configurator.ConfigurePullingAgent(optionsBuilder =>
-                                                                                                    {
-                                                                                                        optionsBuilder.Configure(options =>
-                                                                                                                                 {
-                                                                                                                                     options.BatchContainerBatchSize = 10;
-                                                                                                                                     options.GetQueueMsgsTimerPeriod = TimeSpan.FromMilliseconds(200);
-                                                                                                                                 });
-                                                                                                    });
+                                                                 configurator.UseEventStoreCheckpointer(optionsBuilder =>
+                                                                                                        {
+                                                                                                            optionsBuilder.Configure(options =>
+                                                                                                                                     {
+                                                                                                                                         options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
+                                                                                                                                     });
+                                                                                                        });
+                                                                 // configurator.ConfigurePullingAgent(optionsBuilder =>
+                                                                 //                                    {
+                                                                 //                                        optionsBuilder.Configure(options =>
+                                                                 //                                                                 {
+                                                                 //                                                                     options.BatchContainerBatchSize = 10;
+                                                                 //                                                                     options.GetQueueMsgsTimerPeriod = TimeSpan.FromMilliseconds(200);
+                                                                 //                                                                 });
+                                                                 //                                    });
                                                                  configurator.ConfigureStreamPubSub();
                                                                  configurator.UseConsistentRingQueueBalancer();
                                                              });
@@ -112,8 +124,7 @@ public static class Program
                                })
                    .UseSerilog((context, serviceProvider, logConfig) =>
                                {
-                                   logConfig.ReadFrom.Configuration(context.Configuration)
-                                            .ReadFrom.Services(serviceProvider);
+                                   logConfig.ReadFrom.Configuration(context.Configuration).ReadFrom.Services(serviceProvider);
                                })
                    .UseConsoleLifetime();
     }

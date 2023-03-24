@@ -33,7 +33,7 @@ public class EventStoreProducer : IEventStoreProducer
     /// <summary>
     ///     Start to create client and subscribe from EventStore persistent subscriptions.
     /// </summary>
-    public Task InitAsync()
+    public void Init()
     {
         var timer = Stopwatch.StartNew();
         try
@@ -49,7 +49,6 @@ public class EventStoreProducer : IEventStoreProducer
                 timer.Stop();
                 _logger.LogDebug("InitAsync: QueueName={QueueName}, initialized in {ElapsedMilliseconds} ms", _settings.QueueName, timer.Elapsed.TotalMilliseconds.ToString("0.00"));
             }
-            return Task.CompletedTask;
         }
         catch (Exception ex)
         {

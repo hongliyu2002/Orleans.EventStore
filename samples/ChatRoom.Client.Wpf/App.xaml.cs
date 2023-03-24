@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using ChatRoom.Abstractions;
 using EventStore.Client;
@@ -19,8 +20,7 @@ public partial class App
     /// <inheritdoc />
     public App()
     {
-        _host = CreateHostBuilder()
-           .Build();
+        _host = CreateHostBuilder().Build();
     }
 
     /// <inheritdoc />
@@ -75,6 +75,14 @@ public partial class App
                                                                                                               optionsBuilder.Configure(options =>
                                                                                                                                        {
                                                                                                                                            options.ClientSettings = EventStoreClientSettings.Create(eventStoreConnectionString);
+                                                                                                                                           options.Name = "ChatRoomV2";
+                                                                                                                                           options.Queues = new List<string>
+                                                                                                                                                            {
+                                                                                                                                                                "ChatRoomV2-11111",
+                                                                                                                                                                "ChatRoomV2-22222",
+                                                                                                                                                                "ChatRoomV2-33333",
+                                                                                                                                                                "ChatRoomV2-44444"
+                                                                                                                                                            };
                                                                                                                                        });
                                                                                                           });
                                                                          configurator.ConfigureStreamPubSub();

@@ -27,7 +27,7 @@ public class EventStoreQueueCache : IEventStoreQueueCache
     /// <summary>
     ///     Initializes a new instance of the <see cref="EventStoreQueueCache" /> class.
     /// </summary>
-    /// <param name="queue">Partition this instance is caching.</param>
+    /// <param name="queue">Queue this instance is caching.</param>
     /// <param name="defaultMaxAddCount">Default max number of items that can be added to the cache between purge calls.</param>
     /// <param name="bufferPool">raw data block pool.</param>
     /// <param name="dataAdapter">Adapts EventRecord to cached.</param>
@@ -48,7 +48,7 @@ public class EventStoreQueueCache : IEventStoreQueueCache
                                 TimeSpan? cacheMonitorWriteInterval,
                                 TimeSpan? purgeMetadataInterval)
     {
-        Partition = queue;
+        Queue = queue;
         _defaultMaxAddCount = defaultMaxAddCount;
         _bufferPool = bufferPool;
         _dataAdapter = dataAdapter;
@@ -63,9 +63,9 @@ public class EventStoreQueueCache : IEventStoreQueueCache
     }
 
     /// <summary>
-    ///     Partition this instance is caching.
+    ///     Queue this instance is caching.
     /// </summary>
-    public string Partition { get; }
+    public string Queue { get; }
 
     /// <summary>
     ///     Handles cache purge signals

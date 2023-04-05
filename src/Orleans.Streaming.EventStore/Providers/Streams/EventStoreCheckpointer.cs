@@ -55,7 +55,7 @@ public class EventStoreCheckpointer : IStreamQueueCheckpointer<string>
         ArgumentNullException.ThrowIfNull(serializer, nameof(serializer));
         ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
         // _logger = loggerFactory.CreateLogger<EventStoreCheckpointer>();
-        // _logger.LogInformation("Creating EventStore checkpointer for queue {Partition} of stream provider {StreamProviderName} with serviceId {ServiceId}.", queue, streamProviderName, serviceId);
+        // _logger.LogInformation("Creating EventStore checkpointer for queue {Queue} of stream provider {StreamProviderName} with serviceId {ServiceId}.", queue, streamProviderName, serviceId);
         _persistInterval = options.PersistInterval;
         _stateManager = new EventStoreStateManager(options, serializer, loggerFactory.CreateLogger<EventStoreStateManager>());
         _checkPointState = new EventStoreCheckpointState();

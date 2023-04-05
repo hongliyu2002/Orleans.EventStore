@@ -90,7 +90,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         }
         try
         {
-            await _client.DisposeAsync();
+            await _client.DisposeAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {

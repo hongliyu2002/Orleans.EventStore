@@ -7,9 +7,9 @@
         <PackageId>Orleans.Streaming.EventStore</PackageId>
         <Title>EventStore for Microsoft Orleans Streaming</Title>
         <Description>EventStore Grpc client implementation of streaming for Microsoft Orleans Streaming.</Description>
-        <Version>7.1.1</Version>
-        <AssemblyVersion>7.1.1.0</AssemblyVersion>
-        <FileVersion>7.1.1.0</FileVersion>
+        <Version>7.1.2</Version>
+        <AssemblyVersion>7.1.2.0</AssemblyVersion>
+        <FileVersion>7.1.2.0</FileVersion>
         <Authors>Leo Hong</Authors>
         <Copyright>Copyright 2023 (c) Leo Hong. All rights reserved.</Copyright>
         <RepositoryUrl>https://github.com/hongliyu2002/Orleans.EventStore</RepositoryUrl>
@@ -19,7 +19,7 @@
         <PackageProjectUrl>https://github.com/hongliyu2002/Orleans.EventStore</PackageProjectUrl>
         <PackageIcon>logo_128.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>Remove the CheckpointState Id. and upgraded to Orleans 7.1.1</PackageReleaseNotes>
+        <PackageReleaseNotes>Using Update persistent subscriptions instead of Delete and Create one when subscription already exists.</PackageReleaseNotes>
         <!--SourceLink-->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

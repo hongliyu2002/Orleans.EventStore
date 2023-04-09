@@ -14,7 +14,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
 {
     private readonly string _name;
     private readonly EventStoreStorageOptions _options;
-    private readonly IGrainStorageSerializer _storageSerializer;
+    private readonly IGrainStorageSerializer _grainStorageSerializer;
     private readonly ILogger<EventStoreGrainStorage> _logger;
     private readonly string _serviceId;
 
@@ -33,7 +33,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _name = name;
         _options = options;
-        _storageSerializer = options.GrainStorageSerializer;
+        _grainStorageSerializer = options.GrainStorageSerializer;
         _serviceId = clusterOptions.Value.ServiceId;
         _logger = logger;
     }
@@ -76,7 +76,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         catch (Exception ex)
         {
             timer.Stop();
-            _logger.LogError(ex, "Init: Name={Name} ServiceId={ServiceId}, errored in {ElapsedMilliseconds} ms.", _name, _serviceId, timer.Elapsed.TotalMilliseconds.ToString("0.00"));
+            _logger.LogError(ex, "Init: Name={Name} ServiceId={ServiceId}, errored in {ElapsedMilliseconds} ms", _name, _serviceId, timer.Elapsed.TotalMilliseconds.ToString("0.00"));
             throw new EventStoreStorageException(FormattableString.Invariant($"{ex.GetType()}: {ex.Message}"));
         }
         return Task.CompletedTask;
@@ -122,7 +122,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
             var readState = await readResult.ReadState.ConfigureAwait(false);
             if (readState == ReadState.Ok)
             {
-                var resolvedEvent = await readResult.FirstOrDefaultAsync().ConfigureAwait(false);
+                var resolvedEvent = await readResult.FirstOrDefaultAsync().ConfigureAwait(true);
                 var deserializeState = DeserializeState<T>(resolvedEvent);
                 grainState.State = deserializeState.State;
                 grainState.ETag = deserializeState.ETag;
@@ -136,7 +136,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to read grain state for {GrainType} grain with ID {GrainId} and stream key {Key}.", grainTypeName, grainId, streamName);
+            _logger.LogError("Failed to read grain state for {GrainType} grain with ID {GrainId} and stream key {Key}", grainTypeName, grainId, streamName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to read grain state for {grainTypeName} with ID {grainId} and stream key {streamName}. {ex.GetType()}: {ex.Message}"));
         }
     }
@@ -159,12 +159,12 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         }
         catch (WrongExpectedVersionException)
         {
-            _logger.LogWarning("Version conflict for {GrainType} grain with ID {GrainId} and stream key {Key} on WriteStateAsync.", grainTypeName, grainId, streamName);
+            _logger.LogWarning("Version conflict for {GrainType} grain with ID {GrainId} and stream key {Key} on WriteStateAsync", grainTypeName, grainId, streamName);
             throw new InconsistentStateException($"Version conflict ({nameof(WriteStateAsync)}): ServiceId={_serviceId} ProviderName={_name} GrainType={grainTypeName} GrainId={grainId} ETag={grainState.ETag}.");
         }
         catch (Exception ex) when (ex is not InconsistentStateException)
         {
-            _logger.LogError("Failed to write grain state for {GrainType} grain with ID {GrainId} and stream key {Key}.", grainTypeName, grainId, streamName);
+            _logger.LogError("Failed to write grain state for {GrainType} grain with ID {GrainId} and stream key {Key}", grainTypeName, grainId, streamName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to write grain state for {grainTypeName} with ID {grainId} and stream key {streamName}. {ex.GetType()}: {ex.Message}"));
         }
     }
@@ -201,12 +201,12 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
         }
         catch (WrongExpectedVersionException)
         {
-            _logger.LogWarning("Version conflict for {GrainType} grain with ID {GrainId} and stream key {Key} on ClearStateAsync.", grainTypeName, grainId, streamName);
+            _logger.LogWarning("Version conflict for {GrainType} grain with ID {GrainId} and stream key {Key} on ClearStateAsync", grainTypeName, grainId, streamName);
             throw new InconsistentStateException($"Version conflict ({nameof(ClearStateAsync)}): ServiceId={_serviceId} ProviderName={_name} GrainType={grainTypeName} GrainId={grainId} ETag={grainState.ETag}.");
         }
         catch (Exception ex) when (ex is not InconsistentStateException)
         {
-            _logger.LogError("Failed to clear grain state for {GrainType} grain with ID {GrainId} and stream key {Key}.", grainTypeName, grainId, streamName);
+            _logger.LogError("Failed to clear grain state for {GrainType} grain with ID {GrainId} and stream key {Key}", grainTypeName, grainId, streamName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to clear grain state for grain {grainTypeName} with ID {grainId}. {ex.GetType()}: {ex.Message}"));
         }
     }
@@ -218,27 +218,27 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
     /// <summary>
     /// </summary>
     /// <param name="state"></param>
-    /// <typeparam name="TState"></typeparam>
+    /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    private EventData SerializeState<TState>(TState state)
+    private EventData SerializeState<T>(T state)
     {
-        var contentType = _storageSerializer is JsonGrainStorageSerializer ? "application/json" : "application/octet-stream";
+        var contentType = _grainStorageSerializer is JsonGrainStorageSerializer ? "application/json" : "application/octet-stream";
         if (state is null)
         {
-            return new EventData(Uuid.NewUuid(), typeof(TState).Name, new ReadOnlyMemory<byte>(), null, contentType);
+            return new EventData(Uuid.NewUuid(), typeof(T).Name, new ReadOnlyMemory<byte>(), null, contentType);
         }
-        var stateData = _storageSerializer.Serialize(state);
+        var stateData = _grainStorageSerializer.Serialize(state);
         return new EventData(Uuid.NewUuid(), state.GetType().Name, stateData.ToMemory(), null, contentType);
     }
 
     /// <summary>
     /// </summary>
     /// <param name="evt"></param>
-    /// <typeparam name="TState"></typeparam>
+    /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    private (TState State, string ETag) DeserializeState<TState>(ResolvedEvent evt)
+    private (T State, string ETag) DeserializeState<T>(ResolvedEvent evt)
     {
-        var state = _storageSerializer.Deserialize<TState>(evt.Event.Data) ?? Activator.CreateInstance<TState>();
+        var state = _grainStorageSerializer.Deserialize<T>(evt.Event.Data);
         return (state, evt.Event.EventNumber.ToUInt64().ToString());
     }
 

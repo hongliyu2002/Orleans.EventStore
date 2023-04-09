@@ -3,10 +3,9 @@
 [Immutable]
 [Serializable]
 [GenerateSerializer]
-public sealed record SnackInitializeCommand
+public sealed record SnackBoughtAmountUpdatedEvent
     (Guid SnackId,
-     string Name,
-     string? PictureUrl,
+     decimal BoughtAmount,
      Guid TraceId,
      DateTimeOffset OperatedAt,
-     string OperatedBy) : SnackCommand(TraceId, OperatedAt, OperatedBy);
+     string OperatedBy) : SnackEvent(SnackId, 0, TraceId, OperatedAt, OperatedBy);

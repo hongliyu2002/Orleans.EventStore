@@ -1,6 +1,10 @@
-﻿namespace Orleans.Persistence.EventStore.UnitTests.Commands;
+﻿namespace Vending.Domain.Abstractions.Snacks;
 
 [Immutable]
+[Serializable]
 [GenerateSerializer]
-public sealed record SnackRepoDeleteCommand(Guid Id, Guid TraceId, DateTimeOffset OperatedAt, string OperatedBy) 
-    : DomainCommand(TraceId, OperatedAt, OperatedBy);
+public sealed record SnackRepoDeleteCommand
+    (Guid SnackId,
+     Guid TraceId,
+     DateTimeOffset OperatedAt,
+     string OperatedBy) : SnackRepoCommand(TraceId, OperatedAt, OperatedBy);

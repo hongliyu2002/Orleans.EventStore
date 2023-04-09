@@ -1,99 +1,89 @@
-﻿using Fluxera.Guards;
-using Microsoft.Extensions.Logging;
+﻿using Fluxera.Utilities.Extensions;
 using Orleans.FluentResults;
-using Orleans.Persistence.EventStore.UnitTests.Commands;
-using Orleans.Runtime;
+using Orleans.Providers;
+using Vending.Domain.Abstractions;
+using Vending.Domain.Abstractions.Snacks;
 
-namespace Orleans.Persistence.EventStore.UnitTests.Grains;
+namespace Vending.Domain.Snacks;
 
-public class SnackGrain : Grain, ISnackGrain
+[StorageProvider(ProviderName = Constants.GrainStorageName)]
+public sealed class SnackGrain : Grain<Snack>, ISnackGrain
 {
-    private readonly IPersistentState<Snack> _snack;
-    private readonly ILogger<SnackGrain> _logger;
-
     /// <inheritdoc />
-    public SnackGrain([PersistentState("Snack", Constants.TestStoreName)] IPersistentState<Snack> snack, ILogger<SnackGrain> logger)
+    public Task<Snack> GetSnackAsync()
     {
-        _snack = Guard.Against.Null(snack, nameof(snack));
-        _logger = Guard.Against.Null(logger, nameof(logger));
+        return Task.FromResult(State);
     }
 
     /// <inheritdoc />
-    public Task<Result<Snack>> GetAsync()
+    public Task<int> GetVersionAsync()
     {
-        var id = this.GetPrimaryKey();
-        return Task.FromResult(Result.Ok(_snack.State).Ensure(_snack.State.IsCreated, $"Snack {id} is not initialized."));
+        return Task.FromResult(0);
     }
 
-    /// <inheritdoc />
-    public Task<bool> CanInitializeAsync()
+    private Result ValidateInitialize(SnackInitializeCommand command)
     {
-        return Task.FromResult(_snack.State.IsDeleted == false && _snack.State.IsCreated == false);
-    }
-
-    /// <inheritdoc />
-    public Task<Result<bool>> InitializeAsync(SnackInitializeCommand cmd)
-    {
-        var id = this.GetPrimaryKey();
+        var snackId = this.GetPrimaryKey();
         return Result.Ok()
-                     .Ensure(_snack.State.IsDeleted == false, $"Snack {id} has already been removed.")
-                     .Ensure(_snack.State.IsCreated == false, $"Snack {id} already exists.")
-                     .Ensure(_snack.State.Name.Length <= 100, $"The name of snack {id} is too long.")
-                     .Tap(() =>
-                          {
-                              _snack.State.Id = id;
-                              _snack.State.Name = cmd.Name;
-                              _snack.State.CreatedAt = cmd.OperatedAt;
-                              _snack.State.CreatedBy = cmd.OperatedBy;
-                          })
-                     .TapTryAsync(() => _snack.WriteStateAsync())
-                     .MapAsync(() => true);
+                     .Verify(State.IsDeleted == false, $"Snack {snackId} has already been removed.")
+                     .Verify(State.IsCreated == false, $"Snack {snackId} already exists.")
+                     .Verify(command.Name.IsNotNullOrWhiteSpace(), $"The name of snack {snackId} should not be empty.")
+                     .Verify(command.Name.Length <= 200, $"The name of snack {snackId} is too long.")
+                     .Verify(command.PictureUrl == null || command.PictureUrl!.Length <= 500, $"The picture url of snack {snackId} is too long.")
+                     .Verify(command.OperatedBy.IsNotNullOrWhiteSpace(), "Operator should not be empty.");
     }
 
     /// <inheritdoc />
-    public Task<bool> CanRemoveAsync()
+    public Task<bool> CanInitializeAsync(SnackInitializeCommand command)
     {
-        return Task.FromResult(_snack.State.IsDeleted == false && _snack.State.IsCreated);
+        return Task.FromResult(ValidateInitialize(command).IsSuccess);
     }
 
     /// <inheritdoc />
-    public Task<Result<bool>> RemoveAsync(SnackRemoveCommand cmd)
+    public Task<Result> InitializeAsync(SnackInitializeCommand command)
     {
-        var id = this.GetPrimaryKey();
+        return ValidateInitialize(command).TapTry(() => State.Apply(command)).TapTryAsync(WriteStateAsync);
+    }
+
+    private Result ValidateRemove(SnackDeleteCommand command)
+    {
+        var snackId = this.GetPrimaryKey();
+        return Result.Ok().Verify(State.IsDeleted == false, $"Snack {snackId} has already been removed.").Verify(State.IsCreated, $"Snack {snackId} is not initialized.").Verify(command.OperatedBy.IsNotNullOrWhiteSpace(), "Operator should not be empty.");
+    }
+
+    /// <inheritdoc />
+    public Task<bool> CanDeleteAsync(SnackDeleteCommand command)
+    {
+        return Task.FromResult(ValidateRemove(command).IsSuccess);
+    }
+
+    /// <inheritdoc />
+    public Task<Result> DeleteAsync(SnackDeleteCommand command)
+    {
+        return ValidateRemove(command).TapTry(() => State.Apply(command)).TapTryAsync(WriteStateAsync);
+    }
+
+    private Result ValidateUpdate(SnackUpdateCommand command)
+    {
+        var snackId = this.GetPrimaryKey();
         return Result.Ok()
-                     .Ensure(_snack.State.IsDeleted == false, $"Snack {id} has already been removed.")
-                     .Ensure(_snack.State.IsCreated, $"Snack {id} is not initialized.")
-                     .Tap(() =>
-                          {
-                              _snack.State.DeletedAt = cmd.OperatedAt;
-                              _snack.State.DeletedBy = cmd.OperatedBy;
-                              _snack.State.IsDeleted = true;
-                          })
-                     .TapTryAsync(() => _snack.WriteStateAsync())
-                     .MapAsync(() => true);
+                     .Verify(State.IsDeleted == false, $"Snack {snackId} has already been removed.")
+                     .Verify(State.IsCreated, $"Snack {snackId} is not initialized.")
+                     .Verify(command.Name.IsNotNullOrWhiteSpace(), $"The name of snack {snackId} should not be empty.")
+                     .Verify(command.Name.Length <= 200, $"The name of snack {snackId} is too long.")
+                     .Verify(command.PictureUrl.IsNullOrWhiteSpace() || command.PictureUrl!.Length <= 500, $"The picture url of snack {snackId} is too long.")
+                     .Verify(command.OperatedBy.IsNotNullOrWhiteSpace(), "Operator should not be empty.");
     }
 
     /// <inheritdoc />
-    public Task<bool> CanChangeNameAsync()
+    public Task<bool> CanUpdateAsync(SnackUpdateCommand command)
     {
-        return Task.FromResult(_snack.State.IsDeleted == false && _snack.State.IsCreated);
+        return Task.FromResult(ValidateUpdate(command).IsSuccess);
     }
 
     /// <inheritdoc />
-    public Task<Result<bool>> ChangeNameAsync(SnackChangeNameCommand cmd)
+    public Task<Result> UpdateAsync(SnackUpdateCommand command)
     {
-        var id = this.GetPrimaryKey();
-        return Result.Ok()
-                     .Ensure(_snack.State.IsDeleted == false, $"Snack {id} has already been removed.")
-                     .Ensure(_snack.State.IsCreated, $"Snack {id} is not initialized.")
-                     .Ensure(_snack.State.Name.Length <= 100, $"The name of snack {id} is too long.")
-                     .Tap(() =>
-                          {
-                              _snack.State.Name = cmd.Name;
-                              _snack.State.LastModifiedAt = cmd.OperatedAt;
-                              _snack.State.LastModifiedBy = cmd.OperatedBy;
-                          })
-                     .TapTryAsync(() => _snack.WriteStateAsync())
-                     .MapAsync(() => true);
+        return ValidateUpdate(command).TapTry(() => State.Apply(command)).TapTryAsync(WriteStateAsync);
     }
 }

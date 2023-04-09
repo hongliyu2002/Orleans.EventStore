@@ -8,20 +8,24 @@
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.core\7.1.0\lib\net7.0\Orleans.Core.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.streaming\7.1.0\lib\net7.0\Orleans.Streaming.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.core.abstractions\7.1.0\lib\net7.0\Orleans.Core.Abstractions.dll" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\eventstore.client.grpc.operations\22.0.0" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\eventstore.client.grpc.persistentsubscriptions\22.0.0" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\eventstore.client.grpc.streams\22.0.0" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\eventstore.client.grpc.projectionmanagement\22.0.0" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\eventstore.client.grpc\22.0.0" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\eventstore.client.grpc.usermanagement\22.0.0" Loaded="True" /&gt;&#xD;
   &lt;Assembly Path="C:\Program Files\dotnet\shared\Microsoft.NETCore.App\7.0.1\System.Private.CoreLib.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.extensions.objectpool\7.0.0\lib\net7.0\Microsoft.Extensions.ObjectPool.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\eventstore.client.grpc\22.0.0\lib\net5.0\EventStore.Client.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\7.0.1\ref\net7.0\System.Runtime.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\7.0.1\ref\net7.0\System.Collections.Concurrent.dll" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.serialization.protobuf\7.1.1" Loaded="True" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.core\7.1.1\lib\net7.0\Orleans.Core.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ec151381_002D3eed_002D4836_002Db2d1_002Da9531b1be078/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EventStoreClientTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5d0819e1_002D2771_002D4b80_002D8d54_002Dfb1fc31bd205/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="SnackGrainTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a16638da_002D044d_002D4659_002Da16f_002Df5f343026af7/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Should_Create_A_New_Snack" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ec151381_002D3eed_002D4836_002Db2d1_002Da9531b1be078/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="EventStoreClientTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.EventStoreClientTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;

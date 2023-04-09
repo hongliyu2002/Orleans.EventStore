@@ -77,7 +77,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         catch (Exception ex)
         {
             timer.Stop();
-            _logger.LogError(ex, "Init: Name={Name} ServiceId={ServiceId}, errored in {ElapsedMilliseconds} ms.", _name, _serviceId, timer.Elapsed.TotalMilliseconds.ToString("0.00"));
+            _logger.LogError(ex, "Init: Name={Name} ServiceId={ServiceId}, errored in {ElapsedMilliseconds} ms", _name, _serviceId, timer.Elapsed.TotalMilliseconds.ToString("0.00"));
             throw new EventStoreStorageException(FormattableString.Invariant($"{ex.GetType()}: {ex.Message}"));
         }
         return Task.CompletedTask;
@@ -124,7 +124,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to read log entries for {GrainType} grain with ID {GrainId} and stream {StreamName}.", grainTypeName, grainId, streamName);
+            _logger.LogError("Failed to read log entries for {GrainType} grain with ID {GrainId} and stream {StreamName}", grainTypeName, grainId, streamName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to read log entries for {grainTypeName} with ID {grainId} and stream {streamName}. {ex.GetType()}: {ex.Message}"));
         }
     }
@@ -150,7 +150,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to read last log entry for {GrainType} grain with ID {GrainId} and stream {StreamName}.", grainTypeName, grainId, streamName);
+            _logger.LogError("Failed to read last log entry for {GrainType} grain with ID {GrainId} and stream {StreamName}", grainTypeName, grainId, streamName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to read last log entry for {grainTypeName} with ID {grainId} and stream {streamName}. {ex.GetType()}: {ex.Message}"));
         }
     }
@@ -179,7 +179,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         }
         catch (Exception ex) when (ex is not InconsistentStateException)
         {
-            _logger.LogError("Failed to write log entries for {GrainType} grain with ID {GrainId} and stream {StreamName}.", grainTypeName, grainId, streamName);
+            _logger.LogError("Failed to write log entries for {GrainType} grain with ID {GrainId} and stream {StreamName}", grainTypeName, grainId, streamName);
             throw new EventStoreStorageException(FormattableString.Invariant($"Failed to write log entries for {grainTypeName} with ID {grainId} and stream {streamName}. {ex.GetType()}: {ex.Message}"));
         }
     }

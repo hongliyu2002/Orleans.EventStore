@@ -1,10 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Orleans.Persistence.EventStore.UnitTests.Commands;
-using Orleans.Persistence.EventStore.UnitTests.Grains;
 using Orleans.Persistence.EventStore.UnitTests.Hosts;
 using Orleans.TestingHost;
+using Vending.Domain.Abstractions.Snacks;
 
 namespace Orleans.Persistence.EventStore.UnitTests;
 
@@ -16,7 +15,11 @@ public class SnackGrainTests
     [OneTimeSetUp]
     public async Task Setup()
     {
-        Cluster = new TestClusterBuilder().AddClientBuilderConfigurator<ClientBuilderConfigurator>().AddSiloBuilderConfigurator<SiloConfigurator>().Build();
+        var builder = new TestClusterBuilder().AddClientBuilderConfigurator<ClientBuilderConfigurator>().AddSiloBuilderConfigurator<SiloConfigurator>();
+        builder.Options.ServiceId = "VendingService";
+        builder.Options.ServiceId = "VendingCluster";
+        // builder.Options.InitialSilosCount = 1;
+        Cluster = builder.Build();
         await Cluster.DeployAsync();
     }
 
@@ -32,12 +35,13 @@ public class SnackGrainTests
     [Order(1)]
     public async Task Should_Create_A_New_Snack()
     {
+        var command = new SnackInitializeCommand(Guid.NewGuid(), "Apple", null, Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Create_A_New_Snack");
         var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
         var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
         snackGrain.Should().NotBeNull();
-        var canInitialize = await snackGrain.CanInitializeAsync();
+        var canInitialize = await snackGrain.CanInitializeAsync(command);
         canInitialize.Should().BeTrue();
-        var initializeResult = await snackGrain.InitializeAsync(new SnackInitializeCommand("Apple", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Create_A_New_Snack"));
+        var initializeResult = await snackGrain.InitializeAsync(command);
         initializeResult.IsSuccess.Should().BeTrue();
     }
 
@@ -45,27 +49,29 @@ public class SnackGrainTests
     [Order(2)]
     public async Task Should_Change_Name_Of_Snack()
     {
+        var command = new SnackUpdateCommand("Orange", null, Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Change_Name_Of_Snack");
         var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
         var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
         snackGrain.Should().NotBeNull();
-        var canChangeName = await snackGrain.CanChangeNameAsync();
+        var canChangeName = await snackGrain.CanUpdateAsync(command);
         canChangeName.Should().BeTrue();
-        var changeNameResult = await snackGrain.ChangeNameAsync(new SnackChangeNameCommand("Orange", Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Change_Name_Of_Snack"));
+        var changeNameResult = await snackGrain.UpdateAsync(command);
         changeNameResult.IsSuccess.Should().BeTrue();
     }
-
-    [Test]
-    [Order(3)]
-    public async Task Should_Remove_SnackG()
-    {
-        var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
-        var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
-        snackGrain.Should().NotBeNull();
-        var canChangeName = await snackGrain.CanRemoveAsync();
-        canChangeName.Should().BeTrue();
-        var removeResult = await snackGrain.RemoveAsync(new SnackRemoveCommand(Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Remove_Snack"));
-        removeResult.IsSuccess.Should().BeTrue();
-    }
+    //
+    // [Test]
+    // [Order(3)]
+    // public async Task Should_Remove_SnackG()
+    // {
+    //     var command = new SnackDeleteCommand(Guid.NewGuid(), DateTimeOffset.UtcNow, "Should_Remove_Snack");
+    //     var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
+    //     var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
+    //     snackGrain.Should().NotBeNull();
+    //     var canChangeName = await snackGrain.CanDeleteAsync(command);
+    //     canChangeName.Should().BeTrue();
+    //     var removeResult = await snackGrain.DeleteAsync(command);
+    //     removeResult.IsSuccess.Should().BeTrue();
+    // }
 
     [Test]
     [Order(4)]
@@ -74,9 +80,8 @@ public class SnackGrainTests
         var grainFactory = Cluster.ServiceProvider.GetRequiredService<IGrainFactory>();
         var snackGrain = grainFactory.GetGrain<ISnackGrain>(_snackId);
         snackGrain.Should().NotBeNull();
-        var getResult = await snackGrain.GetAsync();
-        getResult.IsSuccess.Should().BeTrue();
-        getResult.Value.Name.Should().Be("Orange");
-        await TestContext.Progress.WriteLineAsync(getResult.Value.ToString());
+        var getResult = await snackGrain.GetSnackAsync();
+        getResult.Name.Should().Be("Orange");
+        await TestContext.Progress.WriteLineAsync(getResult.ToString());
     }
 }

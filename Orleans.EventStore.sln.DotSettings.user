@@ -13,14 +13,34 @@
   &lt;Assembly Path="C:\Users\hongl\.nuget\packages\eventstore.client.grpc\22.0.0\lib\net5.0\EventStore.Client.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\7.0.1\ref\net7.0\System.Runtime.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\7.0.1\ref\net7.0\System.Collections.Concurrent.dll" /&gt;&#xD;
-  &lt;Assembly Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.core\7.1.1\lib\net7.0\Orleans.Core.dll" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.sdk\7.0.0" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.sdk\7.1.0" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.sdk\7.1.1" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.persistence.redis\7.1.0-beta1" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\hongl\.nuget\packages\microsoft.orleans.persistence.redis\7.1.1-beta1" Loaded="True" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3ab61924_002Df392_002D4f6e_002Dba17_002D6d858501efe2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Should_Get_Snack #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests.Should_Get_Snack&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3c253ef3_002Dd9a6_002D4ee2_002D99e5_002Da7328ad05342/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Should_Get_Snack" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests.Should_Get_Snack&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests.Should_Create_A_New_Snack&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5d0819e1_002D2771_002D4b80_002D8d54_002Dfb1fc31bd205/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="SnackGrainTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a16638da_002D044d_002D4659_002Da16f_002Df5f343026af7/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Should_Create_A_New_Snack" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=78e74cb4_002Dda8c_002D4d03_002D8dd5_002Db98112f72d7a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Should_Get_Snack #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests.Should_Get_Snack&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a16638da_002D044d_002D4659_002Da16f_002Df5f343026af7/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Should_Create_A_New_Snack" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
@@ -36,6 +56,11 @@
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.PersistentSubscriptionsClientTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::6F5EB6C0-6FB8-42A1-A1D2-3E8D8F322F0F::net7.0::EventStore.UnitTests.ClientTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::41A65AB5-8758-4558-8541-ACF4F504096D::net7.0::Orleans.Streaming.EventStore.UnitTests.ChannelGrainTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fe615ecb_002D62e6_002D4e7b_002Da60c_002Da2a725aebabd/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Should_Create_A_New_Snack #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::A3AB1F50-C4AA-4CBB-9D75-F8BEB81BE1E2::net7.0::Orleans.Persistence.EventStore.UnitTests.SnackGrainTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>

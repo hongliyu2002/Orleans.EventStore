@@ -122,7 +122,7 @@ public class EventStoreGrainStorage : IGrainStorage, ILifecycleParticipant<ISilo
             var readState = await readResult.ReadState.ConfigureAwait(false);
             if (readState == ReadState.Ok)
             {
-                var resolvedEvent = await readResult.FirstOrDefaultAsync().ConfigureAwait(true);
+                var resolvedEvent = await readResult.FirstOrDefaultAsync().ConfigureAwait(false);
                 var deserializeState = DeserializeState<T>(resolvedEvent);
                 grainState.State = deserializeState.State;
                 grainState.ETag = deserializeState.ETag;

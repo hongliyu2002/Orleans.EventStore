@@ -14,6 +14,7 @@
         <PackageReference Include="Fluxera.Guards" Version="7.1.0" />
         <PackageReference Include="Fluxera.Utilities" Version="7.1.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+        <PackageReference Include="Microsoft.Orleans.Persistence.Redis" Version="7.1.1-beta1" />
         <PackageReference Include="Microsoft.Orleans.Server" Version="7.1.1" />
         <PackageReference Include="Microsoft.Orleans.TestingHost" Version="7.1.1" />
         <PackageReference Include="NUnit" Version="3.13.3" />
@@ -27,10 +28,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Orleans.FluentResults" Version="7.1.4" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\Orleans.Persistence.EventStore\Orleans.Persistence.EventStore.csproj" />
     </ItemGroup>
     
 </Project>

@@ -120,7 +120,11 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
             {
                 return new List<TLogEntry>();
             }
-            return await readResult.Select(DeserializeEvent<TLogEntry>).OrderBy(x => x.Version).Select(x => x.LogEntry).ToListAsync().ConfigureAwait(false);
+            return await readResult.Select(DeserializeEvent<TLogEntry>)
+                                   .OrderBy(x => x.Version)
+                                   .Select(x => x.LogEntry)
+                                   .ToListAsync()
+                                   .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -145,7 +149,8 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
             {
                 return -1;
             }
-            var resolvedEvent = await readResult.FirstOrDefaultAsync().ConfigureAwait(false);
+            var resolvedEvent = await readResult.FirstOrDefaultAsync()
+                                                .ConfigureAwait(false);
             return (int)resolvedEvent.Event.EventNumber.ToUInt64();
         }
         catch (Exception ex)
@@ -170,7 +175,8 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
         try
         {
             var serializedEntries = entries.Select(SerializeEvent);
-            var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision((ulong)expectedVersion), serializedEntries, null, null, _storageOptions.Credentials).ConfigureAwait(false);
+            var writeResult = await _client.AppendToStreamAsync(streamName, new StreamRevision((ulong)expectedVersion), serializedEntries, null, null, _storageOptions.Credentials)
+                                           .ConfigureAwait(false);
             return (int)writeResult.NextExpectedStreamRevision.ToUInt64();
         }
         catch (WrongExpectedVersionException)
@@ -201,7 +207,8 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
             return new EventData(Uuid.NewUuid(), typeof(TLogEntry).Name, new ReadOnlyMemory<byte>(), null, contentType);
         }
         var entryData = _storageSerializer.Serialize(entry);
-        return new EventData(Uuid.NewUuid(), entry.GetType().Name, entryData.ToMemory(), null, contentType);
+        return new EventData(Uuid.NewUuid(), entry.GetType()
+                                                  .Name, entryData.ToMemory(), null, contentType);
     }
 
     /// <summary>
@@ -211,7 +218,7 @@ public class EventStoreLogConsistentStorage : ILogConsistentStorage, ILifecycleP
     /// <returns></returns>
     private (TLogEntry LogEntry, int Version) DeserializeEvent<TLogEntry>(ResolvedEvent evt)
     {
-        var entry = _storageSerializer.Deserialize<TLogEntry>(evt.Event.Data) ?? Activator.CreateInstance<TLogEntry>();
+        var entry = _storageSerializer.Deserialize<TLogEntry>(evt.Event.Data);
         return (entry, (int)evt.Event.EventNumber.ToUInt64());
     }
 
